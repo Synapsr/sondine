@@ -1,0 +1,23 @@
+{
+  "name": "@sondine/browser-extension",
+  "version": "0.4.0",
+  "private": true,
+  "description": "Sondine's browser extension: tells Sondine which tab plays sound, through native messaging.",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "scripts": {
+    "build": "wxt build",
+    "build:firefox": "wxt build --browser firefox",
+    "zip": "wxt zip --mode store && wxt zip --browser firefox --mode store",
+    "typecheck": "tsc -p src && tsc -p entrypoints && tsc",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@sondine/protocol": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:",
+    "wxt": "catalog:"
+  }
+}

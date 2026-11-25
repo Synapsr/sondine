@@ -1,0 +1,19 @@
+name: Idea
+description: Suggest a change to what Sondine does.
+labels: [idea]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Sondine stays local by default: ideas that need an account, a hosted copy of what it hears, or data about its users beyond the opt-in anonymous counts are out of scope (docs/decisions/002-local-only.md, docs/decisions/042-usage-statistics.md).
+  - type: textarea
+    id: need
+    attributes:
+      label: What you are trying to do
+      description: The situation and what is missing today.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What you suggest

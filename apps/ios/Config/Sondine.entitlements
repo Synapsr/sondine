@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- The app's own group first, so its items (the Mac's credentials) stay its
+	     own; the second is shared with the widget extension for the control's
+	     state only (ADR 031, « Built at M5.6 »). -->
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)app.sondine.ios</string>
+		<string>$(AppIdentifierPrefix)app.sondine.ios.shared</string>
+	</array>
+</dict>
+</plist>

@@ -1,0 +1,2 @@
+ALTER TABLE `context_items` ADD `transcript_run_id` integer REFERENCES track_runs(id);--> statement-breakpoint
+CREATE INDEX `context_items_transcript_idx` ON `context_items` (`transcript_run_id`) WHERE "context_items"."transcript_run_id" is not null;

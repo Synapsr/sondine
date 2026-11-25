@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    // Node runs src/cli/import-model.ts and the build script imports
+    // src/speech-cpp/runtime.ts: no syntax that type stripping cannot erase.
+    "erasableSyntaxOnly": true
+  },
+  "include": ["src", "test"]
+}

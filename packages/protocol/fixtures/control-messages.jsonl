@@ -1,0 +1,14 @@
+{"type":"hello","id":"c1","protocol":7,"client":{"name":"sondine-core","version":"0.1.0"}}
+{"type":"config","id":"c2","microphone":{"enabled":true,"followCalls":true,"allowedTransports":["built-in","usb","thunderbolt","pci"]},"systemAudio":{"enabled":true,"appTaps":{"enabled":true,"max":8,"releaseAfterIdleMs":30000,"releaseAfterSilenceMs":120000}},"excludedBundleIds":["com.example.private-notes"],"holds":{"calls":true,"screen":true,"schedule":[{"days":[1,2,3,4,5],"startMinute":540,"endMinute":1080},{"days":[0,1,2,3,4,5,6],"startMinute":1380,"endMinute":420}],"networks":["156d3845f9cf77804e66d475ef0ed074","3b15e743933ce75589a8106d131b38a2"],"networkKey":"AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=","lifted":["9b2f4c1e-7d3a-4e8b-a1c2-d3e4f5a6b7c8"]},"vad":{"threshold":0.5,"minSpeechMs":250,"minSilenceMs":800},"healthIntervalMs":60000}
+{"type":"config","id":"c14","microphone":{"enabled":true,"followCalls":true,"allowedTransports":["built-in","usb","thunderbolt","pci"]},"systemAudio":{"enabled":true,"appTaps":{"enabled":true,"max":8,"releaseAfterIdleMs":30000,"releaseAfterSilenceMs":120000}},"excludedBundleIds":[],"holds":{"calls":false,"screen":false,"schedule":[],"networks":[],"networkKey":"","lifted":[]},"vad":{"threshold":0.5,"minSpeechMs":250,"minSilenceMs":800},"healthIntervalMs":60000}
+{"type":"exclude.pids","id":"c3","pids":[4120,4121,4125,4130]}
+{"type":"pin.input","id":"c4","deviceUid":"AppleUSBAudioEngine:Generic:USB Microphone:1234:1","allowBluetooth":false}
+{"type":"pin.input","id":"c5","deviceUid":null,"allowBluetooth":false}
+{"type":"pause","id":"c6","scope":"all"}
+{"type":"pause","id":"c7","scope":"microphone"}
+{"type":"resume","id":"c8","scope":"all"}
+{"type":"snapshot","id":"c9"}
+{"type":"request.permissions","id":"c11","scope":"all"}
+{"type":"request.permissions","id":"c12","scope":"microphone"}
+{"type":"request.permissions","id":"c13","scope":"system-audio"}
+{"type":"shutdown","id":"c10"}

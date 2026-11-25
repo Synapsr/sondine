@@ -1,0 +1,30 @@
+{
+  "name": "sondine",
+  "private": true,
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "scripts": {
+    "dev": "turbo run dev --filter=@sondine/desktop",
+    "build": "turbo run build",
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test",
+    "test:native": "swift test --package-path native && SONDINE_PHONE_FIXTURE=\"$PWD/native/.build/debug/sondine-phone-fixture\" SONDINE_PHONE_E2E=\"$PWD/native/.build/debug/sondine-phone-e2e\" SONDINE_LAN=\"$PWD/native/.build/debug/sondine-lan\" pnpm --filter @sondine/desktop exec vitest run src/core/imports/phone-file.test.ts test/phone-sync-e2e.test.ts",
+    "test:ios": "apps/ios/scripts/test.sh",
+    "release:ios": "infisical run --path /desktop -- apps/ios/scripts/release.sh",
+    "bench": "pnpm --filter @sondine/bench bench"
+  },
+  "devDependencies": {
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:",
+    "turbo": "catalog:",
+    "typescript": "catalog:"
+  },
+  "engines": {
+    "node": ">=24.11"
+  },
+  "packageManager": "pnpm@12.16.1"
+}

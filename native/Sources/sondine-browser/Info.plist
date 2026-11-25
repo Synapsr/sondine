@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Linked into the __TEXT,__info_plist section of sondine-browser (Package.swift).
+     App Sandbox refuses to start a tool whose signature carries no bundle
+     identifier (ADR 010). The version matches `relayVersion` in main.swift. -->
+<plist version="1.0">
+  <dict>
+    <key>CFBundleIdentifier</key>
+    <string>app.sondine.browser</string>
+    <key>CFBundleName</key>
+    <string>sondine-browser</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleShortVersionString</key>
+    <string>0.1.0</string>
+    <key>CFBundleVersion</key>
+    <string>0.1.0</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>27.0</string>
+  </dict>
+</plist>

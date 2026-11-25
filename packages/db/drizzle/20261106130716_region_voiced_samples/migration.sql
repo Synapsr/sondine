@@ -1,0 +1,1 @@
+ALTER TABLE `speech_regions` ADD `voiced_samples` integer;

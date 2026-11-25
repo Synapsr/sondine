@@ -1,0 +1,8 @@
+{"type":"hello","extension":"0.1.0"}
+{"type":"tabs","at":1762700000000,"tabs":[{"tab":412,"url":"https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=42s","title":"Une vidéo - YouTube"}]}
+{"type":"tabs","at":1762700005000,"tabs":[]}
+{"type":"media","at":1762700000100,"tab":412,"videoId":"dQw4w9WgXcQ","positionMs":42000,"durationMs":212000,"rate":1,"ad":false}
+{"type":"media","at":1762700003000,"tab":412,"videoId":null,"positionMs":0,"durationMs":null,"rate":0,"ad":true}
+{"type":"hello","extension":"0.2.0","refreshMs":30000}
+{"type":"tabs","at":1762700035000,"tabs":[],"read":{"cause":"refresh","tabs":14,"audible":1}}
+{"type":"tabs","at":1762700040000,"tabs":[{"tab":1073741829,"url":"https://www.youtube.com/watch?v=dQw4w9WgXcQ","title":"Une vidéo - YouTube"}],"read":{"cause":"refresh","tabs":2,"audible":0,"pages":1}}

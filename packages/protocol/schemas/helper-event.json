@@ -1,0 +1,1916 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sondine:protocol:7:helper-event",
+  "$comment": "Generated from packages/protocol/src by `pnpm --filter @sondine/protocol run gen`. Do not edit.",
+  "title": "Sondine helper event",
+  "description": "One JSON line sent by sondine-audio to core, protocol 7.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/ReadyEvent"
+    },
+    {
+      "$ref": "#/$defs/AckEvent"
+    },
+    {
+      "$ref": "#/$defs/PermissionsEvent"
+    },
+    {
+      "$ref": "#/$defs/DevicesEvent"
+    },
+    {
+      "$ref": "#/$defs/ProcessesEvent"
+    },
+    {
+      "$ref": "#/$defs/TrackOpenEvent"
+    },
+    {
+      "$ref": "#/$defs/TrackUpdateEvent"
+    },
+    {
+      "$ref": "#/$defs/TrackCloseEvent"
+    },
+    {
+      "$ref": "#/$defs/RegionOpenEvent"
+    },
+    {
+      "$ref": "#/$defs/RegionCloseEvent"
+    },
+    {
+      "$ref": "#/$defs/CommitEvent"
+    },
+    {
+      "$ref": "#/$defs/ActivityEvent"
+    },
+    {
+      "$ref": "#/$defs/CallEvent"
+    },
+    {
+      "$ref": "#/$defs/ListenEvent"
+    },
+    {
+      "$ref": "#/$defs/CallSeenEvent"
+    },
+    {
+      "$ref": "#/$defs/SituationEvent"
+    },
+    {
+      "$ref": "#/$defs/HoldsEvent"
+    },
+    {
+      "$ref": "#/$defs/ClockEvent"
+    },
+    {
+      "$ref": "#/$defs/SelfEnvelopeEvent"
+    },
+    {
+      "$ref": "#/$defs/HealthEvent"
+    },
+    {
+      "$ref": "#/$defs/WarningEvent"
+    },
+    {
+      "$ref": "#/$defs/ErrorEvent"
+    }
+  ],
+  "$defs": {
+    "ReadyEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "ready"
+        },
+        "replyTo": {
+          "$ref": "#/$defs/RequestId"
+        },
+        "protocol": {
+          "type": "number",
+          "const": 7
+        },
+        "sessionId": {
+          "description": "Id of this helper launch.",
+          "$ref": "#/$defs/Uuid"
+        },
+        "helper": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "$ref": "#/$defs/VersionText"
+            },
+            "build": {
+              "$ref": "#/$defs/VersionText"
+            }
+          },
+          "required": ["version", "build"],
+          "additionalProperties": false
+        },
+        "os": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "$ref": "#/$defs/VersionText"
+            },
+            "build": {
+              "$ref": "#/$defs/VersionText"
+            }
+          },
+          "required": ["version", "build"],
+          "additionalProperties": false
+        },
+        "timebase": {
+          "$ref": "#/$defs/Timebase"
+        },
+        "paused": {
+          "type": "object",
+          "properties": {
+            "microphone": {
+              "type": "boolean"
+            },
+            "systemAudio": {
+              "type": "boolean"
+            }
+          },
+          "required": ["microphone", "systemAudio"],
+          "additionalProperties": false
+        },
+        "capabilities": {
+          "type": "object",
+          "properties": {
+            "appTaps": {
+              "type": "boolean"
+            },
+            "maxAppTaps": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 8
+            },
+            "vad": {
+              "type": "object",
+              "properties": {
+                "engine": {
+                  "$ref": "#/$defs/ShortText"
+                },
+                "version": {
+                  "$ref": "#/$defs/VersionText"
+                }
+              },
+              "required": ["engine", "version"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["appTaps", "maxAppTaps", "vad"],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "type",
+        "replyTo",
+        "protocol",
+        "sessionId",
+        "helper",
+        "os",
+        "timebase",
+        "paused",
+        "capabilities"
+      ],
+      "additionalProperties": false,
+      "description": "Reply to `hello`: the helper speaks this protocol version."
+    },
+    "RequestId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._:-]{1,64}$",
+      "description": "Client-chosen id of a control message, unique per connection; echoed as `replyTo`."
+    },
+    "Uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "description": "Lowercase canonical UUID."
+    },
+    "VersionText": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,63}$",
+      "description": "Version or build string."
+    },
+    "Timebase": {
+      "type": "object",
+      "properties": {
+        "numer": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        },
+        "denom": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        }
+      },
+      "required": ["numer", "denom"],
+      "additionalProperties": false,
+      "description": "mach_timebase_info: nanoseconds = ticks × numer ÷ denom."
+    },
+    "ShortText": {
+      "type": "string",
+      "pattern": "^[^\\u0000-\\u001f\\u007f]{1,256}$",
+      "description": "Human-readable text without control characters, 1 to 256 characters."
+    },
+    "AckEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "ack"
+        },
+        "replyTo": {
+          "$ref": "#/$defs/RequestId"
+        }
+      },
+      "required": ["type", "replyTo"],
+      "additionalProperties": false,
+      "description": "Terminal success reply to every control message except `hello`."
+    },
+    "PermissionsEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "permissions"
+        },
+        "replyTo": {
+          "description": "Id of the control message this event answers; absent on spontaneous events.",
+          "$ref": "#/$defs/RequestId"
+        },
+        "microphone": {
+          "$ref": "#/$defs/PermissionState"
+        },
+        "systemAudio": {
+          "$ref": "#/$defs/PermissionState"
+        }
+      },
+      "required": ["type", "microphone", "systemAudio"],
+      "additionalProperties": false,
+      "description": "Current microphone and system-audio permission state; sent on change."
+    },
+    "PermissionState": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/PermissionStatus"
+        },
+        "evidence": {
+          "$ref": "#/$defs/PermissionEvidence"
+        }
+      },
+      "required": ["status", "evidence"],
+      "additionalProperties": false,
+      "description": "Permission status and how it was learned. Stream health is reported per track, never here."
+    },
+    "PermissionStatus": {
+      "type": "string",
+      "enum": ["unknown", "not-determined", "restricted", "denied", "granted", "granted-verified"],
+      "description": "Permission state. `granted-verified` only after the first non-zero sample; silence never proves denial."
+    },
+    "PermissionEvidence": {
+      "type": "string",
+      "enum": ["authorization-status", "tcc-preflight", "first-signal", "not-checked"],
+      "description": "How the status was learned: the public authorization API, the TCC preflight, the first non-zero sample, or not checked yet."
+    },
+    "DevicesEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "devices"
+        },
+        "replyTo": {
+          "description": "Id of the control message this event answers; absent on spontaneous events.",
+          "$ref": "#/$defs/RequestId"
+        },
+        "defaultInputUid": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DeviceUid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "defaultOutputUid": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DeviceUid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "devices": {
+          "maxItems": 256,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AudioDevice"
+          }
+        }
+      },
+      "required": ["type", "defaultInputUid", "defaultOutputUid", "devices"],
+      "additionalProperties": false,
+      "description": "The complete device list; sent on change."
+    },
+    "DeviceUid": {
+      "type": "string",
+      "pattern": "^[^\\u0000-\\u001f\\u007f]{1,512}$",
+      "description": "Core Audio device UID (kAudioDevicePropertyDeviceUID)."
+    },
+    "AudioDevice": {
+      "type": "object",
+      "properties": {
+        "uid": {
+          "$ref": "#/$defs/DeviceUid"
+        },
+        "name": {
+          "$ref": "#/$defs/ShortText"
+        },
+        "transport": {
+          "$ref": "#/$defs/Transport"
+        },
+        "transportCode": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FourCharCode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "input": {
+          "type": "boolean",
+          "description": "Has input streams."
+        },
+        "output": {
+          "type": "boolean",
+          "description": "Has output streams."
+        },
+        "alive": {
+          "type": "boolean"
+        },
+        "nominalRate": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SampleRate"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dataSource": {
+          "anyOf": [
+            {
+              "description": "Current data source code, for example `ispk` (built-in speakers) or `hdpn` (headphones).",
+              "$ref": "#/$defs/FourCharCode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "loopback": {
+          "type": "boolean",
+          "description": "A known loopback or virtual device that carries system audio; never a microphone candidate."
+        }
+      },
+      "required": [
+        "uid",
+        "name",
+        "transport",
+        "transportCode",
+        "input",
+        "output",
+        "alive",
+        "nominalRate",
+        "dataSource",
+        "loopback"
+      ],
+      "additionalProperties": false,
+      "description": "One Core Audio device."
+    },
+    "Transport": {
+      "type": "string",
+      "enum": [
+        "built-in",
+        "usb",
+        "bluetooth",
+        "bluetooth-le",
+        "thunderbolt",
+        "pci",
+        "firewire",
+        "hdmi",
+        "displayport",
+        "airplay",
+        "avb",
+        "continuity",
+        "virtual",
+        "aggregate",
+        "unknown"
+      ],
+      "description": "Device transport decoded from kAudioDevicePropertyTransportType."
+    },
+    "FourCharCode": {
+      "type": "string",
+      "pattern": "^[ -~]{4}$",
+      "description": "Core Audio four-character code as text, for example `bltn` or `usb `."
+    },
+    "SampleRate": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 768000,
+      "description": "Sample rate in Hz (nominal or measured)."
+    },
+    "ProcessesEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "processes"
+        },
+        "replyTo": {
+          "description": "Id of the control message this event answers; absent on spontaneous events.",
+          "$ref": "#/$defs/RequestId"
+        },
+        "processes": {
+          "maxItems": 1024,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AudioProcess"
+          }
+        }
+      },
+      "required": ["type", "processes"],
+      "additionalProperties": false,
+      "description": "The complete list of Core Audio process objects with their mapping; sent on change."
+    },
+    "AudioProcess": {
+      "type": "object",
+      "properties": {
+        "objectId": {
+          "$ref": "#/$defs/ObjectId"
+        },
+        "pid": {
+          "$ref": "#/$defs/Pid"
+        },
+        "startWallNs": {
+          "anyOf": [
+            {
+              "description": "Process start time, wall-clock ns.",
+              "$ref": "#/$defs/ClockValue"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "halBundleId": {
+          "anyOf": [
+            {
+              "description": "kAudioProcessPropertyBundleID, for example `com.apple.WebKit.GPU`.",
+              "$ref": "#/$defs/BundleId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "app": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AppIdentity"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "mapping": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProcessMapping"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "trackKey": {
+          "anyOf": [
+            {
+              "description": "Track that captures this process: `app:<bundleID>` or `system:other`; null when excluded.",
+              "$ref": "#/$defs/TrackKey"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "excluded": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": ["own", "user"],
+              "description": "Why the process is in no tap: one of Sondine's own, or an app the user excluded."
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "objectId",
+        "pid",
+        "startWallNs",
+        "halBundleId",
+        "app",
+        "mapping",
+        "trackKey",
+        "excluded"
+      ],
+      "additionalProperties": false,
+      "description": "One Core Audio process object. A process incarnation is (pid, startWallNs)."
+    },
+    "ObjectId": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295,
+      "description": "Core Audio AudioObjectID."
+    },
+    "Pid": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 2147483647,
+      "description": "Process id."
+    },
+    "ClockValue": {
+      "description": "Non-negative 64-bit integer written as a decimal string without leading zeros, at most 2^63 - 1. Decoded to bigint in TypeScript.",
+      "type": "string",
+      "pattern": "^(?:0|[1-9][0-9]{0,18})$"
+    },
+    "BundleId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,254}$",
+      "description": "Bundle identifier of an app or daemon."
+    },
+    "AppIdentity": {
+      "type": "object",
+      "properties": {
+        "bundleId": {
+          "$ref": "#/$defs/BundleId"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ShortText"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["bundleId", "name"],
+      "additionalProperties": false,
+      "description": "The app a process belongs to."
+    },
+    "ProcessMapping": {
+      "type": "object",
+      "properties": {
+        "evidence": {
+          "$ref": "#/$defs/MappingEvidence"
+        },
+        "confidence": {
+          "$ref": "#/$defs/MappingConfidence"
+        },
+        "viaTerminal": {
+          "type": "boolean",
+          "description": "A command-line process resolved to its terminal."
+        }
+      },
+      "required": ["evidence", "confidence", "viaTerminal"],
+      "additionalProperties": false,
+      "description": "Evidence and confidence of a process-to-app mapping."
+    },
+    "MappingEvidence": {
+      "type": "string",
+      "enum": ["responsibility", "ancestry", "path", "daemon-map", "hal-bundle-id"],
+      "description": "How a process object was mapped to an app."
+    },
+    "MappingConfidence": {
+      "type": "string",
+      "enum": ["high", "medium", "low"],
+      "description": "Confidence in a process-to-app mapping."
+    },
+    "TrackKey": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^input:[^\\u0000-\\u001f\\u007f]{1,512}$"
+        },
+        {
+          "type": "string",
+          "pattern": "^app:[A-Za-z0-9][A-Za-z0-9_.-]{0,254}$"
+        },
+        {
+          "type": "string",
+          "const": "system:other"
+        }
+      ],
+      "description": "Stable track identity: `input:<deviceUID>`, `app:<bundleID>`, or `system:other`."
+    },
+    "TrackOpenEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "track.open"
+        },
+        "replyTo": {
+          "description": "Id of the control message this event answers; absent on spontaneous events.",
+          "$ref": "#/$defs/RequestId"
+        },
+        "trackKey": {
+          "$ref": "#/$defs/TrackKey"
+        },
+        "runId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "epoch": {
+          "$ref": "#/$defs/Epoch"
+        },
+        "start": {
+          "description": "Clock of sample 0.",
+          "$ref": "#/$defs/ClockPoint"
+        },
+        "anchor": {
+          "$ref": "#/$defs/ClockAnchor"
+        },
+        "format": {
+          "$ref": "#/$defs/AudioFormat"
+        },
+        "nominalRate": {
+          "description": "Device or aggregate nominal rate.",
+          "$ref": "#/$defs/SampleRate"
+        },
+        "measuredRate": {
+          "anyOf": [
+            {
+              "description": "Rate measured as frames ÷ Δhost time; null until measured.",
+              "$ref": "#/$defs/SampleRate"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stream": {
+          "$ref": "#/$defs/StreamState"
+        },
+        "source": {
+          "$ref": "#/$defs/TrackSource"
+        }
+      },
+      "required": [
+        "type",
+        "trackKey",
+        "runId",
+        "epoch",
+        "start",
+        "anchor",
+        "format",
+        "nominalRate",
+        "measuredRate",
+        "stream",
+        "source"
+      ],
+      "additionalProperties": false,
+      "description": "A track run starts. Sample index 0 is the run's first sample."
+    },
+    "Epoch": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295,
+      "description": "Capture epoch, increasing within one helper session. Each track run starts a new epoch, and so does a rate or format change inside a run; one event (wake, coreaudiod restart) may start the same epoch for several tracks."
+    },
+    "ClockPoint": {
+      "type": "object",
+      "properties": {
+        "hostTicks": {
+          "$ref": "#/$defs/ClockValue"
+        },
+        "continuousNs": {
+          "$ref": "#/$defs/ClockValue"
+        }
+      },
+      "required": ["hostTicks", "continuousNs"],
+      "additionalProperties": false,
+      "description": "An instant on the helper's clocks: host ticks (mach_absolute_time, stops in sleep) and continuous nanoseconds (mach_continuous_time converted with the timebase, runs in sleep). Ordering and durations use continuousNs."
+    },
+    "ClockAnchor": {
+      "type": "object",
+      "properties": {
+        "hostTicks": {
+          "$ref": "#/$defs/ClockValue"
+        },
+        "continuousNs": {
+          "$ref": "#/$defs/ClockValue"
+        },
+        "wallNs": {
+          "$ref": "#/$defs/ClockValue"
+        }
+      },
+      "required": ["hostTicks", "continuousNs", "wallNs"],
+      "additionalProperties": false,
+      "description": "Anchor triple read together: host ticks, continuous nanoseconds, and wall-clock nanoseconds since the Unix epoch. Wall time is for display only."
+    },
+    "AudioFormat": {
+      "type": "object",
+      "properties": {
+        "rate": {
+          "type": "number",
+          "const": 16000
+        },
+        "channels": {
+          "type": "number",
+          "const": 1
+        },
+        "sampleFormat": {
+          "type": "string",
+          "const": "s16le"
+        }
+      },
+      "required": ["rate", "channels", "sampleFormat"],
+      "additionalProperties": false,
+      "description": "Spool sample format: 16 kHz mono signed 16-bit little-endian PCM."
+    },
+    "StreamState": {
+      "type": "string",
+      "enum": ["starting", "running", "stalled", "zero-suspect"],
+      "description": "Health of a track's stream, independent of permission: waiting for the first IO cycle, delivering, no IO cycle for over 2 s, or flagged by the zero watchdog."
+    },
+    "TrackSource": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/InputSource"
+        },
+        {
+          "$ref": "#/$defs/AppSource"
+        },
+        {
+          "$ref": "#/$defs/SystemSource"
+        }
+      ],
+      "description": "What a track captures."
+    },
+    "InputSource": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "input"
+        },
+        "deviceUid": {
+          "$ref": "#/$defs/DeviceUid"
+        },
+        "name": {
+          "$ref": "#/$defs/ShortText"
+        },
+        "transport": {
+          "$ref": "#/$defs/Transport"
+        },
+        "selection": {
+          "$ref": "#/$defs/InputSelection"
+        }
+      },
+      "required": ["kind", "deviceUid", "name", "transport", "selection"],
+      "additionalProperties": false,
+      "description": "A microphone track."
+    },
+    "InputSelection": {
+      "type": "string",
+      "enum": ["pinned", "call-follow", "default"],
+      "description": "Why this microphone is open: the user's pin, the device a call app is using, or the allowlisted default input."
+    },
+    "AppSource": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "app"
+        },
+        "bundleId": {
+          "$ref": "#/$defs/BundleId"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ShortText"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "objectIds": {
+          "minItems": 1,
+          "maxItems": 64,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ObjectId"
+          }
+        }
+      },
+      "required": ["kind", "bundleId", "name", "objectIds"],
+      "additionalProperties": false,
+      "description": "A private process tap on every process object of one app."
+    },
+    "SystemSource": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "system"
+        },
+        "excludedObjectIds": {
+          "maxItems": 1024,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ObjectId"
+          }
+        }
+      },
+      "required": ["kind", "excludedObjectIds"],
+      "additionalProperties": false,
+      "description": "The global tap: everything not on an app track, minus excluded processes."
+    },
+    "TrackUpdateEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "track.update"
+        },
+        "replyTo": {
+          "description": "Id of the control message this event answers; absent on spontaneous events.",
+          "$ref": "#/$defs/RequestId"
+        },
+        "trackKey": {
+          "$ref": "#/$defs/TrackKey"
+        },
+        "runId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "epoch": {
+          "$ref": "#/$defs/Epoch"
+        },
+        "reason": {
+          "type": "string",
+          "enum": ["rate-change", "format-change", "stream", "source"]
+        },
+        "sampleIndex": {
+          "description": "Run sample index where the change applies.",
+          "$ref": "#/$defs/SampleIndex"
+        },
+        "at": {
+          "$ref": "#/$defs/ClockPoint"
+        },
+        "nominalRate": {
+          "description": "Device or aggregate nominal rate.",
+          "$ref": "#/$defs/SampleRate"
+        },
+        "measuredRate": {
+          "anyOf": [
+            {
+              "description": "Rate measured as frames ÷ Δhost time; null until measured.",
+              "$ref": "#/$defs/SampleRate"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stream": {
+          "$ref": "#/$defs/StreamState"
+        },
+        "source": {
+          "$ref": "#/$defs/TrackSource"
+        }
+      },
+      "required": [
+        "type",
+        "trackKey",
+        "runId",
+        "epoch",
+        "reason",
+        "sampleIndex",
+        "at",
+        "nominalRate",
+        "measuredRate",
+        "stream",
+        "source"
+      ],
+      "additionalProperties": false,
+      "description": "A run's state changed. A rate or format change starts a new epoch at `sampleIndex`."
+    },
+    "SampleIndex": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991,
+      "description": "Index of a 16 kHz sample since the start of its track run. Samples lost in gaps are counted, so the index tracks time."
+    },
+    "TrackCloseEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "track.close"
+        },
+        "replyTo": {
+          "description": "Id of the control message this event answers; absent on spontaneous events.",
+          "$ref": "#/$defs/RequestId"
+        },
+        "trackKey": {
+          "$ref": "#/$defs/TrackKey"
+        },
+        "runId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "epoch": {
+          "$ref": "#/$defs/Epoch"
+        },
+        "endSample": {
+          "description": "Samples in the run, gaps included.",
+          "$ref": "#/$defs/SampleIndex"
+        },
+        "at": {
+          "$ref": "#/$defs/ClockPoint"
+        },
+        "reason": {
+          "$ref": "#/$defs/TrackEndReason"
+        }
+      },
+      "required": ["type", "trackKey", "runId", "epoch", "endSample", "at", "reason"],
+      "additionalProperties": false,
+      "description": "A track run ended. Its spool files are complete once this event is sent."
+    },
+    "TrackEndReason": {
+      "type": "string",
+      "enum": [
+        "paused",
+        "held",
+        "disabled",
+        "excluded",
+        "device-removed",
+        "device-changed",
+        "tap-released",
+        "sleep",
+        "service-restarted",
+        "permission",
+        "error",
+        "shutdown"
+      ],
+      "description": "Why a track run ended. `held`: a private zone holds capture (ADR 029); `paused` is only the user's pause."
+    },
+    "RegionOpenEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "region.open"
+        },
+        "replyTo": {
+          "description": "Id of the control message this event answers; absent on spontaneous events.",
+          "$ref": "#/$defs/RequestId"
+        },
+        "regionId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "trackKey": {
+          "$ref": "#/$defs/TrackKey"
+        },
+        "runId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "epoch": {
+          "$ref": "#/$defs/Epoch"
+        },
+        "startSample": {
+          "$ref": "#/$defs/SampleIndex"
+        },
+        "at": {
+          "$ref": "#/$defs/ClockPoint"
+        }
+      },
+      "required": ["type", "regionId", "trackKey", "runId", "epoch", "startSample", "at"],
+      "additionalProperties": false,
+      "description": "The VAD opened a speech region; it stays provisional until `region.close`."
+    },
+    "RegionCloseEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "region.close"
+        },
+        "replyTo": {
+          "description": "Id of the control message this event answers; absent on spontaneous events.",
+          "$ref": "#/$defs/RequestId"
+        },
+        "trackKey": {
+          "$ref": "#/$defs/TrackKey"
+        },
+        "runId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "regionId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "startSample": {
+          "description": "Run sample index where speech starts, without pre-roll.",
+          "$ref": "#/$defs/SampleIndex"
+        },
+        "endSample": {
+          "description": "Run sample index after the last speech sample, without post-roll; > startSample.",
+          "$ref": "#/$defs/SampleIndex"
+        },
+        "voicedSamples": {
+          "description": "Samples the VAD heard as speech between the bounds, which also hold pauses shorter than the minimum silence; <= endSample - startSample. Absent from manifests written before it existed.",
+          "$ref": "#/$defs/Count"
+        },
+        "closeReason": {
+          "$ref": "#/$defs/RegionCloseReason"
+        },
+        "speechProbability": {
+          "$ref": "#/$defs/SpeechProbability"
+        },
+        "level": {
+          "$ref": "#/$defs/LevelStats"
+        },
+        "at": {
+          "description": "Clock of the region's end.",
+          "$ref": "#/$defs/ClockPoint"
+        },
+        "foreground": {
+          "maxItems": 64,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ForegroundSpan"
+          },
+          "description": "The apps in front while it lasted, in order, inside the region and apart; a stretch with no app (none, the screen locked, an app the user excluded) has no span."
+        }
+      },
+      "required": [
+        "type",
+        "trackKey",
+        "runId",
+        "regionId",
+        "startSample",
+        "endSample",
+        "closeReason",
+        "speechProbability",
+        "level",
+        "at",
+        "foreground"
+      ],
+      "additionalProperties": false,
+      "description": "A speech region closed; the same span is written as a `region` manifest record (without `foreground`)."
+    },
+    "Count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991,
+      "description": "Non-negative integer within the exact range of a double (2^53 - 1)."
+    },
+    "RegionCloseReason": {
+      "type": "string",
+      "enum": ["silence", "max-duration", "track-closed"],
+      "description": "Why a speech region closed."
+    },
+    "SpeechProbability": {
+      "type": "object",
+      "properties": {
+        "mean": {
+          "$ref": "#/$defs/Probability"
+        },
+        "max": {
+          "$ref": "#/$defs/Probability"
+        }
+      },
+      "required": ["mean", "max"],
+      "additionalProperties": false,
+      "description": "Mean and maximum VAD speech probability over an interval; max >= mean."
+    },
+    "Probability": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Probability in [0, 1]."
+    },
+    "LevelStats": {
+      "type": "object",
+      "properties": {
+        "mean": {
+          "$ref": "#/$defs/Dbfs"
+        },
+        "peak": {
+          "$ref": "#/$defs/Dbfs"
+        }
+      },
+      "required": ["mean", "peak"],
+      "additionalProperties": false,
+      "description": "Mean and peak level over an interval; peak >= mean."
+    },
+    "Dbfs": {
+      "type": "number",
+      "minimum": -120,
+      "maximum": 0,
+      "description": "Level in dBFS: 10·log10 of mean power with full scale at 0, clamped to -120."
+    },
+    "ForegroundSpan": {
+      "type": "object",
+      "properties": {
+        "bundleId": {
+          "$ref": "#/$defs/BundleId"
+        },
+        "name": {
+          "description": "The app's name, else its bundle ID.",
+          "$ref": "#/$defs/ShortText"
+        },
+        "startSample": {
+          "$ref": "#/$defs/SampleIndex"
+        },
+        "endSample": {
+          "description": "After the span's last sample; > startSample.",
+          "$ref": "#/$defs/SampleIndex"
+        }
+      },
+      "required": ["bundleId", "name", "startSample", "endSample"],
+      "additionalProperties": false,
+      "description": "The app in front on the Mac over part of a speech region, in run samples (ADR 022): NSWorkspace's frontmost application, never a window or what is on screen."
+    },
+    "CommitEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "commit"
+        },
+        "replyTo": {
+          "description": "Id of the control message this event answers; absent on spontaneous events.",
+          "$ref": "#/$defs/RequestId"
+        },
+        "trackKey": {
+          "$ref": "#/$defs/TrackKey"
+        },
+        "runId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "file": {
+          "description": "PCM file relative to the spool root.",
+          "$ref": "#/$defs/SpoolPath"
+        },
+        "seq": {
+          "description": "Commit number within the PCM file, starting at 0.",
+          "$ref": "#/$defs/Count"
+        },
+        "epoch": {
+          "$ref": "#/$defs/Epoch"
+        },
+        "committedOffset": {
+          "description": "Durable byte length of the PCM file after this commit. The block is [committedOffset - sampleCount × 2, committedOffset).",
+          "$ref": "#/$defs/Count"
+        },
+        "sampleIndex": {
+          "description": "Run sample index of the block's first sample.",
+          "$ref": "#/$defs/SampleIndex"
+        },
+        "sampleCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991,
+          "description": "Samples in the block."
+        },
+        "crc32": {
+          "description": "CRC-32/ISO-HDLC (as zlib's crc32) of the block's bytes.",
+          "$ref": "#/$defs/Uint32"
+        },
+        "at": {
+          "description": "Clock of the block's first sample.",
+          "$ref": "#/$defs/ClockPoint"
+        },
+        "gaps": {
+          "maxItems": 64,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/GapSpan"
+          },
+          "description": "Gaps recorded since the previous commit of this run, in order, all before sampleIndex."
+        }
+      },
+      "required": [
+        "type",
+        "trackKey",
+        "runId",
+        "file",
+        "seq",
+        "epoch",
+        "committedOffset",
+        "sampleIndex",
+        "sampleCount",
+        "crc32",
+        "at",
+        "gaps"
+      ],
+      "additionalProperties": false,
+      "description": "A spool block became durable: the PCM bytes and the manifest record were both fsynced."
+    },
+    "SpoolPath": {
+      "type": "string",
+      "maxLength": 512,
+      "pattern": "^[A-Za-z0-9_-][A-Za-z0-9._-]*(?:\\/[A-Za-z0-9_-][A-Za-z0-9._-]*)*$",
+      "description": "Path of a spool file relative to the spool root, `/`-separated; no segment starts with a dot."
+    },
+    "Uint32": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295,
+      "description": "Unsigned 32-bit integer."
+    },
+    "GapSpan": {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "$ref": "#/$defs/GapReason"
+        },
+        "fromSample": {
+          "$ref": "#/$defs/SampleIndex"
+        },
+        "toSample": {
+          "$ref": "#/$defs/SampleIndex"
+        }
+      },
+      "required": ["reason", "fromSample", "toSample"],
+      "additionalProperties": false,
+      "description": "Samples [fromSample, toSample) of a run that have no stored bytes; toSample > fromSample."
+    },
+    "GapReason": {
+      "type": "string",
+      "enum": ["ring-overflow", "disk-full", "write-error", "stall", "recovery-truncated"],
+      "description": "Why samples have no stored bytes."
+    },
+    "ActivityEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "activity"
+        },
+        "replyTo": {
+          "description": "Id of the control message this event answers; absent on spontaneous events.",
+          "$ref": "#/$defs/RequestId"
+        },
+        "at": {
+          "$ref": "#/$defs/ClockPoint"
+        },
+        "running": {
+          "maxItems": 1024,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RunningProcess"
+          }
+        },
+        "attribution": {
+          "maxItems": 64,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TrackAttribution"
+          }
+        }
+      },
+      "required": ["type", "at", "running", "attribution"],
+      "additionalProperties": false,
+      "description": "IO activity and attribution from `at` on; sent on change, debounced 500 ms."
+    },
+    "RunningProcess": {
+      "type": "object",
+      "properties": {
+        "objectId": {
+          "$ref": "#/$defs/ObjectId"
+        },
+        "output": {
+          "type": "boolean"
+        },
+        "input": {
+          "type": "boolean"
+        },
+        "inputDeviceUids": {
+          "maxItems": 16,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DeviceUid"
+          }
+        }
+      },
+      "required": ["objectId", "output", "input", "inputDeviceUids"],
+      "additionalProperties": false,
+      "description": "A process object with IO running."
+    },
+    "TrackAttribution": {
+      "type": "object",
+      "properties": {
+        "trackKey": {
+          "$ref": "#/$defs/TrackKey"
+        },
+        "runId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "confidence": {
+          "$ref": "#/$defs/AttributionConfidence"
+        },
+        "bundleId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BundleId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "candidateObjectIds": {
+          "maxItems": 1024,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ObjectId"
+          },
+          "description": "Process objects with output running in this track's scope."
+        }
+      },
+      "required": ["trackKey", "runId", "confidence", "bundleId", "candidateObjectIds"],
+      "additionalProperties": false,
+      "description": "Who the audio on an app or system track belongs to from `at` on. App tracks are `exact`; `system:other` is `single-active` (one app, all its process objects, or one process without an app) or `ambiguous`."
+    },
+    "AttributionConfidence": {
+      "type": "string",
+      "enum": ["exact", "single-active", "ambiguous"],
+      "description": "How audio on a track is attributed to an app: its own tap, the only app (or the only process without one) with output running, or unknown."
+    },
+    "CallEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "call"
+        },
+        "replyTo": {
+          "description": "Id of the control message this event answers; absent on spontaneous events.",
+          "$ref": "#/$defs/RequestId"
+        },
+        "callId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "state": {
+          "type": "string",
+          "enum": ["active", "ended"]
+        },
+        "at": {
+          "$ref": "#/$defs/ClockPoint"
+        },
+        "bundleId": {
+          "$ref": "#/$defs/BundleId"
+        },
+        "via": {
+          "type": "string",
+          "enum": ["call-app", "call-daemon", "browser"]
+        },
+        "inputDeviceUid": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DeviceUid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["type", "callId", "state", "at", "bundleId", "via", "inputDeviceUid"],
+      "additionalProperties": false,
+      "description": "A call app, a call daemon, or a browser started or stopped using a microphone."
+    },
+    "ListenEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "listen"
+        },
+        "replyTo": {
+          "description": "Id of the control message this event answers; absent on spontaneous events.",
+          "$ref": "#/$defs/RequestId"
+        },
+        "listenId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "state": {
+          "type": "string",
+          "enum": ["active", "ended"]
+        },
+        "at": {
+          "$ref": "#/$defs/ClockPoint"
+        },
+        "bundleId": {
+          "$ref": "#/$defs/BundleId"
+        },
+        "via": {
+          "type": "string",
+          "enum": ["app", "speech"]
+        }
+      },
+      "required": ["type", "listenId", "state", "at", "bundleId", "via"],
+      "additionalProperties": false,
+      "description": "An app other than a call started or stopped listening to a microphone: a dictation app, a browser page, or the system's speech recognition (`speech`)."
+    },
+    "CallSeenEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "call.seen"
+        },
+        "replyTo": {
+          "description": "Id of the control message this event answers; absent on spontaneous events.",
+          "$ref": "#/$defs/RequestId"
+        },
+        "callId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "state": {
+          "type": "string",
+          "enum": ["active", "ended"]
+        },
+        "at": {
+          "$ref": "#/$defs/ClockPoint"
+        },
+        "bundleId": {
+          "$ref": "#/$defs/BundleId"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ShortText"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "via": {
+          "type": "string",
+          "enum": ["call-app", "call-daemon", "browser"]
+        }
+      },
+      "required": ["type", "callId", "state", "at", "bundleId", "name", "via"],
+      "additionalProperties": false,
+      "description": "A call the helper sees, paused or not (ADR 036): a call app, a call daemon, or a browser playing sound started or stopped using a microphone. Never for Sondine's own or an excluded app; never a call span. One call id per active span; snapshots replay the active ones."
+    },
+    "SituationEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "situation"
+        },
+        "replyTo": {
+          "description": "Id of the control message this event answers; absent on spontaneous events.",
+          "$ref": "#/$defs/RequestId"
+        },
+        "screenAway": {
+          "type": "boolean",
+          "description": "The screen is locked, the screen saver runs, or the displays sleep."
+        },
+        "networks": {
+          "maxItems": 8,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NetworkHash"
+          },
+          "description": "Keyed hashes of the networks the Mac is on now, sorted; empty until a config brings a network key, or when none is readable."
+        }
+      },
+      "required": ["type", "screenAway", "networks"],
+      "additionalProperties": false,
+      "description": "What the Mac's situation is, for core's zones: whether the screen is away, and the networks it is on. Sent on change and replayed in snapshots."
+    },
+    "NetworkHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32}$",
+      "description": "A network the Mac is on, as the first 16 bytes of HMAC-SHA256(networkKey, NetworkSignature) in lowercase hex (ADR 029). The raw signature never travels."
+    },
+    "HoldsEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "holds"
+        },
+        "replyTo": {
+          "description": "Id of the control message this event answers; absent on spontaneous events.",
+          "$ref": "#/$defs/RequestId"
+        },
+        "holds": {
+          "maxItems": 128,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/HoldOccurrence"
+          }
+        }
+      },
+      "required": ["type", "holds"],
+      "additionalProperties": false,
+      "description": "Every hold active now, lifted ones included; sent on change and replayed in snapshots. `ready.paused` stays the user's pause: a hold never changes it."
+    },
+    "HoldOccurrence": {
+      "type": "object",
+      "properties": {
+        "occurrenceId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "reason": {
+          "$ref": "#/$defs/HoldReason"
+        },
+        "scope": {
+          "$ref": "#/$defs/HoldScope"
+        },
+        "bundleId": {
+          "description": "The excluded app, for `app`.",
+          "$ref": "#/$defs/BundleId"
+        },
+        "network": {
+          "description": "The network, for `network`.",
+          "$ref": "#/$defs/NetworkHash"
+        },
+        "window": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 31,
+          "description": "Index of the window in `holds.schedule`, for `schedule`."
+        },
+        "since": {
+          "description": "When its trigger started.",
+          "$ref": "#/$defs/ClockPoint"
+        },
+        "sinceWallMs": {
+          "$ref": "#/$defs/WallMs"
+        },
+        "lifted": {
+          "type": "boolean"
+        }
+      },
+      "required": ["occurrenceId", "reason", "scope", "since", "sinceWallMs", "lifted"],
+      "additionalProperties": false,
+      "description": "One occurrence of a hold: from its trigger's start to its end (the call or listen and 10 s, the window's end, leaving the network, the screen back). Sleep, wake and a reconnect do not end it. A lifted occurrence holds nothing until it ends; the next one has a new id."
+    },
+    "HoldReason": {
+      "type": "string",
+      "enum": ["app", "calls", "screen", "schedule", "network"],
+      "description": "What holds capture: an excluded app in a call or listening (`app`), a call (`calls`), the screen away, hours (`schedule`), or a network."
+    },
+    "HoldScope": {
+      "type": "string",
+      "enum": ["all", "microphone"],
+      "description": "What a hold stops: everything, or the microphone only (an excluded app's call or listen)."
+    },
+    "WallMs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991,
+      "description": "Wall-clock milliseconds since the Unix epoch; display and calendar only."
+    },
+    "ClockEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "clock"
+        },
+        "replyTo": {
+          "description": "Id of the control message this event answers; absent on spontaneous events.",
+          "$ref": "#/$defs/RequestId"
+        },
+        "reason": {
+          "type": "string",
+          "enum": ["periodic", "wake", "request"]
+        },
+        "anchor": {
+          "$ref": "#/$defs/ClockAnchor"
+        }
+      },
+      "required": ["type", "reason", "anchor"],
+      "additionalProperties": false,
+      "description": "A fresh anchor triple, every 60 s and on wake; used by the live view only (manifests carry their own anchors)."
+    },
+    "SelfEnvelopeEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "self.envelope"
+        },
+        "replyTo": {
+          "description": "Id of the control message this event answers; absent on spontaneous events.",
+          "$ref": "#/$defs/RequestId"
+        },
+        "start": {
+          "description": "When the first frame's first sample was played into the tap.",
+          "$ref": "#/$defs/ClockPoint"
+        },
+        "levels": {
+          "minItems": 1,
+          "maxItems": 600,
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": -1200,
+            "maximum": 0
+          },
+          "description": "One level per 10 ms frame, in tenths of a dBFS: -1200 (digital silence) to 0."
+        }
+      },
+      "required": ["type", "start", "levels"],
+      "additionalProperties": false,
+      "description": "The private `self:playback` reference (ADR 035): the 10 ms energy of what Sondine itself plays, captured by a tap on its own processes while they run output, and nothing else (no PCM is stored, nothing is transcribed). Frames are contiguous from `start`; a gap starts a new event. Core keeps them in memory only, to tell echo of a playback from someone speaking over it. Never replayed in snapshots: `replyTo` is never set."
+    },
+    "HealthEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "health"
+        },
+        "replyTo": {
+          "description": "Id of the control message this event answers; absent on spontaneous events.",
+          "$ref": "#/$defs/RequestId"
+        },
+        "at": {
+          "$ref": "#/$defs/ClockPoint"
+        },
+        "windowMs": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3600000
+        },
+        "process": {
+          "type": "object",
+          "properties": {
+            "footprintBytes": {
+              "description": "phys_footprint at `at`.",
+              "$ref": "#/$defs/Count"
+            },
+            "cpuNs": {
+              "description": "User and system CPU time in the window.",
+              "$ref": "#/$defs/DurationNs"
+            },
+            "wakeups": {
+              "description": "Idle and interrupt wakeups in the window.",
+              "$ref": "#/$defs/Count"
+            }
+          },
+          "required": ["footprintBytes", "cpuNs", "wakeups"],
+          "additionalProperties": false
+        },
+        "tracks": {
+          "maxItems": 64,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TrackHealth"
+          }
+        },
+        "stages": {
+          "maxItems": 1024,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StageHistogram"
+          }
+        }
+      },
+      "required": ["type", "at", "windowMs", "process", "tracks", "stages"],
+      "additionalProperties": false,
+      "description": "Histograms and counters for the window that ends at `at`; every 60 s by default."
+    },
+    "DurationNs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991,
+      "description": "Duration in nanoseconds."
+    },
+    "TrackHealth": {
+      "type": "object",
+      "properties": {
+        "trackKey": {
+          "$ref": "#/$defs/TrackKey"
+        },
+        "runId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "stream": {
+          "$ref": "#/$defs/StreamState"
+        },
+        "measuredRate": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SampleRate"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "level": {
+          "anyOf": [
+            {
+              "description": "Mean level over the window.",
+              "$ref": "#/$defs/Dbfs"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "zeroRunMs": {
+          "description": "Longest run of exact zeros in the window.",
+          "$ref": "#/$defs/Count"
+        },
+        "ringHighWaterMs": {
+          "description": "Fullest the capture ring got, in audio ms.",
+          "$ref": "#/$defs/Count"
+        },
+        "ringOverflows": {
+          "$ref": "#/$defs/Count"
+        },
+        "droppedSamples": {
+          "$ref": "#/$defs/Count"
+        },
+        "overloads": {
+          "description": "kAudioDeviceProcessorOverload notifications.",
+          "$ref": "#/$defs/Count"
+        }
+      },
+      "required": [
+        "trackKey",
+        "runId",
+        "stream",
+        "measuredRate",
+        "level",
+        "zeroRunMs",
+        "ringHighWaterMs",
+        "ringOverflows",
+        "droppedSamples",
+        "overloads"
+      ],
+      "additionalProperties": false,
+      "description": "Stream health of one open run over the window."
+    },
+    "StageHistogram": {
+      "type": "object",
+      "properties": {
+        "stage": {
+          "$ref": "#/$defs/HealthStage"
+        },
+        "trackKey": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TrackKey"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "count": {
+          "$ref": "#/$defs/Count"
+        },
+        "sum": {
+          "$ref": "#/$defs/DurationNs"
+        },
+        "p50": {
+          "$ref": "#/$defs/DurationNs"
+        },
+        "p95": {
+          "$ref": "#/$defs/DurationNs"
+        },
+        "max": {
+          "$ref": "#/$defs/DurationNs"
+        }
+      },
+      "required": ["stage", "trackKey", "count", "sum", "p50", "p95", "max"],
+      "additionalProperties": false,
+      "description": "Durations of one stage over the window, in nanoseconds. With count 0 every value is 0; otherwise p50 <= p95 <= max <= sum."
+    },
+    "HealthStage": {
+      "type": "string",
+      "enum": [
+        "io-callback",
+        "drain",
+        "resample",
+        "energy-gate",
+        "vad",
+        "envelope",
+        "spool-write",
+        "spool-fsync",
+        "manifest-fsync",
+        "tap-start"
+      ],
+      "description": "A helper stage measured with a fixed-bucket histogram; `tap-start` runs from the decision to start a tap to its first block."
+    },
+    "WarningEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "warning"
+        },
+        "replyTo": {
+          "description": "Id of the control message this event answers; absent on spontaneous events.",
+          "$ref": "#/$defs/RequestId"
+        },
+        "code": {
+          "$ref": "#/$defs/WarningCode"
+        },
+        "message": {
+          "$ref": "#/$defs/Message"
+        },
+        "trackKey": {
+          "$ref": "#/$defs/TrackKey"
+        }
+      },
+      "required": ["type", "code", "message"],
+      "additionalProperties": false,
+      "description": "Something degraded but capture continues."
+    },
+    "WarningCode": {
+      "type": "string",
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)+$",
+      "description": "Open set of dotted warning codes, for example `transport.unknown` or `pcm.overflow`."
+    },
+    "Message": {
+      "type": "string",
+      "pattern": "^[^\\u0000-\\u001f\\u007f]{1,1024}$",
+      "description": "Diagnostic text for logs, one line, 1 to 1024 characters."
+    },
+    "ErrorEvent": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "error"
+        },
+        "replyTo": {
+          "description": "Id of the control message this event answers; absent on spontaneous events.",
+          "$ref": "#/$defs/RequestId"
+        },
+        "code": {
+          "$ref": "#/$defs/ErrorCode"
+        },
+        "message": {
+          "$ref": "#/$defs/Message"
+        },
+        "fatal": {
+          "type": "boolean"
+        },
+        "trackKey": {
+          "$ref": "#/$defs/TrackKey"
+        }
+      },
+      "required": ["type", "code", "message", "fatal"],
+      "additionalProperties": false,
+      "description": "A failure. With `replyTo` it is the terminal reply to that control message. `fatal` means the helper exits after sending it."
+    },
+    "ErrorCode": {
+      "type": "string",
+      "enum": [
+        "protocol.unsupported",
+        "request.invalid",
+        "request.rejected",
+        "permission.denied",
+        "disk.full",
+        "spool.io",
+        "capture.failed",
+        "vad.unavailable",
+        "internal"
+      ],
+      "description": "Closed set of error codes core acts on."
+    }
+  }
+}

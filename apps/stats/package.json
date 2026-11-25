@@ -1,0 +1,21 @@
+{
+  "name": "@sondine/stats",
+  "version": "0.1.0",
+  "private": true,
+  "description": "stats.sondine.app: receives the anonymous daily reports of people who agreed (ADR 042), and passes them to PostHog EU without their IP.",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc",
+    "test": "vitest run",
+    "dev": "npx --yes wrangler@4.164.0 dev --env dev",
+    "deploy": "npx --yes wrangler@4.164.0 deploy --env production"
+  },
+  "dependencies": {
+    "@sondine/protocol": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -1,0 +1,43 @@
+/*
+ * Development only, for @graphical/editor 1.0.4 (loaded by installed-editor.tsx).
+ *
+ * The editor wraps the app in .graphical-theme and ships a scoped preflight
+ * for that class outside any cascade layer. Unlayered rules beat every
+ * layered one, so it overrides Tailwind 4's utilities across the app: no
+ * padding, margins or borders, headings at body size, transparent buttons.
+ * Each declaration below hands those properties back to the app's own layers
+ * (Tailwind's preflight does the same resets there). Remove this file once
+ * the editor layers its reset.
+ */
+
+:where([data-graphical-host], [data-graphical-host] *) {
+  box-sizing: revert-layer;
+  margin: revert-layer;
+  padding: revert-layer;
+  border: revert-layer;
+}
+
+:where([data-graphical-host]) :where(h1, h2, h3) {
+  font-size: revert-layer;
+  font-weight: revert-layer;
+}
+
+:where([data-graphical-host]) :where(a) {
+  color: revert-layer;
+  text-decoration: revert-layer;
+}
+
+:where([data-graphical-host]) :where(ul, ol) {
+  list-style: revert-layer;
+}
+
+:where([data-graphical-host]) :where(button, input) {
+  background: revert-layer;
+  color: revert-layer;
+}
+
+/* The editor's rule names svg outside :where, so this one does too. */
+:where([data-graphical-host]) svg {
+  display: revert-layer;
+  vertical-align: revert-layer;
+}

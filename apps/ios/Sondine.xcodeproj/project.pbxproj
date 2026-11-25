@@ -1,0 +1,567 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		44DCB7701B21B492DD47CE83 /* SondinePhone in Frameworks */ = {isa = PBXBuildFile; productRef = C66452CE28BE6E1E92E0C88C /* SondinePhone */; };
+		1058E83D1A7DBDDE8CE49AD8 /* SondinePhone in Frameworks */ = {isa = PBXBuildFile; productRef = 9963AEF937FDB56558512083 /* SondinePhone */; };
+		BA6679687ABC9215A73AD4BE /* SondineWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 84DF64381EC5AECDCAECEB1B /* SondineWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		588F74B4C502173B24A6A5B3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4EB2D678687C9085DD674A59 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F6C9CDA206C3863817D4F2E1;
+			remoteInfo = Sondine;
+		};
+		4CF483A7B571C37EFEAEF13A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4EB2D678687C9085DD674A59 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5A56960062F5F8FFC38AC376;
+			remoteInfo = SondineWidgets;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A08F85BFE1EBE794E0E0D386 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				BA6679687ABC9215A73AD4BE /* SondineWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		04A6DA40400E37B723E008A6 /* Sondine.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sondine.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DE6630E31A84E4547132D071 /* SondineUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SondineUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		84DF64381EC5AECDCAECEB1B /* SondineWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SondineWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		3A73BB3408CF913CFE7E001E /* Sondine */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Sondine;
+			sourceTree = "<group>";
+		};
+		082C932142D9983643BFE1FC /* SondineUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SondineUITests;
+			sourceTree = "<group>";
+		};
+		CC280538A364647EF12331C0 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		5F6A9DBD5E7D27C77D5CFAC7 /* SondineWidgets */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SondineWidgets;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C6713032BED35E7EA45DD5E1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				44DCB7701B21B492DD47CE83 /* SondinePhone in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6497F5EB7EA349F5F7094721 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E9AB90162118ABE78CE7473E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1058E83D1A7DBDDE8CE49AD8 /* SondinePhone in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		BE894EF3B29829E623E05AB6 = {
+			isa = PBXGroup;
+			children = (
+				3A73BB3408CF913CFE7E001E /* Sondine */,
+				CC280538A364647EF12331C0 /* Shared */,
+				5F6A9DBD5E7D27C77D5CFAC7 /* SondineWidgets */,
+				082C932142D9983643BFE1FC /* SondineUITests */,
+				04A25CCFE6F5E8A849BD8884 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		04A25CCFE6F5E8A849BD8884 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				04A6DA40400E37B723E008A6 /* Sondine.app */,
+				DE6630E31A84E4547132D071 /* SondineUITests.xctest */,
+				84DF64381EC5AECDCAECEB1B /* SondineWidgets.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F6C9CDA206C3863817D4F2E1 /* Sondine */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F5FEB79AE8C49345AA484E0F /* Build configuration list for PBXNativeTarget "Sondine" */;
+			buildPhases = (
+				D13F0921CA57D80E0AD1B0A2 /* Sources */,
+				C6713032BED35E7EA45DD5E1 /* Frameworks */,
+				27EE215F907A29B68F109FEC /* Resources */,
+				A08F85BFE1EBE794E0E0D386 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D415BFE9CB1FE1AEAAC751AF /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				3A73BB3408CF913CFE7E001E /* Sondine */,
+				CC280538A364647EF12331C0 /* Shared */,
+			);
+			name = Sondine;
+			packageProductDependencies = (
+				C66452CE28BE6E1E92E0C88C /* SondinePhone */,
+			);
+			productName = Sondine;
+			productReference = 04A6DA40400E37B723E008A6 /* Sondine.app */;
+			productType = "com.apple.product-type.application";
+		};
+		7A04A88F2B3CE0489E8DBD05 /* SondineUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 40AD6085C1C9E5E22E5B9B43 /* Build configuration list for PBXNativeTarget "SondineUITests" */;
+			buildPhases = (
+				6C1D709B1B03A29058C58D3C /* Sources */,
+				6497F5EB7EA349F5F7094721 /* Frameworks */,
+				F39F4CF290648F839E4E1544 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				67B1EAEEFD73A2884C69A895 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				082C932142D9983643BFE1FC /* SondineUITests */,
+			);
+			name = SondineUITests;
+			productName = SondineUITests;
+			productReference = DE6630E31A84E4547132D071 /* SondineUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		5A56960062F5F8FFC38AC376 /* SondineWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8A2FE9840A08780F99DF0132 /* Build configuration list for PBXNativeTarget "SondineWidgets" */;
+			buildPhases = (
+				6146BE0BF53459B0F39AA3C3 /* Sources */,
+				E9AB90162118ABE78CE7473E /* Frameworks */,
+				2ABE4FF885AE5DE037D442EC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				5F6A9DBD5E7D27C77D5CFAC7 /* SondineWidgets */,
+				CC280538A364647EF12331C0 /* Shared */,
+			);
+			name = SondineWidgets;
+			packageProductDependencies = (
+				9963AEF937FDB56558512083 /* SondinePhone */,
+			);
+			productName = SondineWidgets;
+			productReference = 84DF64381EC5AECDCAECEB1B /* SondineWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4EB2D678687C9085DD674A59 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2720;
+				LastUpgradeCheck = 2720;
+				TargetAttributes = {
+					F6C9CDA206C3863817D4F2E1 = {
+						CreatedOnToolsVersion = 27.2;
+					};
+					7A04A88F2B3CE0489E8DBD05 = {
+						CreatedOnToolsVersion = 27.2;
+						TestTargetID = F6C9CDA206C3863817D4F2E1;
+					};
+					5A56960062F5F8FFC38AC376 = {
+						CreatedOnToolsVersion = 27.2;
+					};
+				};
+			};
+			buildConfigurationList = 8716D0E922314E99AD464074 /* Build configuration list for PBXProject "Sondine" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				fr,
+				Base,
+			);
+			mainGroup = BE894EF3B29829E623E05AB6;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				94A07A431BD9CE2E5ECCF12B /* XCLocalSwiftPackageReference "../../native" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 04A25CCFE6F5E8A849BD8884 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F6C9CDA206C3863817D4F2E1 /* Sondine */,
+				7A04A88F2B3CE0489E8DBD05 /* SondineUITests */,
+				5A56960062F5F8FFC38AC376 /* SondineWidgets */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		27EE215F907A29B68F109FEC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F39F4CF290648F839E4E1544 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2ABE4FF885AE5DE037D442EC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D13F0921CA57D80E0AD1B0A2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6C1D709B1B03A29058C58D3C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6146BE0BF53459B0F39AA3C3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		67B1EAEEFD73A2884C69A895 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F6C9CDA206C3863817D4F2E1 /* Sondine */;
+			targetProxy = 588F74B4C502173B24A6A5B3 /* PBXContainerItemProxy */;
+		};
+		D415BFE9CB1FE1AEAAC751AF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5A56960062F5F8FFC38AC376 /* SondineWidgets */;
+			targetProxy = 4CF483A7B571C37EFEAEF13A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		04122D13BFAAA9998DFBFAD9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		682665C0DF02D56B3B2CB210 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		590DB8CFC091DDE2C8942F53 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Config/Sondine.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = P5G8WAJ2G2;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Config/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Sondine;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Sondine uses the camera only to scan the pairing code your Mac shows.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Sondine finds your Mac on your Wi-Fi, sends it your recordings and reads what it transcribed.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Sondine records when you tap Record, with every voice nearby. Recordings stay on the iPhone until they go to your Mac, or you share them.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.sondine.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SONDINE_BUILD_TIME = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		D8391FDAB6833C8B92BF63C1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Config/Sondine.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = P5G8WAJ2G2;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Config/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Sondine;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Sondine uses the camera only to scan the pairing code your Mac shows.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Sondine finds your Mac on your Wi-Fi, sends it your recordings and reads what it transcribed.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Sondine records when you tap Record, with every voice nearby. Recordings stay on the iPhone until they go to your Mac, or you share them.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.sondine.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SONDINE_BUILD_TIME = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		5F252639D5B763AB50362686 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = P5G8WAJ2G2;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.sondine.ios.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = Sondine;
+			};
+			name = Debug;
+		};
+		5F3D2984CA037135244EDE18 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = P5G8WAJ2G2;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.sondine.ios.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = Sondine;
+			};
+			name = Release;
+		};
+		3DB1E3385E5420FC90C9E914 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Config/SondineWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = P5G8WAJ2G2;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/SondineWidgets-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Sondine;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.sondine.ios.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		0AAEEBA6761B56D739C79889 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Config/SondineWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = P5G8WAJ2G2;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/SondineWidgets-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Sondine;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.sondine.ios.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8716D0E922314E99AD464074 /* Build configuration list for PBXProject "Sondine" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				04122D13BFAAA9998DFBFAD9 /* Debug */,
+				682665C0DF02D56B3B2CB210 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F5FEB79AE8C49345AA484E0F /* Build configuration list for PBXNativeTarget "Sondine" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				590DB8CFC091DDE2C8942F53 /* Debug */,
+				D8391FDAB6833C8B92BF63C1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		40AD6085C1C9E5E22E5B9B43 /* Build configuration list for PBXNativeTarget "SondineUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5F252639D5B763AB50362686 /* Debug */,
+				5F3D2984CA037135244EDE18 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8A2FE9840A08780F99DF0132 /* Build configuration list for PBXNativeTarget "SondineWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3DB1E3385E5420FC90C9E914 /* Debug */,
+				0AAEEBA6761B56D739C79889 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		94A07A431BD9CE2E5ECCF12B /* XCLocalSwiftPackageReference "../../native" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../native;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C66452CE28BE6E1E92E0C88C /* SondinePhone */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SondinePhone;
+		};
+		9963AEF937FDB56558512083 /* SondinePhone */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SondinePhone;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 4EB2D678687C9085DD674A59 /* Project object */;
+}

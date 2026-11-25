@@ -1,0 +1,23 @@
+{
+  "name": "@sondine/compute",
+  "version": "0.1.0",
+  "private": true,
+  "description": "sondine-compute: transcribes for Macs that cannot run Sondine's model, on a machine of the user's or of Synapsr's (ADR 040).",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "scripts": {
+    "build": "vite build --ssr src/main.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@sondine/engines": "workspace:*",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

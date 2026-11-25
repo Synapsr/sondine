@@ -1,0 +1,3 @@
+# WXT's generated types and cache, and its default output folder (ours is dist).
+.wxt
+.output

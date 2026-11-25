@@ -1,0 +1,12 @@
+{
+  "format": "graphical-project-v1",
+  "active": "graphical",
+  "themes": [
+    {
+      "id": "graphical",
+      "name": "Sondine",
+      "path": "themes/graphical.json"
+    }
+  ],
+  "id": "0c887281-8121-4985-a0de-a00839b9c60a"
+}

@@ -1,0 +1,1 @@
+CREATE INDEX `episodes_dictation_idx` ON `episodes` (`started_at_ms`) WHERE "episodes"."context" = 'dictation';

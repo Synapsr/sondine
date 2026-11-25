@@ -1,0 +1,111 @@
+/*
+ * Sondine's Tailwind keys beside Graphical's classes.
+ *
+ * Graphical's classes come from graphical/generated/tailwind-theme.css:
+ * bg-neutral-3, text-body-s, text-display-m, font-body font-medium,
+ * p-m gap-xs, corner-s, edge-m, shadow-m, tracking-l. This file adds the
+ * semantic colors, the spacing steps for sizes and offsets (size-s, h-xs,
+ * -top-xxs), ring widths for box-shadow edges, and the motion utilities.
+ */
+
+@theme inline {
+  --color-cte-canvas: var(--cte-canvas);
+  --color-cte-surface: var(--cte-surface);
+  --color-cte-surface-muted: var(--cte-surface-muted);
+  --color-cte-text: var(--cte-text);
+  --color-cte-text-muted: var(--cte-text-muted);
+  --color-cte-border: var(--cte-border);
+  --color-cte-accent: var(--cte-accent);
+  --color-cte-accent-text: var(--cte-accent-text);
+  --color-cte-danger: var(--cte-danger);
+  --color-cte-focus: var(--cte-focus);
+  --color-border-default: var(--border-default-color);
+  --color-option-badge-background: var(--option-badge-background);
+  --color-option-badge-foreground: var(--option-badge-foreground);
+  --color-navigation-active-background: var(--navigation-active-background);
+  --color-navigation-active-foreground: var(--navigation-active-foreground);
+
+  /* Geometry (size-*, w-*, h-*, insets, translations) keeps the spacing steps;
+     padding, margins and gaps come from Graphical's own namespaces. */
+  --spacing-0: var(--space-zero);
+  --spacing-zero: var(--space-zero);
+  --spacing-xxs: var(--space-xxs);
+  --spacing-xs: var(--space-xs);
+  --spacing-s: var(--space-s);
+  --spacing-m: var(--space-m);
+  --spacing-l: var(--space-l);
+  --spacing-xl: var(--space-xl);
+  --spacing-xxl: var(--space-xxl);
+
+  /* Edges are box shadows (ring-* for outer, inset-ring-* for inner edges),
+     sized by the theme's stroke widths. */
+  --ring-width-none: var(--border-none);
+  --ring-width-s: var(--border-s);
+  --ring-width-m: var(--border-m);
+  --ring-width-l: var(--border-l);
+
+  --ease-motion: var(--motion-easing);
+  --ease-motion-large: var(--motion-large-easing);
+  --transition-duration-motion: var(--motion-duration);
+  --transition-duration-motion-large: var(--motion-large-duration);
+  --default-transition-duration: var(--motion-duration);
+  --default-transition-timing-function: var(--motion-easing);
+
+  --default-font-family: var(--font-body);
+  --default-mono-font-family: var(--font-data);
+}
+
+/*
+ * dark: follows the nearest theme scope, so a light ThemeScope inside a dark
+ * page stays light. A scope element matches by its own class; any other
+ * element asks its parent's --theme-mode (style queries never see the element
+ * itself), unless it is a light scope.
+ */
+@custom-variant dark {
+  &:where(.dark, [data-theme="dark"]) {
+    @slot;
+  }
+  @container style(--theme-mode: dark) {
+    &:not(:where(.light, [data-theme="light"])) {
+      @slot;
+    }
+  }
+}
+
+/*
+ * Interactive state variants with the theme's precedence:
+ * disabled before focused, focused before hovered, otherwise rest.
+ * A pending control (data-pending) is disabled for input but keeps its look.
+ */
+@custom-variant control-hover {
+  @media (hover: hover) {
+    &:hover:not([data-disabled], [data-pending], :focus-visible) {
+      @slot;
+    }
+  }
+}
+@custom-variant control-focus (&:focus-visible:is(:not([data-disabled]), [data-pending]));
+@custom-variant control-pressed (&:active:not([data-disabled]));
+@custom-variant control-disabled (&[data-disabled]:not([data-pending]));
+@custom-variant control-pending (&[data-pending]);
+
+/* Keyboard focus outline, separate from fills and edges. */
+@utility focus-ring {
+  &:focus-visible {
+    outline: var(--focus-ring-outline, 2px solid var(--cte-focus));
+    outline-offset: 0px;
+  }
+}
+
+/*
+ * The same outline on an ancestor while a descendant has keyboard focus: a
+ * field around its input, a clipping root around its viewport. To count only
+ * one part, put it under a variant naming that part:
+ * has-[[data-slot=combobox-input]:focus-visible]:focus-ring-within.
+ */
+@utility focus-ring-within {
+  &:has(:focus-visible) {
+    outline: var(--focus-ring-outline, 2px solid var(--cte-focus));
+    outline-offset: 0px;
+  }
+}

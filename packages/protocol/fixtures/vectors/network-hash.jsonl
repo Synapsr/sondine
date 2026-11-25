@@ -1,0 +1,4 @@
+{"key":"AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=","signature":"IPv4.Router=192.168.1.1;IPv4.RouterHardwareAddress=aa:bb:cc:dd:ee:ff","hash":"156d3845f9cf77804e66d475ef0ed074"}
+{"key":"AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=","signature":"IPv6.Prefix=2001:db8:1::/64;IPv6.RouterHardwareAddress=aa:bb:cc:dd:ee:ff","hash":"22248958f47ea28e96ec14828d00b460"}
+{"key":"AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=","signature":"IPv4.Router=10.0.0.1;IPv4.RouterHardwareAddress=02:11:22:33:44:55","hash":"3b15e743933ce75589a8106d131b38a2"}
+{"key":"paWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaWlpaU=","signature":"IPv4.Router=192.168.1.1;IPv4.RouterHardwareAddress=aa:bb:cc:dd:ee:ff","hash":"d2fd71a0ae05114bc3c63e3b5cd0c079"}

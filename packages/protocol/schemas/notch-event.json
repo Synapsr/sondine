@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sondine:notch:1:notch-event",
+  "$comment": "Generated from packages/protocol/src by `pnpm --filter @sondine/protocol run gen`. Do not edit.",
+  "title": "Sondine notch event",
+  "description": "One JSON line sondine-notch sends main: what the user clicked.",
+  "$ref": "#/$defs/NotchEvent",
+  "$defs": {
+    "NotchEvent": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "ready"
+            }
+          },
+          "required": ["type"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "no-notch"
+            }
+          },
+          "required": ["type"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "open-person"
+            },
+            "view": {
+              "$ref": "#/$defs/ViewNumber"
+            },
+            "personId": {
+              "$ref": "#/$defs/RowId"
+            }
+          },
+          "required": ["type", "view", "personId"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "open-episode"
+            },
+            "view": {
+              "$ref": "#/$defs/ViewNumber"
+            },
+            "episodeId": {
+              "$ref": "#/$defs/RowId"
+            }
+          },
+          "required": ["type", "view", "episodeId"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "dismiss"
+            },
+            "view": {
+              "$ref": "#/$defs/ViewNumber"
+            },
+            "callId": {
+              "$ref": "#/$defs/RowId"
+            }
+          },
+          "required": ["type", "view", "callId"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "toggle"
+            },
+            "view": {
+              "$ref": "#/$defs/ViewNumber"
+            },
+            "callId": {
+              "$ref": "#/$defs/CallKey"
+            },
+            "on": {
+              "type": "boolean"
+            }
+          },
+          "required": ["type", "view", "callId", "on"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "mute"
+            },
+            "view": {
+              "$ref": "#/$defs/ViewNumber"
+            },
+            "callId": {
+              "$ref": "#/$defs/CallKey"
+            }
+          },
+          "required": ["type", "view", "callId"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "end-episode"
+            },
+            "view": {
+              "$ref": "#/$defs/ViewNumber"
+            },
+            "episodeId": {
+              "$ref": "#/$defs/RowId"
+            }
+          },
+          "required": ["type", "view", "episodeId"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "resume"
+            },
+            "view": {
+              "$ref": "#/$defs/ViewNumber"
+            }
+          },
+          "required": ["type", "view"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "done"
+            },
+            "view": {
+              "$ref": "#/$defs/ViewNumber"
+            },
+            "key": {
+              "$ref": "#/$defs/CallKey"
+            }
+          },
+          "required": ["type", "view", "key"],
+          "additionalProperties": false
+        }
+      ],
+      "description": "One line sondine-notch sends main."
+    },
+    "ViewNumber": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991,
+      "description": "Which `show` a click was made on; main counts them from 1."
+    },
+    "RowId": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991,
+      "description": "A row id in Sondine's database."
+    },
+    "CallKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "The call or the card shown; the same one keeps its key."
+    }
+  }
+}

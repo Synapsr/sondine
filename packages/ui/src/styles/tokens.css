@@ -1,0 +1,26 @@
+/*
+ * Sondine's own tokens, beside Graphical's.
+ *
+ * The theme's values live in graphical/generated/theme.css (Graphical's
+ * colors, type, spacing, corners, edges, shadows, motion and component
+ * variables, light at :root and dark under [data-theme="dark"]). Change them
+ * in the Graphical editor or graphical/themes/graphical.json, never here.
+ * This file keeps only what Sondine adds: the mode each scope is in, which
+ * the dark: variant reads.
+ */
+
+@layer theme {
+  :root,
+  :host,
+  .light,
+  [data-theme="light"] {
+    color-scheme: light;
+    --theme-mode: light;
+  }
+
+  .dark,
+  [data-theme="dark"] {
+    color-scheme: dark;
+    --theme-mode: dark;
+  }
+}

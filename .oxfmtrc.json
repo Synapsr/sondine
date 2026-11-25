@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "ignorePatterns": [
+    "**/dist/**",
+    "**/out/**",
+    "**/*.gen.ts",
+    "**/paraglide/**",
+    "packages/db/drizzle/**",
+    "graphical/generated/**",
+    "graphical/themes/**",
+    "graphical/install/*.json",
+    "graphical/install/*.md",
+    "graphical/project.json",
+    "graphical/role-map.json",
+    "graphical/README.md"
+  ]
+}

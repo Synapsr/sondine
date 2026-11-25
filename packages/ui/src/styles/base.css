@@ -1,0 +1,37 @@
+@layer base {
+  html {
+    background-color: var(--cte-canvas);
+    color: var(--cte-text);
+    /* Allo's weight and optical size follow font-weight and font-size. */
+    font-optical-sizing: auto;
+    text-wrap: pretty;
+  }
+
+  /* Typography and colors are set on every theme scope, so portalled content
+     and nested .light/.dark subtrees pick up the scope's values. <html> keeps
+     the browser's root font size so rem stays 16px. */
+  body,
+  :where(.light, .dark, [data-theme]):not(html) {
+    background-color: var(--cte-canvas);
+    color: var(--cte-text);
+    font-family: var(--font-body);
+    font-size: var(--size-s);
+    font-weight: var(--weight-body-regular);
+    line-height: var(--line-s);
+    letter-spacing: var(--letter-spacing-s);
+  }
+
+  :where(textarea, [contenteditable]) {
+    text-wrap-style: auto;
+  }
+}
+
+/* A check mark drawing itself, from its short stroke to its long one (Checkbox). */
+@keyframes sondine-check-draw {
+  from {
+    stroke-dashoffset: 24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}

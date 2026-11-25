@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Electron's helper apps: renderer, GPU, network and the core utility process. -->
+<plist version="1.0">
+  <dict>
+    <key>com.apple.security.cs.allow-jit</key>
+    <true/>
+    <!-- Core owns the database in the group container. -->
+    <key>com.apple.security.application-groups</key>
+    <array>
+      <string>P5G8WAJ2G2.app.sondine</string>
+    </array>
+  </dict>
+</plist>

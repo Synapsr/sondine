@@ -1,0 +1,49 @@
+# stats.sondine.app (README.md, ADR 042). The PostHog token is a secret, never
+# here: it comes from Infisical (STATS_POSTHOG_TOKEN) through `wrangler secret put`.
+# Two environments and no default one, so a bare `wrangler deploy` publishes
+# a Worker without a route, a token or a limiter: it refuses everything.
+name = "sondine-stats"
+main = "src/worker.ts"
+compatibility_date = "2026-11-01"
+workers_dev = false
+preview_urls = false
+send_metrics = false
+
+# Nothing is logged: no invocation log, no trace, no log export.
+[observability]
+enabled = false
+
+[env.production]
+workers_dev = false
+routes = [{ pattern = "stats.sondine.app", custom_domain = true }]
+
+[env.production.observability]
+enabled = false
+
+# Per Cloudflare location, for everyone together: the Worker does not read IPs.
+[[env.production.ratelimits]]
+name = "LIMITER"
+namespace_id = "4201"
+
+[env.production.ratelimits.simple]
+limit = 20
+period = 60
+
+# `pnpm --filter @sondine/stats dev`, on this machine only: no route and no
+# token, so a report is checked and forwarded nowhere.
+[env.dev]
+workers_dev = false
+
+[env.dev.observability]
+enabled = false
+
+[env.dev.vars]
+FORWARD = "no"
+
+[[env.dev.ratelimits]]
+name = "LIMITER"
+namespace_id = "4202"
+
+[env.dev.ratelimits.simple]
+limit = 20
+period = 60

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Sondine Notch.app (Contents/Helpers): call context beside the notch
+     (ADR 025). What it shows comes in on stdin and what the user clicks goes
+     out on stdout, so it needs no file, no device, no application group and
+     no network. -->
+<plist version="1.0">
+  <dict>
+    <!-- ADR 010: App Sandbox with no network entitlement denies outbound
+         network; scripts/check-package.mjs checks the entitlements. -->
+    <key>com.apple.security.app-sandbox</key>
+    <true/>
+  </dict>
+</plist>

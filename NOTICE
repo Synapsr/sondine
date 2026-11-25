@@ -1,0 +1,31 @@
+Sondine
+Copyright (C) 2026 Téo Goulois
+
+Sondine is free software: you can redistribute it and/or modify it under the
+terms of the GNU Affero General Public License version 3 (see LICENSE).
+
+Additional permission under GNU AGPL version 3 section 7
+
+If you modify this Program, or any covered work, by linking or combining it
+with the third-party assets listed below (or modified versions of them that
+keep their original license), containing parts covered by the terms of their
+own licenses, the licensors of this Program grant you additional permission
+to convey the resulting work. Those assets are not part of the Corresponding
+Source and remain under their own licenses:
+
+- Nucleo icons, in packages/ui/src/icon/nucleo/ — Copyright (c) Nucleo,
+  Nucleo Icons License (https://nucleoapp.com/license). Redistribution of the
+  icons outside this product is prohibited. At most 100 icons are included.
+- Allo font, in packages/ui/src/fonts/ and apps/ios/Shared/Fonts/ — Copyright 2026 Josh Puckett and
+  The Inter Project Authors, SIL Open Font License 1.1 (license copy next to
+  the font file, https://openfontlicense.org).
+
+Sondine's theme (graphical/) was made with Graphical
+(https://www.graphicalui.com). Its editor, guide and skills belong to
+Graphical and are neither in this repository nor in the app.
+
+Model weights are never committed. The Silero VAD model (MIT) and the WeSpeaker
+voice model (CC-BY-4.0, converted by Fluid Inference) are fetched at build time
+from pinned URLs with their sha256 and bundled in the app with their licenses
+and notices. Every other model is downloaded by the user and keeps its own
+license and notices next to its files.

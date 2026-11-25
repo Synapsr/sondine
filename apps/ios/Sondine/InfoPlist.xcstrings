@@ -1,0 +1,74 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sondine"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sondine"
+          }
+        }
+      }
+    },
+    "NSCameraUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sondine uses the camera only to scan the pairing code your Mac shows."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sondine utilise la caméra seulement pour scanner le code d’appairage affiché par votre Mac."
+          }
+        }
+      }
+    },
+    "NSLocalNetworkUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sondine finds your Mac on your Wi-Fi, sends it your recordings and reads what it transcribed."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sondine trouve votre Mac sur votre Wi-Fi, lui envoie vos enregistrements et lit ce qu’il a transcrit."
+          }
+        }
+      }
+    },
+    "NSMicrophoneUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sondine records when you tap Record, with every voice nearby. Recordings stay on the iPhone until they go to your Mac, or you share them."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sondine enregistre quand vous touchez Enregistrer, avec toutes les voix proches. Les enregistrements restent sur l’iPhone jusqu’à leur envoi à votre Mac, ou à ce que vous les partagiez."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

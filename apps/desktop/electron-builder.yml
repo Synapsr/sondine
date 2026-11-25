@@ -1,0 +1,103 @@
+# Packaging for macOS (ADR 010). `pnpm --filter @sondine/desktop build:mac`
+# builds the helper and the app, signs both with Developer ID, and checks the
+# result. `release:mac` also notarizes (scripts/build-mac.mjs passes
+# `mac.notarize` and a timestamp server).
+appId: app.sondine
+productName: Sondine
+copyright: Copyright © 2026 Téo Goulois
+directories:
+  output: release
+  buildResources: build
+files:
+  - package.json
+  - out/main/**
+  - out/preload/**
+  - out/renderer/**
+  - resources/tray/**
+  - "!**/*.map"
+asar: true
+# Locked so no other process can borrow Sondine's microphone and system audio
+# grants (ADR 010). Core is a utility process, so runAsNode can be off.
+electronFuses:
+  runAsNode: false
+  enableCookieEncryption: true
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  enableEmbeddedAsarIntegrityValidation: true
+  onlyLoadAppFromAsar: true
+  loadBrowserProcessSpecificV8Snapshot: false
+  grantFileProtocolExtraPrivileges: false
+# The capture helper, the agents', browsers' and iPhones' relays, speech.cpp's worker
+# app, the journal's text server app, the voice app and the notch app are
+# staged and signed by scripts/build-mac.mjs with their own entitlements, so
+# electron-builder copies them and leaves their signatures alone.
+extraFiles:
+  - from: build/stage/sondine-audio
+    to: Helpers/sondine-audio
+  - from: build/stage/sondine-mcp
+    to: Helpers/sondine-mcp
+  - from: build/stage/sondine-browser
+    to: Helpers/sondine-browser
+  - from: build/stage/sondine-lan
+    to: Helpers/sondine-lan
+  - from: build/stage/Sondine Speech.app
+    to: Helpers/Sondine Speech.app
+  - from: build/stage/Sondine Text.app
+    to: Helpers/Sondine Text.app
+  - from: build/stage/Sondine Voice.app
+    to: Helpers/Sondine Voice.app
+  - from: build/stage/Sondine Notch.app
+    to: Helpers/Sondine Notch.app
+extraResources:
+  - from: ../../packages/db/drizzle
+    to: drizzle
+    filter:
+      - "**/migration.sql"
+      - "**/snapshot.json"
+  - from: build/stage/models
+    to: models
+  # Loaded by main to ask macOS for the group container (ADR 013).
+  - from: build/stage/native
+    to: native
+  # The unpacked browser extension the user loads (ADR 023), built by
+  # scripts/build-mac.mjs.
+  - from: ../browser-extension/dist/chrome-mv3
+    to: browser-extension
+mac:
+  target:
+    - target: dir
+      arch: arm64
+    - target: dmg
+      arch: arm64
+  category: public.app-category.productivity
+  # Sondine's icon, from the first app (the Tauri one).
+  icon: build/icon.icns
+  minimumSystemVersion: "27.0"
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  # The "Developer ID Application: Téo Goulois (P5G8WAJ2G2)" certificate;
+  # electron-builder refuses the "Developer ID Application:" prefix.
+  identity: Téo Goulois (P5G8WAJ2G2)
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.inherit.plist
+  signIgnore:
+    - Contents/Helpers/sondine-audio$
+    - Contents/Helpers/sondine-mcp$
+    - Contents/Helpers/sondine-browser$
+    - Contents/Helpers/sondine-lan$
+    - Contents/Helpers/Sondine Speech\.app
+    - Contents/Helpers/Sondine Text\.app
+    - Contents/Helpers/Sondine Voice\.app
+    - Contents/Helpers/Sondine Notch\.app
+  notarize: false
+  # Only notarization needs a secure timestamp: `release:mac` sets both.
+  timestamp: none
+  extendInfo:
+    NSMicrophoneUsageDescription: Sondine listens to your microphone to keep a private memory of your conversations. The audio stays on this Mac unless you choose to send it elsewhere.
+    NSAudioCaptureUsageDescription: Sondine records the audio your apps play, such as calls and videos, to keep a private memory of them. The audio stays on this Mac unless you choose to send it elsewhere.
+    # Paired iPhones (ADR 008); sondine-lan's Info.plist carries the same string.
+    NSLocalNetworkUsageDescription: Sondine talks with the iPhones you pair, to receive their recordings and show them your memory.
+dmg:
+  title: Sondine
+  writeUpdateInfo: false
+publish: null

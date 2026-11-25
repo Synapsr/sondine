@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Sondine Speech.app (Contents/Helpers): speech.cpp's worker (ADR 016).
+     Audio comes in on stdin and text goes out on stdout, so it needs no
+     device, no application group and no network. No JIT: Metal compiles its
+     kernels in the GPU driver's own process. -->
+<plist version="1.0">
+  <dict>
+    <!-- ADR 010: App Sandbox with no network entitlement denies outbound
+         network; scripts/check-package.mjs proves it on every signed build. -->
+    <key>com.apple.security.app-sandbox</key>
+    <true/>
+    <!-- Model weights, read-only (ADR 013). The sandbox denies the app
+         bundle, the group container (database, spool) and the rest of home. -->
+    <key>com.apple.security.temporary-exception.files.home-relative-path.read-only</key>
+    <array>
+      <string>/Library/Application Support/Sondine/models/</string>
+    </array>
+  </dict>
+</plist>

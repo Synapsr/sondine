@@ -1,0 +1,10 @@
+{
+  // A Cloudflare Worker: web APIs only (Request, Response, fetch), no Node.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["es2024", "dom"],
+    "types": [],
+    "erasableSyntaxOnly": true
+  },
+  "include": ["src", "test"]
+}

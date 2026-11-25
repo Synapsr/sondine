@@ -1,0 +1,27 @@
+{
+  "name": "@sondine/engines",
+  "version": "0.0.0",
+  "private": true,
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./remote": "./src/remote/index.ts",
+    "./synthetic": "./src/same-moment/synthetic.ts",
+    "./self-echo-synthetic": "./src/self-echo/synthetic.ts"
+  },
+  "scripts": {
+    "import-model": "node src/cli/import-model.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@sondine/protocol": "workspace:*",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

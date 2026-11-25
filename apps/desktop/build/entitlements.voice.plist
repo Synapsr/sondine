@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Sondine Voice.app (Contents/Helpers): voice embeddings for naming voices
+     (architecture §8). The audio comes in on stdin and the embeddings go out
+     on stdout, and the model sits in its own bundle, so it needs no file
+     outside it, no device, no application group and no network. -->
+<plist version="1.0">
+  <dict>
+    <!-- ADR 010: App Sandbox with no network entitlement denies outbound
+         network; scripts/check-package.mjs checks the entitlements. -->
+    <key>com.apple.security.app-sandbox</key>
+    <true/>
+  </dict>
+</plist>

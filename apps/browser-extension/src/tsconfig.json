@@ -1,0 +1,10 @@
+{
+  // The extension itself runs in the browser: DOM types, no Node.
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["es2024", "dom"],
+    "types": [],
+    "erasableSyntaxOnly": true
+  },
+  "include": ["."]
+}

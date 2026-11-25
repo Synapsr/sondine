@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sondine:browser:1:browser-handshake",
+  "$comment": "Generated from packages/protocol/src by `pnpm --filter @sondine/protocol run gen`. Do not edit.",
+  "title": "Sondine browser relay handshake",
+  "description": "The relay's hello to core, or core's answer to it.",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/BrowserHello"
+    },
+    {
+      "$ref": "#/$defs/BrowserAnswer"
+    }
+  ],
+  "$defs": {
+    "BrowserHello": {
+      "type": "object",
+      "properties": {
+        "v": {
+          "type": "number",
+          "const": 1
+        },
+        "origin": {
+          "type": "string",
+          "pattern": "^chrome-extension:\\/\\/[A-Za-z0-9-]{1,64}\\/$"
+        },
+        "browser": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "bundleId": {
+                  "$ref": "#/$defs/BundleId"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 120
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                }
+              },
+              "required": ["bundleId", "name", "path"],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "The browser that started the relay; null when the relay found no app bundle above it."
+        }
+      },
+      "required": ["v", "origin", "browser"],
+      "additionalProperties": false,
+      "description": "First line the relay sends to core."
+    },
+    "BundleId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,254}$",
+      "description": "Bundle identifier of an app or daemon."
+    },
+    "BrowserAnswer": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "type": "boolean",
+              "const": true
+            }
+          },
+          "required": ["ok"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "ok": {
+              "type": "boolean",
+              "const": false
+            },
+            "reason": {
+              "type": "string",
+              "enum": ["disabled", "busy", "bad-hello", "not-running"]
+            }
+          },
+          "required": ["ok", "reason"],
+          "additionalProperties": false
+        }
+      ],
+      "description": "Core's answer to the hello."
+    }
+  }
+}

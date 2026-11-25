@@ -1,0 +1,12 @@
+{
+  // Node side: WXT's config, the build scripts and the tests. The extension's
+  // own code has src/tsconfig.json and entrypoints/tsconfig.json, without
+  // Node's types.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["es2024", "dom"],
+    "types": ["node"],
+    "erasableSyntaxOnly": true
+  },
+  "include": ["wxt.config.ts", "vitest.config.ts", "scripts", "test"]
+}

@@ -1,0 +1,24 @@
+/*
+ * Tailwind's default scales, cleared so only the theme's keys resolve:
+ * Graphical's classes (graphical/generated/tailwind-theme.css, imported right
+ * after this file) and Sondine's own (theme.css). bg-red-500, text-sm or p-4
+ * produce nothing.
+ */
+
+@theme static {
+  --color-*: initial;
+  --font-*: initial;
+  --font-weight-*: initial;
+  --text-*: initial;
+  --leading-*: initial;
+  --tracking-*: initial;
+  --spacing: initial;
+  --spacing-*: initial;
+  --container-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+  --text-shadow-*: initial;
+  --ease-*: initial;
+}

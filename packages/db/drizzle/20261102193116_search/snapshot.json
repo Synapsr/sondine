@@ -1,0 +1,3737 @@
+{
+  "id": "62bfaafd-c37f-4419-908b-3bcb6d192de0",
+  "prevIds": ["81a6fca6-dbe4-4d53-9a68-7376772c36a0"],
+  "version": "7",
+  "dialect": "sqlite",
+  "ddl": [
+    {
+      "name": "analysis_runs",
+      "entityType": "tables"
+    },
+    {
+      "name": "episode_analysis",
+      "entityType": "tables"
+    },
+    {
+      "name": "episode_speakers",
+      "entityType": "tables"
+    },
+    {
+      "name": "segments",
+      "entityType": "tables"
+    },
+    {
+      "name": "speaker_turns",
+      "entityType": "tables"
+    },
+    {
+      "name": "deleted_ranges",
+      "entityType": "tables"
+    },
+    {
+      "name": "user_assertions",
+      "entityType": "tables"
+    },
+    {
+      "name": "apps",
+      "entityType": "tables"
+    },
+    {
+      "name": "chunks",
+      "entityType": "tables"
+    },
+    {
+      "name": "devices",
+      "entityType": "tables"
+    },
+    {
+      "name": "epochs",
+      "entityType": "tables"
+    },
+    {
+      "name": "gaps",
+      "entityType": "tables"
+    },
+    {
+      "name": "process_incarnations",
+      "entityType": "tables"
+    },
+    {
+      "name": "speech_regions",
+      "entityType": "tables"
+    },
+    {
+      "name": "spool_files",
+      "entityType": "tables"
+    },
+    {
+      "name": "track_runs",
+      "entityType": "tables"
+    },
+    {
+      "name": "episode_regions",
+      "entityType": "tables"
+    },
+    {
+      "name": "episodes",
+      "entityType": "tables"
+    },
+    {
+      "name": "identity_rules",
+      "entityType": "tables"
+    },
+    {
+      "name": "settings",
+      "entityType": "tables"
+    },
+    {
+      "name": "job_attempts",
+      "entityType": "tables"
+    },
+    {
+      "name": "jobs",
+      "entityType": "tables"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "episode_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "stage",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "status",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "'running'",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "pass_uid",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "engine_id",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "engine_version",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "engine_runtime",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "adapter_class",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "model_sha256",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "engine_config",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "'{}'",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "input_hash",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "input_generation",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "coverage",
+      "type": "real",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "metrics",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "'{}'",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "error_code",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "started_at_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "finished_at_ms",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "published_at_ms",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episode_analysis",
+      "name": "episode_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episode_analysis",
+      "name": "stage",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episode_analysis",
+      "name": "run_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episode_analysis",
+      "name": "input_generation",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episode_analysis",
+      "name": "published_at_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episode_speakers",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episode_speakers",
+      "name": "episode_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episode_speakers",
+      "name": "run_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episode_speakers",
+      "name": "label",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episode_speakers",
+      "name": "ordinal",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episode_speakers",
+      "name": "voiced_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "0",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "segments",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "segments",
+      "name": "run_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "segments",
+      "name": "episode_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "segments",
+      "name": "track_run_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "segments",
+      "name": "seq",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "segments",
+      "name": "sample_start",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "segments",
+      "name": "sample_end",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "segments",
+      "name": "start_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "segments",
+      "name": "end_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "segments",
+      "name": "speaker_label",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "segments",
+      "name": "episode_speaker_id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "segments",
+      "name": "text",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "segments",
+      "name": "lang",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "segments",
+      "name": "confidence",
+      "type": "real",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "segments",
+      "name": "words",
+      "type": "blob",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speaker_turns",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speaker_turns",
+      "name": "run_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speaker_turns",
+      "name": "episode_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speaker_turns",
+      "name": "track_run_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speaker_turns",
+      "name": "sample_start",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speaker_turns",
+      "name": "sample_end",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speaker_turns",
+      "name": "start_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speaker_turns",
+      "name": "end_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speaker_turns",
+      "name": "speaker_label",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speaker_turns",
+      "name": "episode_speaker_id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speaker_turns",
+      "name": "confidence",
+      "type": "real",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "deleted_ranges",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "deleted_ranges",
+      "name": "scope",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "deleted_ranges",
+      "name": "track_run_id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "deleted_ranges",
+      "name": "sample_start",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "deleted_ranges",
+      "name": "sample_end",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "deleted_ranges",
+      "name": "wall_start_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "deleted_ranges",
+      "name": "wall_end_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "deleted_ranges",
+      "name": "origin",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "deleted_ranges",
+      "name": "created_at_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "user_assertions",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "user_assertions",
+      "name": "kind",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "user_assertions",
+      "name": "track_run_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "user_assertions",
+      "name": "sample_start",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "user_assertions",
+      "name": "sample_end",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "user_assertions",
+      "name": "payload",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "'{}'",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "user_assertions",
+      "name": "origin",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "user_assertions",
+      "name": "created_at_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "user_assertions",
+      "name": "revoked_at_ms",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "apps",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "apps",
+      "name": "bundle_id",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "apps",
+      "name": "name",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "apps",
+      "name": "first_seen_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "apps",
+      "name": "last_seen_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "chunks",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "chunks",
+      "name": "spool_file_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "chunks",
+      "name": "track_run_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "chunks",
+      "name": "byte_offset",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "chunks",
+      "name": "byte_length",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "chunks",
+      "name": "sample_start",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "chunks",
+      "name": "sample_count",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "chunks",
+      "name": "host_ticks",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "chunks",
+      "name": "continuous_us",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "chunks",
+      "name": "wall_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "chunks",
+      "name": "crc32",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "chunks",
+      "name": "audio_state",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "'present'",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "chunks",
+      "name": "archive_rel_path",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "devices",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "devices",
+      "name": "uid",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "devices",
+      "name": "name",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "devices",
+      "name": "transport",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "'unknown'",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "devices",
+      "name": "has_input",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "false",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "devices",
+      "name": "has_output",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "false",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "devices",
+      "name": "first_seen_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "devices",
+      "name": "last_seen_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "epochs",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "epochs",
+      "name": "track_run_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "epochs",
+      "name": "seq",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "epochs",
+      "name": "reason",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "epochs",
+      "name": "sample_start",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "epochs",
+      "name": "measured_rate_hz",
+      "type": "real",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "epochs",
+      "name": "timebase_numer",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "epochs",
+      "name": "timebase_denom",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "epochs",
+      "name": "anchor_host_ticks",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "epochs",
+      "name": "anchor_continuous_us",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "epochs",
+      "name": "anchor_wall_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "epochs",
+      "name": "drift_ppm",
+      "type": "real",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "epochs",
+      "name": "alignment_uncertainty_us",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "gaps",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "gaps",
+      "name": "track_run_id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "gaps",
+      "name": "track_key",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "gaps",
+      "name": "reason",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "gaps",
+      "name": "wall_start_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "gaps",
+      "name": "wall_end_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "gaps",
+      "name": "sample_start",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "gaps",
+      "name": "sample_end",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "gaps",
+      "name": "lost_bytes",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "gaps",
+      "name": "detail",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "process_incarnations",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "process_incarnations",
+      "name": "pid",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "process_incarnations",
+      "name": "started_wall_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "process_incarnations",
+      "name": "bundle_id",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "process_incarnations",
+      "name": "app_id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "process_incarnations",
+      "name": "responsible_pid",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "process_incarnations",
+      "name": "evidence",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "process_incarnations",
+      "name": "confidence",
+      "type": "real",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "process_incarnations",
+      "name": "first_seen_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "process_incarnations",
+      "name": "last_seen_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "process_incarnations",
+      "name": "exited_wall_ms",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speech_regions",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speech_regions",
+      "name": "track_run_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speech_regions",
+      "name": "sample_start",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speech_regions",
+      "name": "sample_end",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speech_regions",
+      "name": "wall_start_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speech_regions",
+      "name": "wall_end_ms",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speech_regions",
+      "name": "continuous_start_us",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speech_regions",
+      "name": "continuous_end_us",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speech_regions",
+      "name": "state",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "'open'",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speech_regions",
+      "name": "end_reason",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "speech_regions",
+      "name": "vad_version",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "spool_files",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "spool_files",
+      "name": "track_run_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "spool_files",
+      "name": "seq",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "spool_files",
+      "name": "rel_path",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "spool_files",
+      "name": "sample_start",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "spool_files",
+      "name": "committed_bytes",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "0",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "spool_files",
+      "name": "state",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "'open'",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "spool_files",
+      "name": "created_wall_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "spool_files",
+      "name": "closed_wall_ms",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "track_runs",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "track_runs",
+      "name": "uid",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "track_runs",
+      "name": "track_key",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "track_runs",
+      "name": "source_kind",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "track_runs",
+      "name": "device_id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "track_runs",
+      "name": "app_id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "track_runs",
+      "name": "sample_rate",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "16000",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "track_runs",
+      "name": "state",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "'open'",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "track_runs",
+      "name": "end_reason",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "track_runs",
+      "name": "started_wall_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "track_runs",
+      "name": "ended_wall_ms",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "track_runs",
+      "name": "sample_end",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "track_runs",
+      "name": "updated_at_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episode_regions",
+      "name": "episode_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episode_regions",
+      "name": "speech_region_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episode_regions",
+      "name": "grouping_version",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episodes",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episodes",
+      "name": "state",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "'open'",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episodes",
+      "name": "context",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episodes",
+      "name": "size",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episodes",
+      "name": "size_state",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "'provisional'",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episodes",
+      "name": "analysis_state",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "'pending'",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episodes",
+      "name": "input_generation",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "1",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episodes",
+      "name": "started_at_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episodes",
+      "name": "ended_at_ms",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episodes",
+      "name": "voiced_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "0",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episodes",
+      "name": "primary_app_id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episodes",
+      "name": "label",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episodes",
+      "name": "grouping_version",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episodes",
+      "name": "classifier_version",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episodes",
+      "name": "kind_inputs",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "'{}'",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episodes",
+      "name": "created_at_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "episodes",
+      "name": "updated_at_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "identity_rules",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "identity_rules",
+      "name": "scope",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "identity_rules",
+      "name": "app_id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "identity_rules",
+      "name": "device_id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "identity_rules",
+      "name": "episode_id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "identity_rules",
+      "name": "recognize",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "identity_rules",
+      "name": "created_at_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "identity_rules",
+      "name": "updated_at_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "settings",
+      "name": "key",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "settings",
+      "name": "value",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "settings",
+      "name": "updated_at_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "job_attempts",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "job_attempts",
+      "name": "job_id",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "job_attempts",
+      "name": "attempt",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "job_attempts",
+      "name": "outcome",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "'running'",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "job_attempts",
+      "name": "run_id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "job_attempts",
+      "name": "worker_pid",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "job_attempts",
+      "name": "error_code",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "job_attempts",
+      "name": "error_message",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "job_attempts",
+      "name": "started_at_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "job_attempts",
+      "name": "finished_at_ms",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "jobs",
+      "name": "id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "jobs",
+      "name": "kind",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "jobs",
+      "name": "state",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "'queued'",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "jobs",
+      "name": "priority",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "100",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "jobs",
+      "name": "episode_id",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "jobs",
+      "name": "stage",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "jobs",
+      "name": "input_generation",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "jobs",
+      "name": "dedupe_key",
+      "type": "text",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "jobs",
+      "name": "payload",
+      "type": "text",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "'{}'",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "jobs",
+      "name": "attempts",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "0",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "jobs",
+      "name": "max_attempts",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": "3",
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "jobs",
+      "name": "not_before_ms",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "jobs",
+      "name": "created_at_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "jobs",
+      "name": "updated_at_ms",
+      "type": "integer",
+      "notNull": true,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "jobs",
+      "name": "finished_at_ms",
+      "type": "integer",
+      "notNull": false,
+      "autoincrement": false,
+      "default": null,
+      "generated": null,
+      "entityType": "columns"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "analysis_runs_episode_stage_idx",
+      "columns": [
+        {
+          "value": "episode_id",
+          "isExpression": false
+        },
+        {
+          "value": "stage",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "analysis_runs_pass_idx",
+      "columns": [
+        {
+          "value": "pass_uid",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "episode_speakers",
+      "name": "episode_speakers_episode_idx",
+      "columns": [
+        {
+          "value": "episode_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "segments",
+      "name": "segments_episode_start_idx",
+      "columns": [
+        {
+          "value": "episode_id",
+          "isExpression": false
+        },
+        {
+          "value": "start_ms",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "segments",
+      "name": "segments_run_idx",
+      "columns": [
+        {
+          "value": "run_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "speaker_turns",
+      "name": "speaker_turns_run_idx",
+      "columns": [
+        {
+          "value": "run_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "speaker_turns",
+      "name": "speaker_turns_episode_start_idx",
+      "columns": [
+        {
+          "value": "episode_id",
+          "isExpression": false
+        },
+        {
+          "value": "start_ms",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "deleted_ranges",
+      "name": "deleted_ranges_wall_idx",
+      "columns": [
+        {
+          "value": "wall_start_ms",
+          "isExpression": false
+        },
+        {
+          "value": "wall_end_ms",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "deleted_ranges",
+      "name": "deleted_ranges_run_idx",
+      "columns": [
+        {
+          "value": "track_run_id",
+          "isExpression": false
+        },
+        {
+          "value": "sample_start",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "user_assertions",
+      "name": "user_assertions_anchor_idx",
+      "columns": [
+        {
+          "value": "track_run_id",
+          "isExpression": false
+        },
+        {
+          "value": "sample_start",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "user_assertions",
+      "name": "user_assertions_active_kind_idx",
+      "columns": [
+        {
+          "value": "kind",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": "\"user_assertions\".\"revoked_at_ms\" is null",
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "chunks",
+      "name": "chunks_run_sample_idx",
+      "columns": [
+        {
+          "value": "track_run_id",
+          "isExpression": false
+        },
+        {
+          "value": "sample_start",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "chunks",
+      "name": "chunks_wall_idx",
+      "columns": [
+        {
+          "value": "wall_ms",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "gaps",
+      "name": "gaps_identity_unique",
+      "columns": [
+        {
+          "value": "coalesce(\"track_run_id\", 0)",
+          "isExpression": true
+        },
+        {
+          "value": "coalesce(\"track_key\", '')",
+          "isExpression": true
+        },
+        {
+          "value": "reason",
+          "isExpression": false
+        },
+        {
+          "value": "wall_start_ms",
+          "isExpression": false
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "gaps",
+      "name": "gaps_wall_start_idx",
+      "columns": [
+        {
+          "value": "wall_start_ms",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "speech_regions",
+      "name": "speech_regions_wall_start_idx",
+      "columns": [
+        {
+          "value": "wall_start_ms",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "track_runs",
+      "name": "track_runs_track_key_started_idx",
+      "columns": [
+        {
+          "value": "track_key",
+          "isExpression": false
+        },
+        {
+          "value": "started_wall_ms",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "track_runs",
+      "name": "track_runs_started_idx",
+      "columns": [
+        {
+          "value": "started_wall_ms",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "episodes",
+      "name": "episodes_started_idx",
+      "columns": [
+        {
+          "value": "started_at_ms",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "episodes",
+      "name": "episodes_size_started_idx",
+      "columns": [
+        {
+          "value": "size",
+          "isExpression": false
+        },
+        {
+          "value": "started_at_ms",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "identity_rules",
+      "name": "identity_rules_global_unique",
+      "columns": [
+        {
+          "value": "scope",
+          "isExpression": false
+        }
+      ],
+      "isUnique": true,
+      "where": "\"identity_rules\".\"scope\" = 'global'",
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "identity_rules",
+      "name": "identity_rules_app_unique",
+      "columns": [
+        {
+          "value": "app_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": true,
+      "where": "\"identity_rules\".\"scope\" = 'app'",
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "identity_rules",
+      "name": "identity_rules_device_unique",
+      "columns": [
+        {
+          "value": "device_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": true,
+      "where": "\"identity_rules\".\"scope\" = 'device'",
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "identity_rules",
+      "name": "identity_rules_episode_unique",
+      "columns": [
+        {
+          "value": "episode_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": true,
+      "where": "\"identity_rules\".\"scope\" = 'episode'",
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "jobs",
+      "name": "jobs_runnable_idx",
+      "columns": [
+        {
+          "value": "state",
+          "isExpression": false
+        },
+        {
+          "value": "priority",
+          "isExpression": false
+        },
+        {
+          "value": "created_at_ms",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "jobs",
+      "name": "jobs_episode_idx",
+      "columns": [
+        {
+          "value": "episode_id",
+          "isExpression": false
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "jobs",
+      "name": "jobs_active_dedupe_unique",
+      "columns": [
+        {
+          "value": "dedupe_key",
+          "isExpression": false
+        }
+      ],
+      "isUnique": true,
+      "where": "\"jobs\".\"state\" in ('queued', 'running') and \"jobs\".\"dedupe_key\" is not null",
+      "origin": "manual",
+      "entityType": "indexes"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "fk_analysis_runs_episode_id_episodes_id_fk",
+      "columns": ["episode_id"],
+      "tableTo": "episodes",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "episode_analysis",
+      "name": "fk_episode_analysis_episode_id_episodes_id_fk",
+      "columns": ["episode_id"],
+      "tableTo": "episodes",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "episode_analysis",
+      "name": "fk_episode_analysis_run_id_analysis_runs_id_fk",
+      "columns": ["run_id"],
+      "tableTo": "analysis_runs",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "episode_speakers",
+      "name": "fk_episode_speakers_episode_id_episodes_id_fk",
+      "columns": ["episode_id"],
+      "tableTo": "episodes",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "episode_speakers",
+      "name": "fk_episode_speakers_run_id_analysis_runs_id_fk",
+      "columns": ["run_id"],
+      "tableTo": "analysis_runs",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "segments",
+      "name": "fk_segments_run_id_analysis_runs_id_fk",
+      "columns": ["run_id"],
+      "tableTo": "analysis_runs",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "segments",
+      "name": "fk_segments_episode_id_episodes_id_fk",
+      "columns": ["episode_id"],
+      "tableTo": "episodes",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "RESTRICT",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "segments",
+      "name": "fk_segments_track_run_id_track_runs_id_fk",
+      "columns": ["track_run_id"],
+      "tableTo": "track_runs",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "segments",
+      "name": "fk_segments_episode_speaker_id_episode_speakers_id_fk",
+      "columns": ["episode_speaker_id"],
+      "tableTo": "episode_speakers",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "SET NULL",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "speaker_turns",
+      "name": "fk_speaker_turns_run_id_analysis_runs_id_fk",
+      "columns": ["run_id"],
+      "tableTo": "analysis_runs",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "speaker_turns",
+      "name": "fk_speaker_turns_episode_id_episodes_id_fk",
+      "columns": ["episode_id"],
+      "tableTo": "episodes",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "speaker_turns",
+      "name": "fk_speaker_turns_track_run_id_track_runs_id_fk",
+      "columns": ["track_run_id"],
+      "tableTo": "track_runs",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "speaker_turns",
+      "name": "fk_speaker_turns_episode_speaker_id_episode_speakers_id_fk",
+      "columns": ["episode_speaker_id"],
+      "tableTo": "episode_speakers",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "SET NULL",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "deleted_ranges",
+      "name": "fk_deleted_ranges_track_run_id_track_runs_id_fk",
+      "columns": ["track_run_id"],
+      "tableTo": "track_runs",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "user_assertions",
+      "name": "fk_user_assertions_track_run_id_track_runs_id_fk",
+      "columns": ["track_run_id"],
+      "tableTo": "track_runs",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "chunks",
+      "name": "fk_chunks_spool_file_id_spool_files_id_fk",
+      "columns": ["spool_file_id"],
+      "tableTo": "spool_files",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "chunks",
+      "name": "fk_chunks_track_run_id_track_runs_id_fk",
+      "columns": ["track_run_id"],
+      "tableTo": "track_runs",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "epochs",
+      "name": "fk_epochs_track_run_id_track_runs_id_fk",
+      "columns": ["track_run_id"],
+      "tableTo": "track_runs",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "gaps",
+      "name": "fk_gaps_track_run_id_track_runs_id_fk",
+      "columns": ["track_run_id"],
+      "tableTo": "track_runs",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "process_incarnations",
+      "name": "fk_process_incarnations_app_id_apps_id_fk",
+      "columns": ["app_id"],
+      "tableTo": "apps",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "speech_regions",
+      "name": "fk_speech_regions_track_run_id_track_runs_id_fk",
+      "columns": ["track_run_id"],
+      "tableTo": "track_runs",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "spool_files",
+      "name": "fk_spool_files_track_run_id_track_runs_id_fk",
+      "columns": ["track_run_id"],
+      "tableTo": "track_runs",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "track_runs",
+      "name": "fk_track_runs_device_id_devices_id_fk",
+      "columns": ["device_id"],
+      "tableTo": "devices",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "track_runs",
+      "name": "fk_track_runs_app_id_apps_id_fk",
+      "columns": ["app_id"],
+      "tableTo": "apps",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "episode_regions",
+      "name": "fk_episode_regions_episode_id_episodes_id_fk",
+      "columns": ["episode_id"],
+      "tableTo": "episodes",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "episode_regions",
+      "name": "fk_episode_regions_speech_region_id_speech_regions_id_fk",
+      "columns": ["speech_region_id"],
+      "tableTo": "speech_regions",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "episodes",
+      "name": "fk_episodes_primary_app_id_apps_id_fk",
+      "columns": ["primary_app_id"],
+      "tableTo": "apps",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "NO ACTION",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "identity_rules",
+      "name": "fk_identity_rules_app_id_apps_id_fk",
+      "columns": ["app_id"],
+      "tableTo": "apps",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "identity_rules",
+      "name": "fk_identity_rules_device_id_devices_id_fk",
+      "columns": ["device_id"],
+      "tableTo": "devices",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "identity_rules",
+      "name": "fk_identity_rules_episode_id_episodes_id_fk",
+      "columns": ["episode_id"],
+      "tableTo": "episodes",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "job_attempts",
+      "name": "fk_job_attempts_job_id_jobs_id_fk",
+      "columns": ["job_id"],
+      "tableTo": "jobs",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "job_attempts",
+      "name": "fk_job_attempts_run_id_analysis_runs_id_fk",
+      "columns": ["run_id"],
+      "tableTo": "analysis_runs",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "SET NULL",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "jobs",
+      "name": "fk_jobs_episode_id_episodes_id_fk",
+      "columns": ["episode_id"],
+      "tableTo": "episodes",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "SET NULL",
+      "nameExplicit": false,
+      "entityType": "fks"
+    },
+    {
+      "table": "episode_analysis",
+      "name": "episode_analysis_pk",
+      "columns": ["episode_id", "stage"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "episode_regions",
+      "name": "episode_regions_pk",
+      "columns": ["episode_id", "speech_region_id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "analysis_runs_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "episode_speakers",
+      "name": "episode_speakers_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "segments",
+      "name": "segments_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "speaker_turns",
+      "name": "speaker_turns_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "deleted_ranges",
+      "name": "deleted_ranges_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "user_assertions",
+      "name": "user_assertions_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "apps",
+      "name": "apps_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "chunks",
+      "name": "chunks_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "devices",
+      "name": "devices_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "epochs",
+      "name": "epochs_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "gaps",
+      "name": "gaps_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "process_incarnations",
+      "name": "process_incarnations_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "speech_regions",
+      "name": "speech_regions_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "spool_files",
+      "name": "spool_files_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "track_runs",
+      "name": "track_runs_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "episodes",
+      "name": "episodes_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "identity_rules",
+      "name": "identity_rules_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "settings",
+      "name": "settings_pk",
+      "columns": ["key"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "job_attempts",
+      "name": "job_attempts_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "jobs",
+      "name": "jobs_pk",
+      "columns": ["id"],
+      "nameExplicit": false,
+      "entityType": "pks"
+    },
+    {
+      "table": "episode_analysis",
+      "name": "episode_analysis_run_unique",
+      "columns": ["run_id"],
+      "nameExplicit": true,
+      "entityType": "uniques"
+    },
+    {
+      "table": "episode_speakers",
+      "name": "episode_speakers_run_label_unique",
+      "columns": ["run_id", "label"],
+      "nameExplicit": true,
+      "entityType": "uniques"
+    },
+    {
+      "table": "episode_speakers",
+      "name": "episode_speakers_run_ordinal_unique",
+      "columns": ["run_id", "ordinal"],
+      "nameExplicit": true,
+      "entityType": "uniques"
+    },
+    {
+      "table": "segments",
+      "name": "segments_run_seq_unique",
+      "columns": ["run_id", "seq"],
+      "nameExplicit": true,
+      "entityType": "uniques"
+    },
+    {
+      "table": "chunks",
+      "name": "chunks_spool_offset_unique",
+      "columns": ["spool_file_id", "byte_offset"],
+      "nameExplicit": true,
+      "entityType": "uniques"
+    },
+    {
+      "table": "epochs",
+      "name": "epochs_run_seq_unique",
+      "columns": ["track_run_id", "seq"],
+      "nameExplicit": true,
+      "entityType": "uniques"
+    },
+    {
+      "table": "process_incarnations",
+      "name": "process_incarnations_pid_start_unique",
+      "columns": ["pid", "started_wall_ms"],
+      "nameExplicit": true,
+      "entityType": "uniques"
+    },
+    {
+      "table": "speech_regions",
+      "name": "speech_regions_run_start_unique",
+      "columns": ["track_run_id", "sample_start"],
+      "nameExplicit": true,
+      "entityType": "uniques"
+    },
+    {
+      "table": "spool_files",
+      "name": "spool_files_run_seq_unique",
+      "columns": ["track_run_id", "seq"],
+      "nameExplicit": true,
+      "entityType": "uniques"
+    },
+    {
+      "table": "episode_regions",
+      "name": "episode_regions_region_version_unique",
+      "columns": ["speech_region_id", "grouping_version"],
+      "nameExplicit": true,
+      "entityType": "uniques"
+    },
+    {
+      "table": "job_attempts",
+      "name": "job_attempts_job_attempt_unique",
+      "columns": ["job_id", "attempt"],
+      "nameExplicit": true,
+      "entityType": "uniques"
+    },
+    {
+      "table": "apps",
+      "name": "apps_bundle_id_unique",
+      "columns": ["bundle_id"],
+      "nameExplicit": false,
+      "entityType": "uniques"
+    },
+    {
+      "table": "devices",
+      "name": "devices_uid_unique",
+      "columns": ["uid"],
+      "nameExplicit": false,
+      "entityType": "uniques"
+    },
+    {
+      "table": "spool_files",
+      "name": "spool_files_rel_path_unique",
+      "columns": ["rel_path"],
+      "nameExplicit": false,
+      "entityType": "uniques"
+    },
+    {
+      "table": "track_runs",
+      "name": "track_runs_uid_unique",
+      "columns": ["uid"],
+      "nameExplicit": false,
+      "entityType": "uniques"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "analysis_runs_stage_check",
+      "value": "\"stage\" in ('asr', 'asr_live', 'align', 'diarize', 'embed_speaker')",
+      "entityType": "checks"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "analysis_runs_status_check",
+      "value": "\"status\" in ('running', 'succeeded', 'failed', 'cancelled', 'published', 'discarded', 'superseded')",
+      "entityType": "checks"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "analysis_runs_adapter_class_check",
+      "value": "\"adapter_class\" in ('product', 'probe')",
+      "entityType": "checks"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "analysis_runs_coverage_check",
+      "value": "\"coverage\" between 0 and 1",
+      "entityType": "checks"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "analysis_runs_engine_config_check",
+      "value": "json_valid(\"engine_config\")",
+      "entityType": "checks"
+    },
+    {
+      "table": "analysis_runs",
+      "name": "analysis_runs_metrics_check",
+      "value": "json_valid(\"metrics\")",
+      "entityType": "checks"
+    },
+    {
+      "table": "episode_analysis",
+      "name": "episode_analysis_stage_check",
+      "value": "\"stage\" in ('asr', 'asr_live', 'align', 'diarize', 'embed_speaker')",
+      "entityType": "checks"
+    },
+    {
+      "table": "segments",
+      "name": "segments_samples_check",
+      "value": "\"sample_end\" >= \"sample_start\"",
+      "entityType": "checks"
+    },
+    {
+      "table": "segments",
+      "name": "segments_time_check",
+      "value": "\"end_ms\" >= \"start_ms\"",
+      "entityType": "checks"
+    },
+    {
+      "table": "segments",
+      "name": "segments_confidence_check",
+      "value": "\"confidence\" between 0 and 1",
+      "entityType": "checks"
+    },
+    {
+      "table": "speaker_turns",
+      "name": "speaker_turns_samples_check",
+      "value": "\"sample_end\" > \"sample_start\"",
+      "entityType": "checks"
+    },
+    {
+      "table": "speaker_turns",
+      "name": "speaker_turns_time_check",
+      "value": "\"end_ms\" >= \"start_ms\"",
+      "entityType": "checks"
+    },
+    {
+      "table": "speaker_turns",
+      "name": "speaker_turns_confidence_check",
+      "value": "\"confidence\" between 0 and 1",
+      "entityType": "checks"
+    },
+    {
+      "table": "deleted_ranges",
+      "name": "deleted_ranges_scope_check",
+      "value": "\"scope\" in ('all', 'track_run')",
+      "entityType": "checks"
+    },
+    {
+      "table": "deleted_ranges",
+      "name": "deleted_ranges_origin_check",
+      "value": "\"origin\" in ('app', 'tray', 'agent', 'phone')",
+      "entityType": "checks"
+    },
+    {
+      "table": "deleted_ranges",
+      "name": "deleted_ranges_wall_check",
+      "value": "\"wall_end_ms\" > \"wall_start_ms\"",
+      "entityType": "checks"
+    },
+    {
+      "table": "deleted_ranges",
+      "name": "deleted_ranges_shape_check",
+      "value": "(\"scope\" = 'all' and \"track_run_id\" is null and \"sample_start\" is null and \"sample_end\" is null) or (\"scope\" = 'track_run' and \"track_run_id\" is not null and \"sample_start\" is not null and \"sample_end\" is not null and \"sample_start\" >= 0 and \"sample_end\" > \"sample_start\")",
+      "entityType": "checks"
+    },
+    {
+      "table": "user_assertions",
+      "name": "user_assertions_kind_check",
+      "value": "\"kind\" in ('transcript_edit', 'force_boundary', 'forbid_boundary', 'size_override', 'context_override', 'speaker_is', 'speaker_is_not')",
+      "entityType": "checks"
+    },
+    {
+      "table": "user_assertions",
+      "name": "user_assertions_origin_check",
+      "value": "\"origin\" in ('app', 'tray', 'agent', 'phone')",
+      "entityType": "checks"
+    },
+    {
+      "table": "user_assertions",
+      "name": "user_assertions_range_check",
+      "value": "\"sample_end\" >= \"sample_start\"",
+      "entityType": "checks"
+    },
+    {
+      "table": "user_assertions",
+      "name": "user_assertions_payload_check",
+      "value": "json_valid(\"payload\")",
+      "entityType": "checks"
+    },
+    {
+      "table": "chunks",
+      "name": "chunks_audio_state_check",
+      "value": "\"audio_state\" in ('present', 'archived', 'expired', 'deleted')",
+      "entityType": "checks"
+    },
+    {
+      "table": "chunks",
+      "name": "chunks_pcm16_check",
+      "value": "\"sample_count\" > 0 and \"byte_length\" = \"sample_count\" * 2",
+      "entityType": "checks"
+    },
+    {
+      "table": "chunks",
+      "name": "chunks_offset_check",
+      "value": "\"byte_offset\" >= 0",
+      "entityType": "checks"
+    },
+    {
+      "table": "chunks",
+      "name": "chunks_crc32_check",
+      "value": "\"crc32\" between 0 and 4294967295",
+      "entityType": "checks"
+    },
+    {
+      "table": "devices",
+      "name": "devices_transport_check",
+      "value": "\"transport\" in ('built_in', 'usb', 'thunderbolt', 'pci', 'bluetooth', 'bluetooth_le', 'airplay', 'hdmi', 'display_port', 'continuity', 'virtual', 'aggregate', 'unknown')",
+      "entityType": "checks"
+    },
+    {
+      "table": "epochs",
+      "name": "epochs_reason_check",
+      "value": "\"reason\" in ('run_start', 'device_change', 'rate_change', 'wake', 'daemon_restart', 'discontinuity')",
+      "entityType": "checks"
+    },
+    {
+      "table": "epochs",
+      "name": "epochs_timebase_check",
+      "value": "\"timebase_numer\" > 0 and \"timebase_denom\" > 0",
+      "entityType": "checks"
+    },
+    {
+      "table": "gaps",
+      "name": "gaps_reason_check",
+      "value": "\"reason\" in ('helper_exit', 'core_exit', 'power_loss', 'disk_full', 'write_error', 'permission_revoked', 'device_lost', 'ring_overflow', 'sleep', 'paused', 'recovery_truncated')",
+      "entityType": "checks"
+    },
+    {
+      "table": "gaps",
+      "name": "gaps_range_check",
+      "value": "\"wall_end_ms\" >= \"wall_start_ms\"",
+      "entityType": "checks"
+    },
+    {
+      "table": "process_incarnations",
+      "name": "process_incarnations_evidence_check",
+      "value": "\"evidence\" in ('responsibility', 'ancestry', 'path', 'daemon_map')",
+      "entityType": "checks"
+    },
+    {
+      "table": "process_incarnations",
+      "name": "process_incarnations_confidence_check",
+      "value": "\"confidence\" between 0 and 1",
+      "entityType": "checks"
+    },
+    {
+      "table": "speech_regions",
+      "name": "speech_regions_state_check",
+      "value": "\"state\" in ('open', 'closed')",
+      "entityType": "checks"
+    },
+    {
+      "table": "speech_regions",
+      "name": "speech_regions_end_reason_check",
+      "value": "\"end_reason\" in ('silence', 'max_length', 'track_closed', 'recovery', 'deleted')",
+      "entityType": "checks"
+    },
+    {
+      "table": "speech_regions",
+      "name": "speech_regions_end_check",
+      "value": "(\"state\" = 'open' and \"sample_end\" is null) or (\"state\" = 'closed' and \"sample_end\" is not null and \"wall_end_ms\" is not null and \"sample_end\" > \"sample_start\")",
+      "entityType": "checks"
+    },
+    {
+      "table": "spool_files",
+      "name": "spool_files_state_check",
+      "value": "\"state\" in ('open', 'closed', 'expired', 'deleted')",
+      "entityType": "checks"
+    },
+    {
+      "table": "track_runs",
+      "name": "track_runs_source_kind_check",
+      "value": "\"source_kind\" in ('input', 'app', 'system', 'phone')",
+      "entityType": "checks"
+    },
+    {
+      "table": "track_runs",
+      "name": "track_runs_state_check",
+      "value": "\"state\" in ('open', 'closed', 'sealed')",
+      "entityType": "checks"
+    },
+    {
+      "table": "track_runs",
+      "name": "track_runs_end_reason_check",
+      "value": "\"end_reason\" in ('stopped', 'paused', 'device_lost', 'device_changed', 'format_changed', 'sleep', 'released', 'helper_exit', 'recovered')",
+      "entityType": "checks"
+    },
+    {
+      "table": "track_runs",
+      "name": "track_runs_sample_rate_check",
+      "value": "\"sample_rate\" > 0",
+      "entityType": "checks"
+    },
+    {
+      "table": "track_runs",
+      "name": "track_runs_end_check",
+      "value": "(\"state\" = 'open' and \"ended_wall_ms\" is null) or (\"state\" <> 'open' and \"ended_wall_ms\" is not null)",
+      "entityType": "checks"
+    },
+    {
+      "table": "episodes",
+      "name": "episodes_state_check",
+      "value": "\"state\" in ('open', 'closed')",
+      "entityType": "checks"
+    },
+    {
+      "table": "episodes",
+      "name": "episodes_context_check",
+      "value": "\"context\" in ('call', 'in_person', 'media', 'mixed')",
+      "entityType": "checks"
+    },
+    {
+      "table": "episodes",
+      "name": "episodes_size_check",
+      "value": "\"size\" in ('trace', 'moment', 'conversation')",
+      "entityType": "checks"
+    },
+    {
+      "table": "episodes",
+      "name": "episodes_size_state_check",
+      "value": "\"size_state\" in ('provisional', 'final')",
+      "entityType": "checks"
+    },
+    {
+      "table": "episodes",
+      "name": "episodes_analysis_state_check",
+      "value": "\"analysis_state\" in ('pending', 'queued', 'running', 'complete', 'failed', 'stale')",
+      "entityType": "checks"
+    },
+    {
+      "table": "episodes",
+      "name": "episodes_generation_check",
+      "value": "\"input_generation\" > 0",
+      "entityType": "checks"
+    },
+    {
+      "table": "episodes",
+      "name": "episodes_kind_inputs_check",
+      "value": "json_valid(\"kind_inputs\")",
+      "entityType": "checks"
+    },
+    {
+      "table": "episodes",
+      "name": "episodes_end_check",
+      "value": "\"ended_at_ms\" is null or \"ended_at_ms\" >= \"started_at_ms\"",
+      "entityType": "checks"
+    },
+    {
+      "table": "identity_rules",
+      "name": "identity_rules_scope_check",
+      "value": "\"scope\" in ('global', 'app', 'device', 'episode')",
+      "entityType": "checks"
+    },
+    {
+      "table": "identity_rules",
+      "name": "identity_rules_target_check",
+      "value": "(case \"scope\"\n        when 'global' then \"app_id\" is null and \"device_id\" is null and \"episode_id\" is null\n        when 'app' then \"app_id\" is not null and \"device_id\" is null and \"episode_id\" is null\n        when 'device' then \"device_id\" is not null and \"app_id\" is null and \"episode_id\" is null\n        when 'episode' then \"episode_id\" is not null and \"app_id\" is null and \"device_id\" is null\n        else 0 end)",
+      "entityType": "checks"
+    },
+    {
+      "table": "settings",
+      "name": "settings_key_check",
+      "value": "\"key\" is not null and length(\"key\") > 0",
+      "entityType": "checks"
+    },
+    {
+      "table": "settings",
+      "name": "settings_value_check",
+      "value": "json_valid(\"value\")",
+      "entityType": "checks"
+    },
+    {
+      "table": "job_attempts",
+      "name": "job_attempts_outcome_check",
+      "value": "\"outcome\" in ('running', 'succeeded', 'failed', 'cancelled', 'abandoned')",
+      "entityType": "checks"
+    },
+    {
+      "table": "jobs",
+      "name": "jobs_kind_check",
+      "value": "\"kind\" in ('analysis', 'live_analysis', 'retention', 'deletion', 'maintenance')",
+      "entityType": "checks"
+    },
+    {
+      "table": "jobs",
+      "name": "jobs_state_check",
+      "value": "\"state\" in ('queued', 'running', 'succeeded', 'failed', 'cancelled')",
+      "entityType": "checks"
+    },
+    {
+      "table": "jobs",
+      "name": "jobs_stage_check",
+      "value": "\"stage\" in ('asr', 'asr_live', 'align', 'diarize', 'embed_speaker')",
+      "entityType": "checks"
+    },
+    {
+      "table": "jobs",
+      "name": "jobs_attempts_check",
+      "value": "\"attempts\" >= 0 and \"max_attempts\" > 0",
+      "entityType": "checks"
+    },
+    {
+      "table": "jobs",
+      "name": "jobs_payload_check",
+      "value": "json_valid(\"payload\")",
+      "entityType": "checks"
+    }
+  ],
+  "renames": []
+}

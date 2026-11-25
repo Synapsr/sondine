@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- sondine-audio (Contents/Helpers). No JIT: it runs native code only. -->
+<plist version="1.0">
+  <dict>
+    <!-- ADR 010: App Sandbox with no network entitlement denies outbound
+         network. Not com.apple.security.inherit: that is only for children of
+         a sandboxed parent, and Electron main is not sandboxed. -->
+    <key>com.apple.security.app-sandbox</key>
+    <true/>
+    <key>com.apple.security.device.audio-input</key>
+    <true/>
+    <!-- Model weights, read-only: main copies the bundled VAD model there
+         (ADR 013). The sandbox denies reading the app bundle itself. -->
+    <key>com.apple.security.temporary-exception.files.home-relative-path.read-only</key>
+    <array>
+      <string>/Library/Application Support/Sondine/models/</string>
+    </array>
+    <!-- The spool and the socket live in the group container (ADR 013). -->
+    <key>com.apple.security.application-groups</key>
+    <array>
+      <string>P5G8WAJ2G2.app.sondine</string>
+    </array>
+  </dict>
+</plist>

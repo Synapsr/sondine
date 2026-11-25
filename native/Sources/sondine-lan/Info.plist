@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Linked into the __TEXT,__info_plist section of sondine-lan (Package.swift).
+     App Sandbox refuses to start a tool whose signature carries no bundle
+     identifier (ADR 010). The version matches `lanRelayVersion` in
+     SondineLan/lan-command.swift. Its local network string matches the app's
+     (ADR 010; check-package.mjs): macOS credits the relay's network use to
+     Sondine. -->
+<plist version="1.0">
+  <dict>
+    <key>CFBundleIdentifier</key>
+    <string>app.sondine.lan</string>
+    <key>CFBundleName</key>
+    <string>sondine-lan</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleShortVersionString</key>
+    <string>0.1.0</string>
+    <key>CFBundleVersion</key>
+    <string>0.1.0</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>27.0</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>Sondine talks with the iPhones you pair, to receive their recordings and show them your memory.</string>
+    <key>NSBonjourServices</key>
+    <array>
+      <string>_sondine._tcp</string>
+    </array>
+  </dict>
+</plist>

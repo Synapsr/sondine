@@ -1,0 +1,859 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sondine:phone:2:memory",
+  "$comment": "Generated from packages/protocol/src by `pnpm --filter @sondine/protocol run gen`. Do not edit.",
+  "title": "Sondine phone memory reads",
+  "description": "The JSON bodies of the phone's live reads of the Mac's memory: search, a day, its journal, the open commitments and a conversation's text, as `$defs` (ADR 008, M5.4).",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/MemorySearchRequest"
+    },
+    {
+      "$ref": "#/$defs/MemorySearchAnswer"
+    },
+    {
+      "$ref": "#/$defs/MemoryDayRequest"
+    },
+    {
+      "$ref": "#/$defs/MemoryDayAnswer"
+    },
+    {
+      "$ref": "#/$defs/MemoryJournalRequest"
+    },
+    {
+      "$ref": "#/$defs/MemoryJournalAnswer"
+    },
+    {
+      "$ref": "#/$defs/MemoryCommitmentsRequest"
+    },
+    {
+      "$ref": "#/$defs/MemoryCommitmentsAnswer"
+    },
+    {
+      "$ref": "#/$defs/MemoryConversationRequest"
+    },
+    {
+      "$ref": "#/$defs/MemoryConversationAnswer"
+    }
+  ],
+  "$defs": {
+    "MemorySearchRequest": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "$ref": "#/$defs/SearchText"
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        }
+      },
+      "required": ["text", "offset"],
+      "additionalProperties": false,
+      "description": "A search of the Mac's transcripts, read as the Mac's search reads it, from `offset` (episodes skipped)."
+    },
+    "SearchText": {
+      "type": "string",
+      "pattern": "^[^\\u0000-\\u001f\\u007f]{1,200}$",
+      "description": "What the user typed in the phone's search field: 1 to 200 characters (UTF-16 units), no control characters. The phone trims it."
+    },
+    "MemorySearchAnswer": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "results"
+            },
+            "episodes": {
+              "maxItems": 20,
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/PhoneSearchEpisode"
+              }
+            },
+            "total": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "untranscribed": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "nextOffset": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": ["status", "episodes", "total", "untranscribed", "nextOffset"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "withheld"
+            }
+          },
+          "required": ["status"],
+          "additionalProperties": false
+        }
+      ],
+      "description": "`results`: matching episodes newest first (20 at most), how many match in all, how many closed episodes are not transcribed yet (the search cannot see them), and the offset of the next page (null on the last). `withheld`: something was deleted while it was read; ask again."
+    },
+    "PhoneSearchEpisode": {
+      "type": "object",
+      "properties": {
+        "episode": {
+          "$ref": "#/$defs/PhoneEpisode"
+        },
+        "hitCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "hits": {
+          "maxItems": 5,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PhoneSearchHit"
+          }
+        },
+        "notes": {
+          "maxItems": 5,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500
+              },
+              "highlights": {
+                "maxItems": 64,
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/PhoneTextRange"
+                }
+              }
+            },
+            "required": ["text", "highlights"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["episode", "hitCount", "hits", "notes"],
+      "additionalProperties": false,
+      "description": "An episode the search found: how many of its sentences matched, the best (at most 5) in time order, and its notes or links that matched (their first 500 characters)."
+    },
+    "PhoneEpisode": {
+      "type": "object",
+      "properties": {
+        "episodeId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "startedAtMs": {
+          "$ref": "#/$defs/WallMs"
+        },
+        "endedAtMs": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WallMs"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "context": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": ["call", "in_person", "media", "mixed", "dictation", "imported"]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "size": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": ["trace", "moment", "conversation"]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "firstWords": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 120
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "people": {
+          "maxItems": 16,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "guesses": {
+          "maxItems": 16,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "apps": {
+          "maxItems": 8,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          }
+        },
+        "phone": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/RecordingName"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "recordingId": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/Uuid"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": ["name", "recordingId"],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "episodeId",
+        "startedAtMs",
+        "endedAtMs",
+        "context",
+        "size",
+        "firstWords",
+        "people",
+        "guesses",
+        "apps",
+        "phone"
+      ],
+      "additionalProperties": false,
+      "description": "An episode of the Mac's memory as the phone lists it: its times (`endedAtMs` null while it goes on), its kind (`context`: in person, a call, media, mixed, a dictation, an import; `size`), its first words, the names the user gave its voices (`people`) and whom Sondine takes others for (`guesses`, unconfirmed, ADR 030), the apps it heard, and for a phone recording its name and, when this phone made it, its id."
+    },
+    "WallMs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991,
+      "description": "Wall-clock milliseconds since the Unix epoch; display and calendar only."
+    },
+    "RecordingName": {
+      "type": "string",
+      "pattern": "^[^\\u0000-\\u001f\\u007f]{1,200}$",
+      "description": "The name the user typed for a recording on the phone: 1 to 200 characters (UTF-16 units), no control characters. The phone trims it; the Mac reads one of blanks only as no name."
+    },
+    "Uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "description": "Lowercase canonical UUID."
+    },
+    "PhoneSearchHit": {
+      "type": "object",
+      "properties": {
+        "sentenceId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "startMs": {
+          "$ref": "#/$defs/WallMs"
+        },
+        "endMs": {
+          "$ref": "#/$defs/WallMs"
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 20000
+        },
+        "highlights": {
+          "maxItems": 64,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PhoneTextRange"
+          }
+        },
+        "speaker": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PhoneSpeaker"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["sentenceId", "startMs", "endMs", "text", "highlights", "speaker"],
+      "additionalProperties": false,
+      "description": "A sentence the search found: its id, times, text, where it matched, and the voice that said it (null when none is known)."
+    },
+    "PhoneTextRange": {
+      "type": "object",
+      "properties": {
+        "start": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "end": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": ["start", "end"],
+      "additionalProperties": false,
+      "description": "Where the search matched in a text, in UTF-16 code units: `text.slice(start, end)`."
+    },
+    "PhoneSpeaker": {
+      "type": "object",
+      "properties": {
+        "ordinal": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "guess": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "self": {
+          "type": "boolean"
+        },
+        "guessSelf": {
+          "type": "boolean"
+        }
+      },
+      "required": ["ordinal", "name", "guess", "self"],
+      "additionalProperties": false,
+      "description": "A voice of the transcript: its number (« Voix 2 »), the user's name for it, or whom Sondine takes it for (ADR 030: a guess, unconfirmed, shown as one), and whether it is the user. Version 2: `guessSelf`, the guess is the user (« Moi ? »), which the phone may confirm (`VoiceRequest`)."
+    },
+    "MemoryDayRequest": {
+      "type": "object",
+      "properties": {
+        "day": {
+          "type": "string",
+          "format": "date",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+        }
+      },
+      "required": ["day"],
+      "additionalProperties": false,
+      "description": "A day of the Mac's memory, `YYYY-MM-DD` in the Mac's time zone."
+    },
+    "MemoryDayAnswer": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "day"
+            },
+            "day": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            },
+            "conversations": {
+              "maxItems": 100,
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/PhoneEpisode"
+              }
+            },
+            "moments": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "media": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "dictations": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "traces": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "status",
+            "day",
+            "conversations",
+            "moments",
+            "media",
+            "dictations",
+            "traces"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "withheld"
+            }
+          },
+          "required": ["status"],
+          "additionalProperties": false
+        }
+      ],
+      "description": "`day`: the day's conversations newest first (100 at most, the ongoing one included), and how many moments, media, dictations and traces it had. `withheld`: ask again."
+    },
+    "MemoryJournalRequest": {
+      "type": "object",
+      "properties": {
+        "day": {
+          "type": "string",
+          "format": "date",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+        }
+      },
+      "required": ["day"],
+      "additionalProperties": false,
+      "description": "A day's journal, `YYYY-MM-DD` in the Mac's time zone."
+    },
+    "MemoryJournalAnswer": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "journal"
+            },
+            "day": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            },
+            "lines": {
+              "maxItems": 1000,
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/PhoneMemoryLine"
+              }
+            },
+            "commitments": {
+              "maxItems": 500,
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/PhoneMemoryLine"
+              }
+            },
+            "pending": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "writing": {
+              "type": "boolean"
+            }
+          },
+          "required": ["status", "day", "lines", "commitments", "pending", "writing"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "withheld"
+            }
+          },
+          "required": ["status"],
+          "additionalProperties": false
+        }
+      ],
+      "description": "`journal`: the day's lines and the commitments made that day, in time order, but those the user said were wrong; how many of its conversations are not written yet, and whether one is being written now. `withheld`: ask again."
+    },
+    "PhoneMemoryLine": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["line", "commitment"]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "voices": {
+          "maxItems": 32,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PhoneLineVoice"
+          }
+        },
+        "sentenceIds": {
+          "maxItems": 64,
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          }
+        },
+        "startMs": {
+          "$ref": "#/$defs/WallMs"
+        },
+        "done": {
+          "type": "boolean"
+        },
+        "due": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "episodeId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": ["kind", "text", "voices", "sentenceIds", "startMs", "done", "due", "episodeId"],
+      "additionalProperties": false,
+      "description": "A line of the Mac's journal or a commitment (ADR 028), read only: as a recording's journal line, with the episode it is about. `sentenceIds` are the sentences of that episode it cites; `startMs` is when the first of them was said."
+    },
+    "PhoneLineVoice": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9]{1,8}$"
+        },
+        "ordinal": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "guess": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "self": {
+          "type": "boolean"
+        }
+      },
+      "required": ["ref", "ordinal", "name", "guess", "self"],
+      "additionalProperties": false,
+      "description": "A voice a journal line names as `{P2}` in its text: the user's name for it, whom Sondine takes it for (a guess), the user, and its number when known."
+    },
+    "MemoryCommitmentsRequest": {
+      "type": "object",
+      "properties": {
+        "beforeMs": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WallMs"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["beforeMs"],
+      "additionalProperties": false,
+      "description": "One page of the open commitments made in the 90 days before `beforeMs` (now when null): about 500, newest conversation first."
+    },
+    "MemoryCommitmentsAnswer": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "commitments"
+            },
+            "today": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            },
+            "commitments": {
+              "maxItems": 2000,
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/PhoneMemoryLine"
+              }
+            },
+            "nextBeforeMs": {
+              "$ref": "#/$defs/WallMs"
+            }
+          },
+          "required": ["status", "today", "commitments", "nextBeforeMs"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "withheld"
+            }
+          },
+          "required": ["status"],
+          "additionalProperties": false
+        }
+      ],
+      "description": "`commitments`: a page of the open ones, newest conversation first (about 500: a page never splits the conversations that started in one millisecond); `today` in the Mac's time zone (one whose `due` is before it is late); `nextBeforeMs`, the start of the oldest conversation kept or of the window, for the next page. `withheld`: ask again."
+    },
+    "MemoryConversationRequest": {
+      "type": "object",
+      "properties": {
+        "episodeId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": ["episodeId"],
+      "additionalProperties": false,
+      "description": "An episode's text, by its id on the Mac."
+    },
+    "MemoryConversationAnswer": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "conversation"
+            },
+            "episode": {
+              "$ref": "#/$defs/PhoneEpisode"
+            },
+            "speakers": {
+              "maxItems": 64,
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/PhoneSpeaker"
+              }
+            },
+            "sentences": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/PhoneSentence"
+              }
+            },
+            "notes": {
+              "maxItems": 500,
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/PhoneNote"
+              }
+            },
+            "truncated": {
+              "type": "boolean"
+            }
+          },
+          "required": ["status", "episode", "speakers", "sentences", "notes", "truncated"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "gone"
+            }
+          },
+          "required": ["status"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "withheld"
+            }
+          },
+          "required": ["status"],
+          "additionalProperties": false
+        }
+      ],
+      "description": "`conversation`: the episode, its voices (the user's names, a guess as a guess), its sentences in time order and its notes and links, read only; `truncated` when the last sentences did not fit in one answer. `gone`: deleted, or never there. `withheld`: ask again."
+    },
+    "PhoneSentence": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "startMs": {
+          "$ref": "#/$defs/WallMs"
+        },
+        "endMs": {
+          "$ref": "#/$defs/WallMs"
+        },
+        "speaker": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 20000
+        }
+      },
+      "required": ["id", "startMs", "endMs", "speaker", "text"],
+      "additionalProperties": false,
+      "description": "A sentence of the transcript, in time order: its id on the Mac, its times, the voice that said it (`PhoneSpeaker.ordinal`) and its text."
+    },
+    "PhoneNote": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20000
+        },
+        "addedAtMs": {
+          "$ref": "#/$defs/WallMs"
+        }
+      },
+      "required": ["id", "text", "addedAtMs"],
+      "additionalProperties": false,
+      "description": "A note (or a link) on the recording's conversation (ADR 024), from the phone or the Mac."
+    }
+  }
+}

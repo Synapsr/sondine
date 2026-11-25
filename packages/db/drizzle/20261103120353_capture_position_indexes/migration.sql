@@ -1,0 +1,2 @@
+CREATE INDEX `segments_track_run_sample_idx` ON `segments` (`track_run_id`,`sample_start`);--> statement-breakpoint
+CREATE INDEX `speaker_turns_track_run_sample_idx` ON `speaker_turns` (`track_run_id`,`sample_start`);

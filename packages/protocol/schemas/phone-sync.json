@@ -1,0 +1,1015 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sondine:phone:2:sync",
+  "$comment": "Generated from packages/protocol/src by `pnpm --filter @sondine/protocol run gen`. Do not edit.",
+  "title": "Sondine phone sync messages",
+  "description": "Every JSON body the iPhone app and the Mac exchange, the pairing QR and the relay's hello, as `$defs` (ADR 008).",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/PairingInvite"
+    },
+    {
+      "$ref": "#/$defs/PhoneRelayHello"
+    },
+    {
+      "$ref": "#/$defs/PhoneError"
+    },
+    {
+      "$ref": "#/$defs/PairRequest"
+    },
+    {
+      "$ref": "#/$defs/PairAnswer"
+    },
+    {
+      "$ref": "#/$defs/HelloRequest"
+    },
+    {
+      "$ref": "#/$defs/HelloAnswer"
+    },
+    {
+      "$ref": "#/$defs/AnnounceRequest"
+    },
+    {
+      "$ref": "#/$defs/UploadStatus"
+    },
+    {
+      "$ref": "#/$defs/StatesRequest"
+    },
+    {
+      "$ref": "#/$defs/StatesAnswer"
+    },
+    {
+      "$ref": "#/$defs/DeleteRequest"
+    },
+    {
+      "$ref": "#/$defs/DeleteAnswer"
+    },
+    {
+      "$ref": "#/$defs/GetRequest"
+    },
+    {
+      "$ref": "#/$defs/GetAnswer"
+    },
+    {
+      "$ref": "#/$defs/RenameRequest"
+    },
+    {
+      "$ref": "#/$defs/NoteRequest"
+    },
+    {
+      "$ref": "#/$defs/TagRequest"
+    },
+    {
+      "$ref": "#/$defs/VoiceRequest"
+    },
+    {
+      "$ref": "#/$defs/TagsRequest"
+    },
+    {
+      "$ref": "#/$defs/TagsAnswer"
+    },
+    {
+      "$ref": "#/$defs/OperationAnswer"
+    },
+    {
+      "$ref": "#/$defs/ForgetRequest"
+    },
+    {
+      "$ref": "#/$defs/ForgetAnswer"
+    }
+  ],
+  "$defs": {
+    "PairingInvite": {
+      "type": "object",
+      "properties": {
+        "v": {
+          "type": "number",
+          "const": 1
+        },
+        "pin": {
+          "$ref": "#/$defs/KeyPin"
+        },
+        "token": {
+          "$ref": "#/$defs/Base64Url32"
+        },
+        "name": {
+          "$ref": "#/$defs/DeviceName"
+        },
+        "port": {
+          "$ref": "#/$defs/PhonePort"
+        },
+        "addrs": {
+          "maxItems": 8,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/IpAddress"
+          }
+        }
+      },
+      "required": ["v", "pin", "token", "name", "port", "addrs"],
+      "additionalProperties": false,
+      "description": "The pairing QR: the Mac's key pin, a one-time token, the service's name, its port and addresses to try when Bonjour is blocked."
+    },
+    "KeyPin": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256 of the Mac's TLS public key (SubjectPublicKeyInfo, DER), lowercase hex: the only thing the phone trusts."
+    },
+    "Base64Url32": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{43}$",
+      "description": "32 random bytes, base64url without padding."
+    },
+    "DeviceName": {
+      "type": "string",
+      "pattern": "^[^\\u0000-\\u001f\\u007f]{1,64}$",
+      "description": "The name the user gave a phone or the Mac's service, 1 to 64 characters, no control characters."
+    },
+    "PhonePort": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65535,
+      "description": "A TCP port."
+    },
+    "IpAddress": {
+      "type": "string",
+      "pattern": "^(?:[0-9]{1,3}(?:\\.[0-9]{1,3}){3}|[0-9a-fA-F:.]{2,45}(?:%[A-Za-z0-9]{1,15})?)$",
+      "description": "An IPv4 address in dotted form, or an IPv6 address (with its zone for a link-local one)."
+    },
+    "PhoneRelayHello": {
+      "type": "object",
+      "properties": {
+        "v": {
+          "type": "number",
+          "const": 1
+        },
+        "via": {
+          "type": "string",
+          "enum": ["lan", "tailnet", "loopback"]
+        },
+        "peer": {
+          "$ref": "#/$defs/IpAddress"
+        }
+      },
+      "required": ["v", "via", "peer"],
+      "additionalProperties": false,
+      "description": "The first line `sondine-lan` writes on core's phone socket: the path the peer took and its address."
+    },
+    "PhoneError": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/PhoneErrorCode"
+        },
+        "macVersion": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": ["error"],
+      "additionalProperties": false,
+      "description": "A refusal's body. `macVersion` comes with `version`, so each side says which app to update."
+    },
+    "PhoneErrorCode": {
+      "type": "string",
+      "enum": [
+        "unauthorized",
+        "revoked",
+        "version",
+        "not-yours",
+        "bad-request",
+        "busy",
+        "gone",
+        "stale",
+        "range",
+        "pairing-closed",
+        "pairing-refused",
+        "pairing-used",
+        "pairing-tailnet"
+      ],
+      "description": "Why the Mac refused a request: no or unknown credential, revoked, another protocol version, a recording another phone made, a malformed request, too many at once or too many wrong credentials, a recording's audio no longer there (deleted, not ready, or taken by retention), a playback whose generation moved (fetch the result again), a byte range past the end, or a pairing that is closed, refused by the user, already used or expired."
+    },
+    "PairRequest": {
+      "type": "object",
+      "properties": {
+        "v": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "token": {
+          "$ref": "#/$defs/Base64Url32"
+        },
+        "deviceId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "deviceName": {
+          "$ref": "#/$defs/DeviceName"
+        }
+      },
+      "required": ["v", "token", "deviceId", "deviceName"],
+      "additionalProperties": false,
+      "description": "The phone's pairing request: the QR's token, the id it made for itself, its name, its version."
+    },
+    "Uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "description": "Lowercase canonical UUID."
+    },
+    "PairAnswer": {
+      "type": "object",
+      "properties": {
+        "credential": {
+          "$ref": "#/$defs/PhoneCredential"
+        },
+        "macId": {
+          "$ref": "#/$defs/Uuid"
+        }
+      },
+      "required": ["credential", "macId"],
+      "additionalProperties": false,
+      "description": "The Mac's « Appairer »: the credential (kept in the Keychain) and the Mac's id."
+    },
+    "PhoneCredential": {
+      "type": "string",
+      "pattern": "^sdp_[A-Za-z0-9_-]{43}$",
+      "description": "The phone's credential: `sdp_` and 32 random bytes, base64url."
+    },
+    "HelloRequest": {
+      "type": "object",
+      "properties": {
+        "v": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "clockMs": {
+          "$ref": "#/$defs/WallMs"
+        },
+        "recordingIds": {
+          "maxItems": 2000,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Uuid"
+          }
+        }
+      },
+      "required": ["v", "clockMs", "recordingIds"],
+      "additionalProperties": false,
+      "description": "The start of a sync: the phone's version, clock and the recording ids it holds."
+    },
+    "WallMs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991,
+      "description": "Wall-clock milliseconds since the Unix epoch; display and calendar only."
+    },
+    "HelloAnswer": {
+      "type": "object",
+      "properties": {
+        "v": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2
+        },
+        "clockMs": {
+          "$ref": "#/$defs/WallMs"
+        },
+        "macId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "addrs": {
+          "maxItems": 16,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/IpAddress"
+          }
+        },
+        "port": {
+          "$ref": "#/$defs/PhonePort"
+        },
+        "maxFileBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "via": {
+          "type": "string",
+          "const": "tailnet"
+        }
+      },
+      "required": ["v", "clockMs", "macId", "addrs", "port", "maxFileBytes"],
+      "additionalProperties": false,
+      "description": "The Mac's clock, id, addresses and port (to find it again without Bonjour), its limits, and the path this phone came by (M5.5): `via` is `tailnet` through Tailscale, and absent at home, so a phone built before M5.5, which reads no other key, still syncs there. `v` is the phone's own version, which the Mac then speaks to it (ADR 039)."
+    },
+    "AnnounceRequest": {
+      "type": "object",
+      "properties": {
+        "recordingId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "sha256": {
+          "$ref": "#/$defs/Sha256Hex"
+        }
+      },
+      "required": ["recordingId", "bytes", "sha256"],
+      "additionalProperties": false,
+      "description": "A file the phone wants to send: its id, length and SHA-256."
+    },
+    "Sha256Hex": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256, lowercase hex."
+    },
+    "UploadStatus": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "send"
+            },
+            "offset": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": ["status", "offset"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "stored"
+            }
+          },
+          "required": ["status"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "conflict"
+            }
+          },
+          "required": ["status"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "deleted"
+            }
+          },
+          "required": ["status"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "refused"
+            },
+            "reason": {
+              "$ref": "#/$defs/RecordingRefusal"
+            }
+          },
+          "required": ["status", "reason"],
+          "additionalProperties": false
+        }
+      ],
+      "description": "`send`: continue from `offset`. `stored`: held for good, the phone may erase its audio. `conflict`: another recording is here under this id, the phone keeps its file. `deleted`: deleted on the Mac, the phone erases its copy. `refused`: try again later, or never for `too-large` and `header`."
+    },
+    "RecordingRefusal": {
+      "type": "string",
+      "enum": ["too-large", "no-room", "unreadable", "header", "hash", "offset", "busy"],
+      "description": "Why the Mac will not take a file now: larger than its limit, no room, its length unreadable, its header missing or naming another id or device, its hash wrong (the part is discarded), or an upload of this phone already running."
+    },
+    "StatesRequest": {
+      "type": "object",
+      "properties": {
+        "recordingIds": {
+          "maxItems": 2000,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Uuid"
+          }
+        }
+      },
+      "required": ["recordingIds"],
+      "additionalProperties": false,
+      "description": "The recording ids the phone holds and follows."
+    },
+    "StatesAnswer": {
+      "type": "object",
+      "properties": {
+        "states": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "recordingId": {
+                "$ref": "#/$defs/Uuid"
+              },
+              "state": {
+                "$ref": "#/$defs/RecordingState"
+              }
+            },
+            "required": ["recordingId", "state"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["states"],
+      "additionalProperties": false,
+      "description": "One state per id asked, in the same order. An id another phone made reads `unknown`."
+    },
+    "RecordingState": {
+      "type": "string",
+      "enum": ["unknown", "receiving", "waiting", "transcribing", "ready", "deleted"],
+      "description": "A recording's state on the Mac: `unknown` (never received), `receiving` (a part is in the inbox), `waiting` (stored, analysis not started), `transcribing`, `ready`, or `deleted`."
+    },
+    "DeleteRequest": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "$ref": "#/$defs/OperationId"
+        },
+        "recordingId": {
+          "$ref": "#/$defs/Uuid"
+        }
+      },
+      "required": ["operationId", "recordingId"],
+      "additionalProperties": false,
+      "description": "A deletion from the phone's outbox: the Mac deletes the recording (or the part it receives) and keeps a tombstone either way."
+    },
+    "OperationId": {
+      "description": "The id the phone gave one operation of its outbox, so a retry does nothing twice.",
+      "$ref": "#/$defs/Uuid"
+    },
+    "DeleteAnswer": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "const": "deleted"
+        }
+      },
+      "required": ["status"],
+      "additionalProperties": false,
+      "description": "The deletion is done (also when it was already): the operation leaves the outbox."
+    },
+    "GetRequest": {
+      "type": "object",
+      "properties": {
+        "recordingId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "revision": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Sha256Hex"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["recordingId", "revision"],
+      "additionalProperties": false,
+      "description": "A recording's result, with the revision the phone holds (null when it has none)."
+    },
+    "GetAnswer": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "result"
+            },
+            "revision": {
+              "$ref": "#/$defs/Sha256Hex"
+            },
+            "result": {
+              "$ref": "#/$defs/PhoneResult"
+            }
+          },
+          "required": ["status", "revision", "result"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "unchanged"
+            }
+          },
+          "required": ["status"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "unavailable"
+            },
+            "state": {
+              "type": "string",
+              "enum": ["unknown", "receiving", "waiting", "transcribing", "deleted"]
+            }
+          },
+          "required": ["status", "state"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "const": "withheld"
+            }
+          },
+          "required": ["status"],
+          "additionalProperties": false
+        }
+      ],
+      "description": "`result`: the result and its revision (the SHA-256 of the result's JSON as sent). `unchanged`: the phone's revision is current. `unavailable`: no result now, with the recording's state. `withheld`: something was deleted while it was read; ask again."
+    },
+    "PhoneResult": {
+      "type": "object",
+      "properties": {
+        "recordingId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RecordingName"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "startedAtMs": {
+          "$ref": "#/$defs/WallMs"
+        },
+        "endedAtMs": {
+          "$ref": "#/$defs/WallMs"
+        },
+        "timeUncertain": {
+          "type": "boolean"
+        },
+        "speakers": {
+          "maxItems": 64,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PhoneSpeaker"
+          }
+        },
+        "sentences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PhoneSentence"
+          }
+        },
+        "journal": {
+          "maxItems": 500,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PhoneJournalLine"
+          }
+        },
+        "notes": {
+          "maxItems": 500,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PhoneNote"
+          }
+        },
+        "tags": {
+          "maxItems": 400,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PhoneTagName"
+          }
+        },
+        "audio": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "generation": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "startedAtMs": {
+                  "$ref": "#/$defs/WallMs"
+                },
+                "durationMs": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["generation", "startedAtMs", "durationMs"],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "recordingId",
+        "name",
+        "startedAtMs",
+        "endedAtMs",
+        "timeUncertain",
+        "speakers",
+        "sentences",
+        "journal",
+        "notes",
+        "audio"
+      ],
+      "additionalProperties": false,
+      "description": "What the Mac made of one of the phone's recordings: its name, times, voices, sentences, the journal lines and commitments that cite it, its notes, and what playback needs (`audio`: the generation for `GET …/audio?g=`, where the WAV's first sample is, its length; null when there is nothing to hear). Version 2: its `tags` (ADR 039)."
+    },
+    "RecordingName": {
+      "type": "string",
+      "pattern": "^[^\\u0000-\\u001f\\u007f]{1,200}$",
+      "description": "The name the user typed for a recording on the phone: 1 to 200 characters (UTF-16 units), no control characters. The phone trims it; the Mac reads one of blanks only as no name."
+    },
+    "PhoneSpeaker": {
+      "type": "object",
+      "properties": {
+        "ordinal": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "guess": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "self": {
+          "type": "boolean"
+        },
+        "guessSelf": {
+          "type": "boolean"
+        }
+      },
+      "required": ["ordinal", "name", "guess", "self"],
+      "additionalProperties": false,
+      "description": "A voice of the transcript: its number (« Voix 2 »), the user's name for it, or whom Sondine takes it for (ADR 030: a guess, unconfirmed, shown as one), and whether it is the user. Version 2: `guessSelf`, the guess is the user (« Moi ? »), which the phone may confirm (`VoiceRequest`)."
+    },
+    "PhoneSentence": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "startMs": {
+          "$ref": "#/$defs/WallMs"
+        },
+        "endMs": {
+          "$ref": "#/$defs/WallMs"
+        },
+        "speaker": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 20000
+        }
+      },
+      "required": ["id", "startMs", "endMs", "speaker", "text"],
+      "additionalProperties": false,
+      "description": "A sentence of the transcript, in time order: its id on the Mac, its times, the voice that said it (`PhoneSpeaker.ordinal`) and its text."
+    },
+    "PhoneJournalLine": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["line", "commitment"]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "voices": {
+          "maxItems": 32,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PhoneLineVoice"
+          }
+        },
+        "sentenceIds": {
+          "maxItems": 64,
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          }
+        },
+        "startMs": {
+          "$ref": "#/$defs/WallMs"
+        },
+        "done": {
+          "type": "boolean"
+        },
+        "due": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["kind", "text", "voices", "sentenceIds", "startMs", "done", "due"],
+      "additionalProperties": false,
+      "description": "A line of the Mac's journal (ADR 028) or a commitment that cites this recording: its text with voices as `{P2}`, the sentences of this recording it cites, when, and for a commitment whether it is done and its date (`YYYY-MM-DD`)."
+    },
+    "PhoneLineVoice": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9]{1,8}$"
+        },
+        "ordinal": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "guess": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "self": {
+          "type": "boolean"
+        }
+      },
+      "required": ["ref", "ordinal", "name", "guess", "self"],
+      "additionalProperties": false,
+      "description": "A voice a journal line names as `{P2}` in its text: the user's name for it, whom Sondine takes it for (a guess), the user, and its number when known."
+    },
+    "PhoneNote": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20000
+        },
+        "addedAtMs": {
+          "$ref": "#/$defs/WallMs"
+        }
+      },
+      "required": ["id", "text", "addedAtMs"],
+      "additionalProperties": false,
+      "description": "A note (or a link) on the recording's conversation (ADR 024), from the phone or the Mac."
+    },
+    "PhoneTagName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 400,
+      "description": "A tag's name as the Mac keeps it (ADR 039): cleaned, one line, 1 to 40 characters."
+    },
+    "RenameRequest": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "$ref": "#/$defs/OperationId"
+        },
+        "recordingId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RecordingName"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "typedAtMs": {
+          "$ref": "#/$defs/WallMs"
+        }
+      },
+      "required": ["operationId", "recordingId", "name", "typedAtMs"],
+      "additionalProperties": false,
+      "description": "A name typed on the phone (null: back to the hour), and when it was typed: of two names, the later one typed wins."
+    },
+    "NoteRequest": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "$ref": "#/$defs/OperationId"
+        },
+        "recordingId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20000
+        }
+      },
+      "required": ["operationId", "recordingId", "text"],
+      "additionalProperties": false,
+      "description": "A note added on the phone to its recording's conversation; sent twice, it is one note."
+    },
+    "TagRequest": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "$ref": "#/$defs/OperationId"
+        },
+        "recordingId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "on": {
+          "type": "boolean"
+        }
+      },
+      "required": ["operationId", "recordingId", "name", "on"],
+      "additionalProperties": false,
+      "description": "A tag put on (`on`) or taken off the phone's recording (ADR 039), by its name as typed; the Mac cleans it and ignores one it refuses."
+    },
+    "VoiceRequest": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "$ref": "#/$defs/OperationId"
+        },
+        "recordingId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "ordinal": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "sentenceId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": ["operationId", "recordingId", "ordinal", "sentenceId"],
+      "additionalProperties": false,
+      "description": "« C'est moi »: the voice `ordinal` of the recording's transcript is the user, as « Moi ? » suggested (ADR 039). `sentenceId` is one of its sentences as the phone read them: a transcript made again since leaves the voice as it is."
+    },
+    "TagsRequest": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false,
+      "description": "The Mac's tags: no fields."
+    },
+    "TagsAnswer": {
+      "type": "object",
+      "properties": {
+        "tags": {
+          "maxItems": 50,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PhoneTagName"
+          }
+        }
+      },
+      "required": ["tags"],
+      "additionalProperties": false,
+      "description": "The Mac's tags, the latest used first, 50 at most."
+    },
+    "OperationAnswer": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["done", "later", "deleted"]
+        }
+      },
+      "required": ["status"],
+      "additionalProperties": false,
+      "description": "`done`: applied, or already, or a later name won; the operation leaves the outbox. `later`: the Mac does not hold the recording yet; it stays. `deleted`: the recording was deleted; it leaves."
+    },
+    "ForgetRequest": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false,
+      "description": "« Oublier ce Mac »: no fields."
+    },
+    "ForgetAnswer": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "const": "forgotten"
+        }
+      },
+      "required": ["status"],
+      "additionalProperties": false,
+      "description": "The credential is revoked."
+    }
+  }
+}

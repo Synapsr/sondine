@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sondine:phone:1:recording-header",
+  "$comment": "Generated from packages/protocol/src by `pnpm --filter @sondine/protocol run gen`. Do not edit.",
+  "title": "Sondine phone recording header",
+  "description": "The JSON the iPhone app writes in a recording's comment tag, before its first sample (ADR 032).",
+  "$ref": "#/$defs/PhoneRecordingHeader",
+  "$defs": {
+    "PhoneRecordingHeader": {
+      "type": "object",
+      "properties": {
+        "sondine": {
+          "type": "string",
+          "const": "phone-recording"
+        },
+        "v": {
+          "type": "number",
+          "const": 1
+        },
+        "recordingId": {
+          "description": "This file's id; the Mac's track run is `phone:<recordingId>`.",
+          "$ref": "#/$defs/Uuid"
+        },
+        "sessionId": {
+          "description": "The session the file belongs to: one tap on « Enregistrer ».",
+          "$ref": "#/$defs/Uuid"
+        },
+        "part": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000,
+          "description": "This file's place in its session, from 1."
+        },
+        "startedWallMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "description": "The phone's wall clock at the file's first sample.",
+          "$ref": "#/$defs/WallMs"
+        },
+        "utcOffsetMin": {
+          "type": "integer",
+          "minimum": -840,
+          "maximum": 840,
+          "description": "The phone's UTC offset then, in minutes."
+        },
+        "deviceId": {
+          "description": "The app's random install id (not the phone's name).",
+          "$ref": "#/$defs/Uuid"
+        },
+        "input": {
+          "$ref": "#/$defs/PhoneInputKind"
+        },
+        "previous": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PhonePartEnd"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "app": {
+          "$ref": "#/$defs/PhoneAppVersion"
+        }
+      },
+      "required": [
+        "sondine",
+        "v",
+        "recordingId",
+        "sessionId",
+        "part",
+        "startedWallMs",
+        "utcOffsetMin",
+        "deviceId",
+        "input",
+        "previous",
+        "app"
+      ],
+      "additionalProperties": false,
+      "description": "The header of one file the iPhone app recorded, in its comment tag."
+    },
+    "Uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "description": "Lowercase canonical UUID."
+    },
+    "WallMs": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991,
+      "description": "Wall-clock milliseconds since the Unix epoch; display and calendar only."
+    },
+    "PhoneInputKind": {
+      "type": "string",
+      "enum": ["built-in", "wired", "bluetooth", "other"],
+      "description": "The kind of microphone iOS routed: the phone's own, a wired headset, a Bluetooth one, or another (USB, CarPlay…)."
+    },
+    "PhonePartEnd": {
+      "type": "string",
+      "enum": ["interruption", "rotation"],
+      "description": "Why the session's previous file ended: an interruption (a call, another app's microphone), or the 3 hour rotation."
+    },
+    "PhoneAppVersion": {
+      "type": "string",
+      "pattern": "^[0-9]{1,4}\\.[0-9]{1,4}\\.[0-9]{1,4} \\([0-9]{1,9}\\)$",
+      "description": "The app's version and build, as `0.1.0 (12)`."
+    }
+  }
+}

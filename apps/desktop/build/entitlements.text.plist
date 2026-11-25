@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Sondine Text.app (Contents/Helpers): llama.cpp's server for the daily
+     journal (ADR 028). It reads its model and listens on a Unix socket in its
+     own container's temporary folder, the one place the sandbox lets it
+     write; core connects there. No network, no application group: it never
+     sees the database or the audio, only the text core sends it. -->
+<plist version="1.0">
+  <dict>
+    <!-- ADR 010: App Sandbox with no network entitlement denies the network. -->
+    <key>com.apple.security.app-sandbox</key>
+    <true/>
+    <!-- Model weights, read-only (ADR 013). -->
+    <key>com.apple.security.temporary-exception.files.home-relative-path.read-only</key>
+    <array>
+      <string>/Library/Application Support/Sondine/models/</string>
+    </array>
+  </dict>
+</plist>

@@ -1,0 +1,39 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs
+dist
+out
+release
+*.tsbuildinfo
+.build
+.swiftpm
+
+# Environment
+.env*
+!.env.example
+
+# Local data, models and benchmark corpora (never committed: private audio)
+.sondine
+native/.models
+bench/results/local
+bench/corpora/private
+
+# Tooling
+.turbo
+.wrangler
+coverage
+*.log
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea
+.ux-shots/
+
+# Graphical's editor, guide and skills: its own terms, not for a public
+# repository (ADR 041)
+/graphical/packages/
+/GUI.md
+/gui/
+/.agents/skills/graphical-*/

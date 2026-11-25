@@ -1,0 +1,156 @@
+@import "@sondine/ui/styles.css";
+@source "./";
+
+/* Base UI portals stack above the app (packages/ui CONVENTIONS). */
+#root {
+  isolation: isolate;
+  min-height: 100dvh;
+}
+
+/* The top bar's wave (ADR 037): its bars move only while speech is heard. */
+@keyframes sondine-wave {
+  0%,
+  100% {
+    transform: scaleY(0.5);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+/*
+ * Zooming between a day, a week and a month (Téo, 2026-11-19): only the
+ * screen moves, the sidebar and the top bar stay. Zooming in, the view left
+ * grows and blurs away while the closer one settles in from a little smaller;
+ * zooming out, the reverse. The router names the direction (zoom-in,
+ * zoom-out); reduced motion keeps the plain switch.
+ */
+#main {
+  view-transition-name: screen;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-group(screen) {
+  animation-duration: 320ms;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html:active-view-transition-type(zoom-in)::view-transition-old(screen) {
+    animation: sondine-zoom-leave-in 320ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+  html:active-view-transition-type(zoom-in)::view-transition-new(screen) {
+    animation: sondine-zoom-enter-in 320ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+  html:active-view-transition-type(zoom-out)::view-transition-old(screen) {
+    animation: sondine-zoom-leave-out 320ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+  html:active-view-transition-type(zoom-out)::view-transition-new(screen) {
+    animation: sondine-zoom-enter-out 320ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(screen),
+  ::view-transition-old(screen),
+  ::view-transition-new(screen) {
+    animation: none;
+  }
+}
+
+@keyframes sondine-zoom-leave-in {
+  to {
+    opacity: 0;
+    scale: 1.06;
+    filter: blur(8px);
+  }
+}
+
+@keyframes sondine-zoom-enter-in {
+  from {
+    opacity: 0;
+    scale: 0.96;
+    filter: blur(6px);
+  }
+}
+
+@keyframes sondine-zoom-leave-out {
+  to {
+    opacity: 0;
+    scale: 0.94;
+    filter: blur(8px);
+  }
+}
+
+@keyframes sondine-zoom-enter-out {
+  from {
+    opacity: 0;
+    scale: 1.04;
+    filter: blur(6px);
+  }
+}
+
+/*
+ * The first run (Téo, 2026-11-19): a step's parts rise in one after the
+ * other from a light blur (`.sondine-stagger`, the delay starting at
+ * --stagger-start); going to another step, the one left slides away blurred
+ * toward where the user goes, and the next one rises in once it is mostly
+ * gone (--stagger-offset). Reduced motion
+ * keeps both still.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .sondine-stagger > * {
+    animation: sondine-rise 460ms cubic-bezier(0.32, 0.72, 0, 1) both;
+    animation-delay: calc(var(--stagger-offset, 0ms) + var(--stagger-start, 0ms));
+  }
+  .sondine-stagger > :nth-child(2) {
+    animation-delay: calc(var(--stagger-offset, 0ms) + var(--stagger-start, 0ms) + 70ms);
+  }
+  .sondine-stagger > :nth-child(3) {
+    animation-delay: calc(var(--stagger-offset, 0ms) + var(--stagger-start, 0ms) + 140ms);
+  }
+  .sondine-stagger > :nth-child(4) {
+    animation-delay: calc(var(--stagger-offset, 0ms) + var(--stagger-start, 0ms) + 210ms);
+  }
+  .sondine-stagger > :nth-child(n + 5) {
+    animation-delay: calc(var(--stagger-offset, 0ms) + var(--stagger-start, 0ms) + 280ms);
+  }
+
+  ::view-transition-group(welcome-step),
+  ::view-transition-new(welcome-step) {
+    animation: none;
+  }
+  html:active-view-transition-type(step-forward)::view-transition-old(welcome-step) {
+    animation: sondine-step-leave-forward 260ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+  html:active-view-transition-type(step-back)::view-transition-old(welcome-step) {
+    animation: sondine-step-leave-back 260ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+}
+
+@keyframes sondine-rise {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+    filter: blur(4px);
+  }
+}
+
+@keyframes sondine-step-leave-forward {
+  to {
+    opacity: 0;
+    translate: -40px 0;
+    filter: blur(6px);
+  }
+}
+
+@keyframes sondine-step-leave-back {
+  to {
+    opacity: 0;
+    translate: 40px 0;
+    filter: blur(6px);
+  }
+}

@@ -1,0 +1,478 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sondine:protocol:7:control-message",
+  "$comment": "Generated from packages/protocol/src by `pnpm --filter @sondine/protocol run gen`. Do not edit.",
+  "title": "Sondine helper control message",
+  "description": "One JSON line sent by core to sondine-audio, protocol 7.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/HelloMessage"
+    },
+    {
+      "$ref": "#/$defs/ConfigMessage"
+    },
+    {
+      "$ref": "#/$defs/ExcludePidsMessage"
+    },
+    {
+      "$ref": "#/$defs/PinInputMessage"
+    },
+    {
+      "$ref": "#/$defs/PauseMessage"
+    },
+    {
+      "$ref": "#/$defs/ResumeMessage"
+    },
+    {
+      "$ref": "#/$defs/SnapshotMessage"
+    },
+    {
+      "$ref": "#/$defs/RequestPermissionsMessage"
+    },
+    {
+      "$ref": "#/$defs/ShutdownMessage"
+    }
+  ],
+  "$defs": {
+    "HelloMessage": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "hello"
+        },
+        "id": {
+          "$ref": "#/$defs/RequestId"
+        },
+        "protocol": {
+          "type": "number",
+          "const": 7
+        },
+        "client": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "$ref": "#/$defs/ShortText"
+            },
+            "version": {
+              "$ref": "#/$defs/VersionText"
+            }
+          },
+          "required": ["name", "version"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["type", "id", "protocol", "client"],
+      "additionalProperties": false,
+      "description": "First line on every connection. Reply: `ready`, or `error` with code `protocol.unsupported` before the helper closes the connection."
+    },
+    "RequestId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._:-]{1,64}$",
+      "description": "Client-chosen id of a control message, unique per connection; echoed as `replyTo`."
+    },
+    "ShortText": {
+      "type": "string",
+      "pattern": "^[^\\u0000-\\u001f\\u007f]{1,256}$",
+      "description": "Human-readable text without control characters, 1 to 256 characters."
+    },
+    "VersionText": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,63}$",
+      "description": "Version or build string."
+    },
+    "ConfigMessage": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "config"
+        },
+        "id": {
+          "$ref": "#/$defs/RequestId"
+        },
+        "microphone": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "followCalls": {
+              "type": "boolean",
+              "description": "Open the device a call app is verifiably using, even Bluetooth, while the call lasts."
+            },
+            "allowedTransports": {
+              "maxItems": 16,
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Transport"
+              },
+              "description": "Transports the automatic mode may open as the default input."
+            }
+          },
+          "required": ["enabled", "followCalls", "allowedTransports"],
+          "additionalProperties": false
+        },
+        "systemAudio": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "appTaps": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "max": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 8
+                },
+                "releaseAfterIdleMs": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 3600000,
+                  "description": "Release an app tap after this long without output IO."
+                },
+                "releaseAfterSilenceMs": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 3600000,
+                  "description": "Release an app tap after this long of exact digital silence."
+                }
+              },
+              "required": ["enabled", "max", "releaseAfterIdleMs", "releaseAfterSilenceMs"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["enabled", "appTaps"],
+          "additionalProperties": false
+        },
+        "excludedBundleIds": {
+          "maxItems": 1024,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/BundleId"
+          },
+          "description": "Apps never captured on any track; while one is in a call or listens to a microphone, and 10 s after, the microphone is held too."
+        },
+        "holds": {
+          "$ref": "#/$defs/CaptureHolds"
+        },
+        "vad": {
+          "type": "object",
+          "properties": {
+            "threshold": {
+              "$ref": "#/$defs/Probability"
+            },
+            "minSpeechMs": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3600000,
+              "description": "Shortest speech that opens a region."
+            },
+            "minSilenceMs": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 3600000,
+              "description": "Silence that closes a region."
+            }
+          },
+          "required": ["threshold", "minSpeechMs", "minSilenceMs"],
+          "additionalProperties": false
+        },
+        "healthIntervalMs": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 3600000,
+          "description": "Interval between `health` events."
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "microphone",
+        "systemAudio",
+        "excludedBundleIds",
+        "holds",
+        "vad",
+        "healthIntervalMs"
+      ],
+      "additionalProperties": false,
+      "description": "The full capture policy; it replaces the previous one. Reply: `ack` once applied, or `error`."
+    },
+    "Transport": {
+      "type": "string",
+      "enum": [
+        "built-in",
+        "usb",
+        "bluetooth",
+        "bluetooth-le",
+        "thunderbolt",
+        "pci",
+        "firewire",
+        "hdmi",
+        "displayport",
+        "airplay",
+        "avb",
+        "continuity",
+        "virtual",
+        "aggregate",
+        "unknown"
+      ],
+      "description": "Device transport decoded from kAudioDevicePropertyTransportType."
+    },
+    "BundleId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,254}$",
+      "description": "Bundle identifier of an app or daemon."
+    },
+    "CaptureHolds": {
+      "type": "object",
+      "properties": {
+        "calls": {
+          "type": "boolean",
+          "description": "Hold everything while any call is active (call app, call daemon, web call), and 10 s after."
+        },
+        "screen": {
+          "type": "boolean",
+          "description": "Hold everything while the screen is locked, the screen saver runs or the displays sleep."
+        },
+        "schedule": {
+          "maxItems": 32,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ScheduleWindow"
+          }
+        },
+        "networks": {
+          "maxItems": 64,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NetworkHash"
+          },
+          "description": "Hold everything while the Mac is on one of these networks."
+        },
+        "networkKey": {
+          "$ref": "#/$defs/NetworkKey"
+        },
+        "lifted": {
+          "maxItems": 64,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Uuid"
+          },
+          "description": "Hold occurrences the user lifted (« Écouter quand même »): they hold nothing until they end."
+        }
+      },
+      "required": ["calls", "screen", "schedule", "networks", "networkKey", "lifted"],
+      "additionalProperties": false,
+      "description": "Private zones at « Rien » the helper enforces itself (ADR 029): while one applies, capture is held. Excluded apps in `excludedBundleIds` also hold the microphone while they are in a call or listen, and 10 s after."
+    },
+    "ScheduleWindow": {
+      "type": "object",
+      "properties": {
+        "days": {
+          "minItems": 1,
+          "maxItems": 7,
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 6
+          },
+          "description": "Days the window starts on: 0 is Sunday … 6 Saturday; unique."
+        },
+        "startMinute": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1439,
+          "description": "Minute of the day it starts at."
+        },
+        "endMinute": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1440,
+          "description": "Minute of the day it ends at (1440 is midnight after its start day)."
+        }
+      },
+      "required": ["days", "startMinute", "endMinute"],
+      "additionalProperties": false,
+      "description": "Hours when capture is held, on the Mac's clock and time zone. A window whose end is at or before its start crosses midnight and belongs to its start day; equal start and end are invalid."
+    },
+    "NetworkHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32}$",
+      "description": "A network the Mac is on, as the first 16 bytes of HMAC-SHA256(networkKey, NetworkSignature) in lowercase hex (ADR 029). The raw signature never travels."
+    },
+    "NetworkKey": {
+      "type": "string",
+      "pattern": "^(?:[A-Za-z0-9+/]{42}[AEIMQUYcgkosw048]=)?$",
+      "description": "Base64 of the 32 random bytes core keeps per install to hash networks, or empty: the helper then reads no network."
+    },
+    "Uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "description": "Lowercase canonical UUID."
+    },
+    "Probability": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Probability in [0, 1]."
+    },
+    "ExcludePidsMessage": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "exclude.pids"
+        },
+        "id": {
+          "$ref": "#/$defs/RequestId"
+        },
+        "pids": {
+          "maxItems": 1024,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Pid"
+          }
+        }
+      },
+      "required": ["type", "id", "pids"],
+      "additionalProperties": false,
+      "description": "The complete set of Sondine's own process ids (main, renderer, GPU and audio services), excluded from every tap. Reply: `ack` or `error`."
+    },
+    "Pid": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 2147483647,
+      "description": "Process id."
+    },
+    "PinInputMessage": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "pin.input"
+        },
+        "id": {
+          "$ref": "#/$defs/RequestId"
+        },
+        "deviceUid": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DeviceUid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "allowBluetooth": {
+          "type": "boolean",
+          "description": "Explicit consent to open a Bluetooth microphone, which drops the headset to call quality."
+        }
+      },
+      "required": ["type", "id", "deviceUid", "allowBluetooth"],
+      "additionalProperties": false,
+      "description": "Pins a microphone as a hard override, or returns to automatic mode with `deviceUid: null`. Reply: `ack`, or `error` with code `request.rejected` for an unknown device."
+    },
+    "DeviceUid": {
+      "type": "string",
+      "pattern": "^[^\\u0000-\\u001f\\u007f]{1,512}$",
+      "description": "Core Audio device UID (kAudioDevicePropertyDeviceUID)."
+    },
+    "PauseMessage": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "pause"
+        },
+        "id": {
+          "$ref": "#/$defs/RequestId"
+        },
+        "scope": {
+          "$ref": "#/$defs/PauseScope"
+        }
+      },
+      "required": ["type", "id", "scope"],
+      "additionalProperties": false,
+      "description": "Stops capture for a scope. Reply: `ack` once IO is stopped or muted and the affected runs are closed."
+    },
+    "PauseScope": {
+      "type": "string",
+      "enum": ["all", "microphone", "system-audio"],
+      "description": "What a pause or resume applies to. `system-audio` covers app taps and `system:other`."
+    },
+    "ResumeMessage": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "resume"
+        },
+        "id": {
+          "$ref": "#/$defs/RequestId"
+        },
+        "scope": {
+          "$ref": "#/$defs/PauseScope"
+        }
+      },
+      "required": ["type", "id", "scope"],
+      "additionalProperties": false,
+      "description": "Resumes capture for a scope. Reply: `ack` or `error`."
+    },
+    "SnapshotMessage": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "snapshot"
+        },
+        "id": {
+          "$ref": "#/$defs/RequestId"
+        }
+      },
+      "required": ["type", "id"],
+      "additionalProperties": false,
+      "description": "Asks for the current state. Reply: `permissions`, `devices`, `processes`, `activity`, one `track.open` per open run, one `region.open` per open region, `clock`, one `call` or `listen` per active span, `situation` and `holds`, each with `replyTo`, then `ack`."
+    },
+    "RequestPermissionsMessage": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "request.permissions"
+        },
+        "id": {
+          "$ref": "#/$defs/RequestId"
+        },
+        "scope": {
+          "$ref": "#/$defs/PauseScope"
+        }
+      },
+      "required": ["type", "id", "scope"],
+      "additionalProperties": false,
+      "description": "Asks macOS for capture access for a scope: the microphone prompt, then a short system-audio probe tap for `system-audio` or `all`. Reply: `permissions` with `replyTo` once the prompts are answered, then `ack`."
+    },
+    "ShutdownMessage": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "shutdown"
+        },
+        "id": {
+          "$ref": "#/$defs/RequestId"
+        }
+      },
+      "required": ["type", "id"],
+      "additionalProperties": false,
+      "description": "Asks the helper to commit, close every run, and exit. Reply: `ack` after the last commit, then the helper closes the socket."
+    }
+  }
+}

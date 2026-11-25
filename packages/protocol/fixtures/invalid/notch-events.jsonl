@@ -1,0 +1,9 @@
+{"type":"ready","screen":"Built-in"}
+{"type":"open-person","personId":2}
+{"type":"open-episode","view":1,"episodeId":0}
+{"type":"dismiss","view":1,"callId":"4"}
+{"type":"quit"}
+{"type":"toggle","view":1,"callId":"a","on":1}
+{"type":"toggle","view":1,"callId":"","on":true}
+{"type":"done","view":1}
+{"type":"resume"}

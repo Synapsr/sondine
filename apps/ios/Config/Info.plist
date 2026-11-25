@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Recording goes on with the screen locked (ADR 032). -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
+	<!-- Only the system's TLS, from M5.2 (ADR 031). -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<!-- Defaults, but for the local network the sync uses (ADR 031). -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<!-- The Mac's relay, found by Bonjour at home (ADR 008). -->
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_sondine._tcp</string>
+	</array>
+	<!-- Written by pnpm release:ios: the build's time, from which it expires. -->
+	<key>SondineBuildTime</key>
+	<string>$(SONDINE_BUILD_TIME)</string>
+</dict>
+</plist>

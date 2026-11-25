@@ -1,0 +1,417 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sondine:spool:1:manifest-record",
+  "$comment": "Generated from packages/protocol/src by `pnpm --filter @sondine/protocol run gen`. Do not edit.",
+  "title": "Sondine spool manifest record",
+  "description": "One JSON line of a spool manifest, format version 1.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/ManifestHeader"
+    },
+    {
+      "$ref": "#/$defs/ManifestCommit"
+    },
+    {
+      "$ref": "#/$defs/ManifestGap"
+    },
+    {
+      "$ref": "#/$defs/ManifestEnvelope"
+    },
+    {
+      "$ref": "#/$defs/ManifestRegion"
+    }
+  ],
+  "$defs": {
+    "ManifestHeader": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "header"
+        },
+        "format": {
+          "type": "string",
+          "const": "sondine-spool"
+        },
+        "version": {
+          "type": "number",
+          "const": 1
+        },
+        "sessionId": {
+          "description": "Helper launch that wrote the file.",
+          "$ref": "#/$defs/Uuid"
+        },
+        "trackKey": {
+          "$ref": "#/$defs/TrackKey"
+        },
+        "runId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "epoch": {
+          "description": "Epoch at the file's first sample.",
+          "$ref": "#/$defs/Epoch"
+        },
+        "file": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-][A-Za-z0-9._-]{0,123}\\.pcm$",
+          "description": "Name of the PCM file, a sibling of the manifest."
+        },
+        "sequence": {
+          "description": "Number of this file within the run, starting at 0.",
+          "$ref": "#/$defs/Count"
+        },
+        "startSample": {
+          "description": "Run sample index of the file's first sample.",
+          "$ref": "#/$defs/SampleIndex"
+        },
+        "rate": {
+          "type": "number",
+          "const": 16000
+        },
+        "channels": {
+          "type": "number",
+          "const": 1
+        },
+        "sampleFormat": {
+          "type": "string",
+          "const": "s16le"
+        },
+        "timebase": {
+          "$ref": "#/$defs/Timebase"
+        },
+        "anchor": {
+          "description": "Clocks read together when the file was created.",
+          "$ref": "#/$defs/ClockAnchor"
+        },
+        "helperVersion": {
+          "$ref": "#/$defs/VersionText"
+        }
+      },
+      "required": [
+        "type",
+        "format",
+        "version",
+        "sessionId",
+        "trackKey",
+        "runId",
+        "epoch",
+        "file",
+        "sequence",
+        "startSample",
+        "rate",
+        "channels",
+        "sampleFormat",
+        "timebase",
+        "anchor",
+        "helperVersion"
+      ],
+      "additionalProperties": false,
+      "description": "First line of every manifest. One manifest per PCM file; files rotate every 10 min within a run."
+    },
+    "Uuid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "description": "Lowercase canonical UUID."
+    },
+    "TrackKey": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^input:[^\\u0000-\\u001f\\u007f]{1,512}$"
+        },
+        {
+          "type": "string",
+          "pattern": "^app:[A-Za-z0-9][A-Za-z0-9_.-]{0,254}$"
+        },
+        {
+          "type": "string",
+          "const": "system:other"
+        }
+      ],
+      "description": "Stable track identity: `input:<deviceUID>`, `app:<bundleID>`, or `system:other`."
+    },
+    "Epoch": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295,
+      "description": "Capture epoch, increasing within one helper session. Each track run starts a new epoch, and so does a rate or format change inside a run; one event (wake, coreaudiod restart) may start the same epoch for several tracks."
+    },
+    "Count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991,
+      "description": "Non-negative integer within the exact range of a double (2^53 - 1)."
+    },
+    "SampleIndex": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991,
+      "description": "Index of a 16 kHz sample since the start of its track run. Samples lost in gaps are counted, so the index tracks time."
+    },
+    "Timebase": {
+      "type": "object",
+      "properties": {
+        "numer": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        },
+        "denom": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        }
+      },
+      "required": ["numer", "denom"],
+      "additionalProperties": false,
+      "description": "mach_timebase_info: nanoseconds = ticks × numer ÷ denom."
+    },
+    "ClockValue": {
+      "description": "Non-negative 64-bit integer written as a decimal string without leading zeros, at most 2^63 - 1. Decoded to bigint in TypeScript.",
+      "type": "string",
+      "pattern": "^(?:0|[1-9][0-9]{0,18})$"
+    },
+    "ClockAnchor": {
+      "type": "object",
+      "properties": {
+        "hostTicks": {
+          "$ref": "#/$defs/ClockValue"
+        },
+        "continuousNs": {
+          "$ref": "#/$defs/ClockValue"
+        },
+        "wallNs": {
+          "$ref": "#/$defs/ClockValue"
+        }
+      },
+      "required": ["hostTicks", "continuousNs", "wallNs"],
+      "additionalProperties": false,
+      "description": "Anchor triple read together: host ticks, continuous nanoseconds, and wall-clock nanoseconds since the Unix epoch. Wall time is for display only."
+    },
+    "VersionText": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]{0,63}$",
+      "description": "Version or build string."
+    },
+    "ManifestCommit": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "commit"
+        },
+        "seq": {
+          "description": "Commit number within the PCM file, starting at 0.",
+          "$ref": "#/$defs/Count"
+        },
+        "epoch": {
+          "$ref": "#/$defs/Epoch"
+        },
+        "committedOffset": {
+          "description": "Durable byte length of the PCM file after this commit. The block is [committedOffset - sampleCount × 2, committedOffset).",
+          "$ref": "#/$defs/Count"
+        },
+        "sampleIndex": {
+          "description": "Run sample index of the block's first sample.",
+          "$ref": "#/$defs/SampleIndex"
+        },
+        "sampleCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991,
+          "description": "Samples in the block."
+        },
+        "crc32": {
+          "description": "CRC-32/ISO-HDLC (as zlib's crc32) of the block's bytes.",
+          "$ref": "#/$defs/Uint32"
+        },
+        "at": {
+          "description": "Clock of the block's first sample.",
+          "$ref": "#/$defs/ClockPoint"
+        }
+      },
+      "required": [
+        "type",
+        "seq",
+        "epoch",
+        "committedOffset",
+        "sampleIndex",
+        "sampleCount",
+        "crc32",
+        "at"
+      ],
+      "additionalProperties": false,
+      "description": "Written after the block's PCM bytes are fsynced, then the manifest is fsynced. Recovery truncates the PCM file to the last commit's committedOffset."
+    },
+    "Uint32": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295,
+      "description": "Unsigned 32-bit integer."
+    },
+    "ClockPoint": {
+      "type": "object",
+      "properties": {
+        "hostTicks": {
+          "$ref": "#/$defs/ClockValue"
+        },
+        "continuousNs": {
+          "$ref": "#/$defs/ClockValue"
+        }
+      },
+      "required": ["hostTicks", "continuousNs"],
+      "additionalProperties": false,
+      "description": "An instant on the helper's clocks: host ticks (mach_absolute_time, stops in sleep) and continuous nanoseconds (mach_continuous_time converted with the timebase, runs in sleep). Ordering and durations use continuousNs."
+    },
+    "ManifestGap": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "gap"
+        },
+        "reason": {
+          "$ref": "#/$defs/GapReason"
+        },
+        "fromSample": {
+          "$ref": "#/$defs/SampleIndex"
+        },
+        "toSample": {
+          "$ref": "#/$defs/SampleIndex"
+        }
+      },
+      "required": ["type", "reason", "fromSample", "toSample"],
+      "additionalProperties": false,
+      "description": "Samples [fromSample, toSample) of the run with no stored bytes; written before the next commit. Recovery writes `recovery-truncated` for bytes it cut."
+    },
+    "GapReason": {
+      "type": "string",
+      "enum": ["ring-overflow", "disk-full", "write-error", "stall", "recovery-truncated"],
+      "description": "Why samples have no stored bytes."
+    },
+    "ManifestEnvelope": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "envelope"
+        },
+        "sampleIndex": {
+          "description": "Run sample index of the first frame's first sample.",
+          "$ref": "#/$defs/SampleIndex"
+        },
+        "frameSamples": {
+          "type": "number",
+          "const": 160
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 6000
+        },
+        "encoding": {
+          "type": "string",
+          "const": "f32le-base64"
+        },
+        "data": {
+          "type": "string",
+          "format": "base64",
+          "contentEncoding": "base64",
+          "pattern": "^$|^(?:[0-9a-zA-Z+/]{4})*(?:(?:[0-9a-zA-Z+/]{2}==)|(?:[0-9a-zA-Z+/]{3}=))?$"
+        }
+      },
+      "required": ["type", "sampleIndex", "frameSamples", "count", "encoding", "data"],
+      "additionalProperties": false,
+      "description": "Log-energy envelope, one value per 10 ms frame, for every track regardless of VAD. `data` is base64 of `count` little-endian Float32 values in dBFS within [-120, 0]. Base64 binary is allowed only here, in manifests."
+    },
+    "ManifestRegion": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "region"
+        },
+        "regionId": {
+          "$ref": "#/$defs/Uuid"
+        },
+        "startSample": {
+          "description": "Run sample index where speech starts, without pre-roll.",
+          "$ref": "#/$defs/SampleIndex"
+        },
+        "endSample": {
+          "description": "Run sample index after the last speech sample, without post-roll; > startSample.",
+          "$ref": "#/$defs/SampleIndex"
+        },
+        "voicedSamples": {
+          "description": "Samples the VAD heard as speech between the bounds, which also hold pauses shorter than the minimum silence; <= endSample - startSample. Absent from manifests written before it existed.",
+          "$ref": "#/$defs/Count"
+        },
+        "closeReason": {
+          "$ref": "#/$defs/RegionCloseReason"
+        },
+        "speechProbability": {
+          "$ref": "#/$defs/SpeechProbability"
+        },
+        "level": {
+          "$ref": "#/$defs/LevelStats"
+        }
+      },
+      "required": [
+        "type",
+        "regionId",
+        "startSample",
+        "endSample",
+        "closeReason",
+        "speechProbability",
+        "level"
+      ],
+      "additionalProperties": false,
+      "description": "A closed speech region, written to the manifest of the file current at close. Its samples may span earlier files of the run."
+    },
+    "RegionCloseReason": {
+      "type": "string",
+      "enum": ["silence", "max-duration", "track-closed"],
+      "description": "Why a speech region closed."
+    },
+    "SpeechProbability": {
+      "type": "object",
+      "properties": {
+        "mean": {
+          "$ref": "#/$defs/Probability"
+        },
+        "max": {
+          "$ref": "#/$defs/Probability"
+        }
+      },
+      "required": ["mean", "max"],
+      "additionalProperties": false,
+      "description": "Mean and maximum VAD speech probability over an interval; max >= mean."
+    },
+    "Probability": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Probability in [0, 1]."
+    },
+    "LevelStats": {
+      "type": "object",
+      "properties": {
+        "mean": {
+          "$ref": "#/$defs/Dbfs"
+        },
+        "peak": {
+          "$ref": "#/$defs/Dbfs"
+        }
+      },
+      "required": ["mean", "peak"],
+      "additionalProperties": false,
+      "description": "Mean and peak level over an interval; peak >= mean."
+    },
+    "Dbfs": {
+      "type": "number",
+      "minimum": -120,
+      "maximum": 0,
+      "description": "Level in dBFS: 10·log10 of mean power with full scale at 0, clamped to -120."
+    }
+  }
+}

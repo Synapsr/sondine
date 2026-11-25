@@ -1,0 +1,51 @@
+{"schema":"PairingInvite","value":{"v":1,"pin":"9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08","token":"q3Zk1F0x9bT2Yw8-hJcL5nR_uVe4mPa7sDoGiK6tQzE","name":"Sondine K7Q2","port":49321,"addrs":["192.168.1.24","fe80::1c2b:3a4d:5e6f:7081%en0"]}}
+{"schema":"PairingInvite","value":{"v":1,"pin":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","token":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","name":"Sondine 0000","port":1,"addrs":[]}}
+{"schema":"PhoneRelayHello","value":{"v":1,"via":"lan","peer":"192.168.1.31"}}
+{"schema":"PhoneRelayHello","value":{"v":1,"via":"tailnet","peer":"100.101.102.103"}}
+{"schema":"PhoneRelayHello","value":{"v":1,"via":"loopback","peer":"::1"}}
+{"schema":"PhoneError","value":{"error":"revoked"}}
+{"schema":"PhoneError","value":{"error":"version","macVersion":1}}
+{"schema":"PairRequest","value":{"v":1,"token":"q3Zk1F0x9bT2Yw8-hJcL5nR_uVe4mPa7sDoGiK6tQzE","deviceId":"c3d4e5f6-0718-4293-a4b5-c6d7e8f90a1b","deviceName":"iPhone de Téo"}}
+{"schema":"PairAnswer","value":{"credential":"sdp_q3Zk1F0x9bT2Yw8-hJcL5nR_uVe4mPa7sDoGiK6tQzE","macId":"0b1c2d3e-4f50-4617-8293-a4b5c6d7e8f9"}}
+{"schema":"HelloRequest","value":{"v":1,"clockMs":1793442720000,"recordingIds":["7f9c2b1e-4d3a-4c8e-9b6f-1a2b3c4d5e6f"]}}
+{"schema":"HelloAnswer","value":{"v":1,"clockMs":1793442721000,"macId":"0b1c2d3e-4f50-4617-8293-a4b5c6d7e8f9","addrs":["192.168.1.24","100.64.0.7"],"port":49321,"maxFileBytes":1073741824}}
+{"schema":"HelloAnswer","value":{"v":1,"clockMs":1793442721000,"macId":"0b1c2d3e-4f50-4617-8293-a4b5c6d7e8f9","addrs":["192.168.1.24","100.64.0.7"],"port":49321,"maxFileBytes":1073741824,"via":"tailnet"}}
+{"schema":"AnnounceRequest","value":{"recordingId":"7f9c2b1e-4d3a-4c8e-9b6f-1a2b3c4d5e6f","bytes":566974,"sha256":"9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"}}
+{"schema":"UploadStatus","value":{"status":"send","offset":0}}
+{"schema":"UploadStatus","value":{"status":"send","offset":262144}}
+{"schema":"UploadStatus","value":{"status":"stored"}}
+{"schema":"UploadStatus","value":{"status":"conflict"}}
+{"schema":"UploadStatus","value":{"status":"deleted"}}
+{"schema":"UploadStatus","value":{"status":"refused","reason":"no-room"}}
+{"schema":"StatesRequest","value":{"recordingIds":[]}}
+{"schema":"StatesAnswer","value":{"states":[{"recordingId":"7f9c2b1e-4d3a-4c8e-9b6f-1a2b3c4d5e6f","state":"transcribing"},{"recordingId":"8a0d3c2f-5e4b-4d9f-8c70-2b3c4d5e6f70","state":"deleted"}]}}
+{"schema":"DeleteRequest","value":{"operationId":"9b1e4d30-6f5c-4ea0-9d81-3c4d5e6f7081","recordingId":"7f9c2b1e-4d3a-4c8e-9b6f-1a2b3c4d5e6f"}}
+{"schema":"DeleteAnswer","value":{"status":"deleted"}}
+{"schema":"ForgetRequest","value":{}}
+{"schema":"ForgetAnswer","value":{"status":"forgotten"}}
+{"schema":"GetRequest","value":{"recordingId":"7f9c2b1e-4d3a-4c8e-9b6f-1a2b3c4d5e6f","revision":null}}
+{"schema":"GetRequest","value":{"recordingId":"7f9c2b1e-4d3a-4c8e-9b6f-1a2b3c4d5e6f","revision":"9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"}}
+{"schema":"GetAnswer","value":{"status":"result","revision":"9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08","result":{"recordingId":"7f9c2b1e-4d3a-4c8e-9b6f-1a2b3c4d5e6f","name":"Réunion budget","startedAtMs":1762956000000,"endedAtMs":1762959600000,"timeUncertain":false,"speakers":[{"ordinal":1,"name":"Téo","guess":null,"self":true},{"ordinal":2,"name":null,"guess":"Marie","self":false},{"ordinal":3,"name":null,"guess":null,"self":false}],"sentences":[{"id":41,"startMs":1762956001200,"endMs":1762956004800,"speaker":1,"text":"On fait le point sur le budget ?"},{"id":42,"startMs":1762956005000,"endMs":1762956009100,"speaker":2,"text":"Oui, je t'envoie le tableau jeudi."},{"id":43,"startMs":1762956010000,"endMs":1762956011000,"speaker":null,"text":""}],"journal":[{"kind":"line","text":"{P1} et {P2} font le point sur le budget.","voices":[{"ref":"P1","ordinal":1,"name":"Téo","guess":null,"self":true},{"ref":"P2","ordinal":2,"name":null,"guess":"Marie","self":false}],"sentenceIds":[41],"startMs":1762956001200,"done":false,"due":null},{"kind":"commitment","text":"{P2} envoie le tableau à {P1}.","voices":[{"ref":"P1","ordinal":1,"name":"Téo","guess":null,"self":true},{"ref":"P2","ordinal":null,"name":null,"guess":null,"self":false}],"sentenceIds":[42],"startMs":1762956005000,"done":true,"due":"2026-11-13"}],"notes":[{"id":7,"text":"Penser à relancer Marie.","addedAtMs":1762960000000}],"audio":{"generation":2,"startedAtMs":1762956000000,"durationMs":3600000}}}}
+{"schema":"GetAnswer","value":{"status":"result","revision":"9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08","result":{"recordingId":"7f9c2b1e-4d3a-4c8e-9b6f-1a2b3c4d5e6f","name":null,"startedAtMs":1762956000000,"endedAtMs":1762959600000,"timeUncertain":true,"speakers":[],"sentences":[],"journal":[],"notes":[],"audio":null}}}
+{"schema":"GetAnswer","value":{"status":"unchanged"}}
+{"schema":"GetAnswer","value":{"status":"unavailable","state":"transcribing"}}
+{"schema":"GetAnswer","value":{"status":"unavailable","state":"deleted"}}
+{"schema":"GetAnswer","value":{"status":"withheld"}}
+{"schema":"RenameRequest","value":{"operationId":"9b1e4d30-6f5c-4ea0-9d81-3c4d5e6f7081","recordingId":"7f9c2b1e-4d3a-4c8e-9b6f-1a2b3c4d5e6f","name":"Réunion budget 🧾","typedAtMs":1762960000000}}
+{"schema":"RenameRequest","value":{"operationId":"9b1e4d30-6f5c-4ea0-9d81-3c4d5e6f7081","recordingId":"7f9c2b1e-4d3a-4c8e-9b6f-1a2b3c4d5e6f","name":null,"typedAtMs":0}}
+{"schema":"NoteRequest","value":{"operationId":"9b1e4d30-6f5c-4ea0-9d81-3c4d5e6f7081","recordingId":"7f9c2b1e-4d3a-4c8e-9b6f-1a2b3c4d5e6f","text":"Penser à relancer Marie.\nAvant vendredi."}}
+{"schema":"OperationAnswer","value":{"status":"done"}}
+{"schema":"OperationAnswer","value":{"status":"later"}}
+{"schema":"OperationAnswer","value":{"status":"deleted"}}
+{"schema":"PhoneError","value":{"error":"gone"}}
+{"schema":"PhoneError","value":{"error":"stale"}}
+{"schema":"PhoneError","value":{"error":"range"}}
+{"schema":"HelloRequest","value":{"v":2,"clockMs":1793442720000,"recordingIds":[]}}
+{"schema":"HelloAnswer","value":{"v":2,"clockMs":1793442721000,"macId":"0b1c2d3e-4f50-4617-8293-a4b5c6d7e8f9","addrs":["192.168.1.24"],"port":49321,"maxFileBytes":1073741824}}
+{"schema":"GetAnswer","value":{"status":"result","revision":"9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08","result":{"recordingId":"7f9c2b1e-4d3a-4c8e-9b6f-1a2b3c4d5e6f","name":"Réunion budget","startedAtMs":1762956000000,"endedAtMs":1762959600000,"timeUncertain":false,"speakers":[{"ordinal":1,"name":"Téo","guess":null,"self":true,"guessSelf":false},{"ordinal":2,"name":null,"guess":"Marie","self":false,"guessSelf":false},{"ordinal":3,"name":null,"guess":null,"self":false},{"ordinal":4,"name":null,"guess":"Téo","self":false,"guessSelf":true}],"sentences":[{"id":41,"startMs":1762956001200,"endMs":1762956004800,"speaker":1,"text":"On fait le point sur le budget ?"},{"id":42,"startMs":1762956005000,"endMs":1762956009100,"speaker":2,"text":"Oui, je t'envoie le tableau jeudi."},{"id":43,"startMs":1762956010000,"endMs":1762956011000,"speaker":null,"text":""}],"journal":[{"kind":"line","text":"{P1} et {P2} font le point sur le budget.","voices":[{"ref":"P1","ordinal":1,"name":"Téo","guess":null,"self":true},{"ref":"P2","ordinal":2,"name":null,"guess":"Marie","self":false}],"sentenceIds":[41],"startMs":1762956001200,"done":false,"due":null},{"kind":"commitment","text":"{P2} envoie le tableau à {P1}.","voices":[{"ref":"P1","ordinal":1,"name":"Téo","guess":null,"self":true},{"ref":"P2","ordinal":null,"name":null,"guess":null,"self":false}],"sentenceIds":[42],"startMs":1762956005000,"done":true,"due":"2026-11-13"}],"notes":[{"id":7,"text":"Penser à relancer Marie.","addedAtMs":1762960000000}],"audio":{"generation":2,"startedAtMs":1762956000000,"durationMs":3600000},"tags":["idées","Création de contenu"]}}}
+{"schema":"TagRequest","value":{"operationId":"9b1e4d30-6f5c-4ea0-9d81-3c4d5e6f7081","recordingId":"7f9c2b1e-4d3a-4c8e-9b6f-1a2b3c4d5e6f","name":"#idées ","on":true}}
+{"schema":"TagRequest","value":{"operationId":"9b1e4d30-6f5c-4ea0-9d81-3c4d5e6f7081","recordingId":"7f9c2b1e-4d3a-4c8e-9b6f-1a2b3c4d5e6f","name":"Idées","on":false}}
+{"schema":"VoiceRequest","value":{"operationId":"9b1e4d30-6f5c-4ea0-9d81-3c4d5e6f7081","recordingId":"7f9c2b1e-4d3a-4c8e-9b6f-1a2b3c4d5e6f","ordinal":4,"sentenceId":41}}
+{"schema":"TagsRequest","value":{}}
+{"schema":"TagsAnswer","value":{"tags":["idées","récap","Jardin"]}}
+{"schema":"TagsAnswer","value":{"tags":[]}}

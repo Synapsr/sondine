@@ -1,0 +1,7 @@
+{"v":2,"origin":"chrome-extension://nnieeegenbmpfllllldjpkolkldjmmdb/","browser":null}
+{"v":1,"origin":"https://example.com/","browser":null}
+{"v":1,"origin":"chrome-extension://nnieeegenbmpfllllldjpkolkldjmmdb/"}
+{"v":1,"origin":"chrome-extension://nnieeegenbmpfllllldjpkolkldjmmdb/","browser":{"bundleId":"net.imput.helium","name":"","path":"/Applications/Helium.app"}}
+{"ok":false}
+{"ok":false,"reason":"sleepy"}
+{"ok":true,"reason":"disabled"}

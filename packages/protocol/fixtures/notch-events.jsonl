@@ -1,0 +1,10 @@
+{"type":"ready"}
+{"type":"no-notch"}
+{"type":"open-person","view":1,"personId":2}
+{"type":"open-episode","view":1,"episodeId":9}
+{"type":"dismiss","view":2,"callId":6}
+{"type":"toggle","view":4,"callId":"0f7a2c6e-5b1d-4a3e-8c9f-7d6e5f4a3b2c","on":false}
+{"type":"mute","view":4,"callId":"0f7a2c6e-5b1d-4a3e-8c9f-7d6e5f4a3b2c"}
+{"type":"end-episode","view":6,"episodeId":31}
+{"type":"resume","view":7}
+{"type":"done","view":6,"key":"ended:1793610000000"}

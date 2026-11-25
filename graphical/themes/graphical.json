@@ -1,0 +1,396 @@
+{
+  "schemaVersion": 2,
+  "name": "Sondine",
+  "theme": {
+    "name": "Sondine",
+    "iconStyle": "filled",
+    "animation": {
+      "duration": 200,
+      "easing": [
+        0.16,
+        1,
+        0.3,
+        1
+      ],
+      "large": {
+        "duration": 360,
+        "easing": [
+          0.22,
+          1,
+          0.36,
+          1
+        ]
+      },
+      "popupScale": 0.96,
+      "pressDistance": 1
+    },
+    "colors": {
+      "light": {
+        "neutral-1": "#ffffff",
+        "neutral-2": "#fbfbfb",
+        "neutral-3": "#f4f4f4",
+        "neutral-4": "#e7e7e7",
+        "neutral-5": "#cdcdcd",
+        "neutral-6": "#a1a1a1",
+        "neutral-7": "#7d7d7d",
+        "neutral-8": "#555555",
+        "neutral-9": "#333333",
+        "neutral-10": "#000000",
+        "success": "#00906c",
+        "warning": "#ffea00",
+        "error": "#fc032d",
+        "color-1": "#000000",
+        "color-2": "#153d85",
+        "color-3": "#bfe8f5",
+        "color-4": "#ffd0b0"
+      },
+      "dark": {
+        "neutral-1": "#000000",
+        "neutral-2": "#202020",
+        "neutral-3": "#2b2b2b",
+        "neutral-4": "#3d3d3d",
+        "neutral-5": "#565656",
+        "neutral-6": "#838383",
+        "neutral-7": "#ababab",
+        "neutral-8": "#cfcfcf",
+        "neutral-9": "#f4f4f4",
+        "neutral-10": "#ffffff",
+        "success": "#00906c",
+        "warning": "#ffea00",
+        "error": "#fc032d",
+        "color-1": "#ffffff",
+        "color-2": "#153d85",
+        "color-3": "#bfe8f5",
+        "color-4": "#ffd0b0"
+      }
+    },
+    "spacing": {
+      "zero": 0,
+      "xxs": 4.24,
+      "xs": 8.48,
+      "s": 12.72,
+      "m": 16.96,
+      "l": 25.44,
+      "xl": 33.92,
+      "xxl": 50.88
+    },
+    "letterSpacing": {
+      "xs": -0.02,
+      "s": -0.01,
+      "m": 0,
+      "l": 0.01,
+      "xl": 0.02
+    },
+    "text": {
+      "xxs": {
+        "size": 10,
+        "lineHeight": 14.000000000288956
+      },
+      "xs": {
+        "size": 12,
+        "lineHeight": 16.000000000805098
+      },
+      "s": {
+        "size": 14,
+        "lineHeight": 20.000000000512728
+      },
+      "m": {
+        "size": 16,
+        "lineHeight": 24
+      },
+      "l": {
+        "size": 18.970364466,
+        "lineHeight": 25.293819288
+      },
+      "xl": {
+        "size": 22.492170499,
+        "lineHeight": 24.991300554
+      },
+      "xxl": {
+        "size": 26,
+        "lineHeight": 28.166666666666668
+      }
+    },
+    "fonts": {
+      "body": {
+        "family": "\"Allo\", sans-serif",
+        "weights": {
+          "regular": 400,
+          "medium": 500,
+          "heavy": 600
+        }
+      },
+      "display": {
+        "family": "\"Allo\", sans-serif",
+        "weights": {
+          "regular": 400,
+          "medium": 500,
+          "heavy": 600
+        }
+      },
+      "data": {
+        "family": "\"Allo\", sans-serif",
+        "weights": {
+          "regular": 400,
+          "medium": 500,
+          "heavy": 600
+        }
+      }
+    },
+    "radius": {
+      "zero": 0,
+      "xs": 8,
+      "s": 12,
+      "m": 18,
+      "l": 28,
+      "xl": 35,
+      "full": 9999
+    },
+    "border": {
+      "none": 0,
+      "s": 0,
+      "m": 0,
+      "l": 0
+    },
+    "shadows": {
+      "s": {
+        "type": "box",
+        "position": "outside",
+        "x": 0,
+        "y": 2,
+        "blur": 4,
+        "spread": 0,
+        "opacity": 0,
+        "color": {
+          "light": "neutral-10",
+          "dark": "neutral-1"
+        }
+      },
+      "m": {
+        "type": "box",
+        "position": "outside",
+        "x": 0,
+        "y": 8,
+        "blur": 24,
+        "spread": 0,
+        "opacity": 7.5,
+        "color": {
+          "light": "neutral-10",
+          "dark": "neutral-1"
+        }
+      },
+      "l": {
+        "type": "box",
+        "position": "outside",
+        "x": 0,
+        "y": 16,
+        "blur": 48,
+        "spread": 0,
+        "opacity": 0,
+        "color": {
+          "light": "neutral-10",
+          "dark": "neutral-1"
+        }
+      }
+    },
+    "primaryActionColor": "color-1",
+    "primaryForeground": {
+      "light": "neutral-1",
+      "dark": "neutral-1"
+    },
+    "neutralTone": "neutral",
+    "colorEmphasis": 24.820963541666664,
+    "buttonRadius": "s",
+    "iconFamily": "Hugeicons",
+    "iconWeight": 400,
+    "colorTranslucency": {
+      "light": {
+        "neutral-1": 20,
+        "neutral-2": 20,
+        "neutral-3": 20,
+        "neutral-4": 20,
+        "neutral-5": 20,
+        "neutral-6": 20,
+        "neutral-7": 20,
+        "neutral-8": 20,
+        "neutral-9": 20,
+        "neutral-10": 20,
+        "success": 20,
+        "warning": 20,
+        "error": 20,
+        "color-1": 30,
+        "color-2": 19,
+        "color-3": 20,
+        "color-4": 20
+      },
+      "dark": {
+        "neutral-1": 20,
+        "neutral-2": 20,
+        "neutral-3": 20,
+        "neutral-4": 20,
+        "neutral-5": 20,
+        "neutral-6": 20,
+        "neutral-7": 20,
+        "neutral-8": 20,
+        "neutral-9": 20,
+        "neutral-10": 20,
+        "success": 20,
+        "warning": 20,
+        "error": 20,
+        "color-1": 20,
+        "color-2": 20,
+        "color-3": 20,
+        "color-4": 20
+      }
+    },
+    "display": {
+      "xxs": {
+        "size": 24,
+        "lineHeight": 28.8
+      },
+      "xs": {
+        "size": 28.499999999999996,
+        "lineHeight": 34.2
+      },
+      "s": {
+        "size": 32.489999999999995,
+        "lineHeight": 38.99
+      },
+      "m": {
+        "size": 37.03859999999999,
+        "lineHeight": 44.45
+      },
+      "l": {
+        "size": 43,
+        "lineHeight": 51.6
+      },
+      "xl": {
+        "size": 50,
+        "lineHeight": 60.0
+      },
+      "xxl": {
+        "size": 57,
+        "lineHeight": 68.4
+      }
+    },
+    "colorTranslucent": {
+      "light": {
+        "color-1": 60,
+        "color-2": 40
+      }
+    },
+    "characterProfile": "imported",
+    "adjustmentBaseline": {
+      "version": 1,
+      "textM": 16,
+      "text": {
+        "xxs": {
+          "size": 10,
+          "lineHeight": 14.000000000288956
+        },
+        "xs": {
+          "size": 12,
+          "lineHeight": 16.000000000805098
+        },
+        "s": {
+          "size": 14,
+          "lineHeight": 20.000000000512728
+        },
+        "m": {
+          "size": 16,
+          "lineHeight": 24
+        },
+        "l": {
+          "size": 18.970364466,
+          "lineHeight": 25.293819288
+        },
+        "xl": {
+          "size": 22.492170499,
+          "lineHeight": 24.991300554
+        },
+        "xxl": {
+          "size": 26,
+          "lineHeight": 28.166666666666668
+        }
+      },
+      "display": {
+        "xxs": {
+          "size": 24,
+          "lineHeight": 26
+        },
+        "xs": {
+          "size": 28.499999999999996,
+          "lineHeight": 30.875
+        },
+        "s": {
+          "size": 32.489999999999995,
+          "lineHeight": 35.1975
+        },
+        "m": {
+          "size": 37.03859999999999,
+          "lineHeight": 40.12514999999999
+        },
+        "l": {
+          "size": 43,
+          "lineHeight": 46.583333333333336
+        },
+        "xl": {
+          "size": 50,
+          "lineHeight": 54.16666666666667
+        },
+        "xxl": {
+          "size": 57,
+          "lineHeight": 61.750000000000014
+        }
+      },
+      "spacing": {
+        "zero": 0,
+        "xxs": 4.24,
+        "xs": 8.48,
+        "s": 12.72,
+        "m": 16.96,
+        "l": 25.44,
+        "xl": 33.92,
+        "xxl": 50.88
+      },
+      "character": {
+        "profile": "imported",
+        "radius": {
+          "zero": 0,
+          "xs": 8,
+          "s": 12,
+          "m": 18,
+          "l": 28,
+          "xl": 35,
+          "full": 9999
+        },
+        "border": {
+          "none": 0,
+          "s": 0,
+          "m": 0,
+          "l": 0
+        },
+        "weights": {
+          "body": {
+            "regular": 400,
+            "medium": 500,
+            "heavy": 600
+          },
+          "display": {
+            "regular": 400,
+            "medium": 500,
+            "heavy": 600
+          },
+          "data": {
+            "regular": 400,
+            "medium": 500,
+            "heavy": 600
+          }
+        },
+        "colorEmphasis": 24.820963541666664,
+        "buttonRadius": "s"
+      }
+    }
+  },
+  "componentTokens": {}
+}

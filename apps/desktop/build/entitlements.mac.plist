@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Sondine.app (Electron main). ADR 010: explicit entitlements per binary. -->
+<plist version="1.0">
+  <dict>
+    <!-- V8 needs JIT pages under the hardened runtime. -->
+    <key>com.apple.security.cs.allow-jit</key>
+    <true/>
+    <!-- macOS asks for microphone access on behalf of the app that spawns the helper. -->
+    <key>com.apple.security.device.audio-input</key>
+    <true/>
+    <!-- The data directory is this group's container (ADR 013). -->
+    <key>com.apple.security.application-groups</key>
+    <array>
+      <string>P5G8WAJ2G2.app.sondine</string>
+    </array>
+  </dict>
+</plist>

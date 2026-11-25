@@ -1,0 +1,18 @@
+/*
+ * @sondine/ui/styles.css: import once from the app's stylesheet entry, then
+ * add an @source for the app's own files.
+ *
+ * The theme itself is Graphical's (graphical/ at the repository root):
+ * theme.css holds its variables, tailwind-theme.css its classes.
+ */
+
+@import "tailwindcss";
+@import "./reset.css";
+@import "../../../../graphical/generated/tailwind-theme.css";
+@import "../../../../graphical/generated/theme.css";
+@import "./fonts.css";
+@import "./tokens.css";
+@import "./theme.css";
+@import "./base.css";
+
+@source "../";

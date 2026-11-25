@@ -1,0 +1,527 @@
+{
+  "version": 1,
+  "profile": "graphical",
+  "modes": {
+    "kind": "attribute",
+    "attribute": "data-theme",
+    "dark": "dark",
+    "light": "light"
+  },
+  "appearance": {
+    "initial": {
+      "navigation": "subtle",
+      "grouping": "cards",
+      "surface": "raised"
+    },
+    "navigation": {
+      "selector": "[data-graphical-host] aside"
+    }
+  },
+  "tokens": [
+    {
+      "variable": "--color-1",
+      "token": "color-1"
+    },
+    {
+      "variable": "--color-1-transparent",
+      "token": "color-1-transparent"
+    },
+    {
+      "variable": "--color-2",
+      "token": "color-2"
+    },
+    {
+      "variable": "--color-2-transparent",
+      "token": "color-2-transparent"
+    },
+    {
+      "variable": "--color-3",
+      "token": "color-3"
+    },
+    {
+      "variable": "--color-3-transparent",
+      "token": "color-3-transparent"
+    },
+    {
+      "variable": "--color-4",
+      "token": "color-4"
+    },
+    {
+      "variable": "--color-4-transparent",
+      "token": "color-4-transparent"
+    },
+    {
+      "variable": "--neutral-1",
+      "token": "neutral-1"
+    },
+    {
+      "variable": "--neutral-1-transparent",
+      "token": "neutral-1-transparent"
+    },
+    {
+      "variable": "--neutral-2",
+      "token": "neutral-2"
+    },
+    {
+      "variable": "--neutral-2-transparent",
+      "token": "neutral-2-transparent"
+    },
+    {
+      "variable": "--neutral-3",
+      "token": "neutral-3"
+    },
+    {
+      "variable": "--neutral-3-transparent",
+      "token": "neutral-3-transparent"
+    },
+    {
+      "variable": "--neutral-4",
+      "token": "neutral-4"
+    },
+    {
+      "variable": "--neutral-4-transparent",
+      "token": "neutral-4-transparent"
+    },
+    {
+      "variable": "--neutral-5",
+      "token": "neutral-5"
+    },
+    {
+      "variable": "--neutral-5-transparent",
+      "token": "neutral-5-transparent"
+    },
+    {
+      "variable": "--neutral-6",
+      "token": "neutral-6"
+    },
+    {
+      "variable": "--neutral-6-transparent",
+      "token": "neutral-6-transparent"
+    },
+    {
+      "variable": "--neutral-7",
+      "token": "neutral-7"
+    },
+    {
+      "variable": "--neutral-7-transparent",
+      "token": "neutral-7-transparent"
+    },
+    {
+      "variable": "--neutral-8",
+      "token": "neutral-8"
+    },
+    {
+      "variable": "--neutral-8-transparent",
+      "token": "neutral-8-transparent"
+    },
+    {
+      "variable": "--neutral-9",
+      "token": "neutral-9"
+    },
+    {
+      "variable": "--neutral-9-transparent",
+      "token": "neutral-9-transparent"
+    },
+    {
+      "variable": "--neutral-10",
+      "token": "neutral-10"
+    },
+    {
+      "variable": "--neutral-10-transparent",
+      "token": "neutral-10-transparent"
+    },
+    {
+      "variable": "--success",
+      "token": "success"
+    },
+    {
+      "variable": "--success-transparent",
+      "token": "success-transparent"
+    },
+    {
+      "variable": "--warning",
+      "token": "warning"
+    },
+    {
+      "variable": "--warning-transparent",
+      "token": "warning-transparent"
+    },
+    {
+      "variable": "--error",
+      "token": "error"
+    },
+    {
+      "variable": "--error-transparent",
+      "token": "error-transparent"
+    },
+    {
+      "variable": "--space-zero",
+      "token": "space.zero",
+      "format": "px"
+    },
+    {
+      "variable": "--space-xxs",
+      "token": "space.xxs",
+      "format": "px"
+    },
+    {
+      "variable": "--space-xs",
+      "token": "space.xs",
+      "format": "px"
+    },
+    {
+      "variable": "--space-s",
+      "token": "space.s",
+      "format": "px"
+    },
+    {
+      "variable": "--space-m",
+      "token": "space.m",
+      "format": "px"
+    },
+    {
+      "variable": "--space-l",
+      "token": "space.l",
+      "format": "px"
+    },
+    {
+      "variable": "--space-xl",
+      "token": "space.xl",
+      "format": "px"
+    },
+    {
+      "variable": "--space-xxl",
+      "token": "space.xxl",
+      "format": "px"
+    },
+    {
+      "variable": "--size-xxs",
+      "token": "text.xxs.size",
+      "format": "px"
+    },
+    {
+      "variable": "--line-xxs",
+      "token": "text.xxs.lineHeight",
+      "format": "px"
+    },
+    {
+      "variable": "--letter-spacing-xxs",
+      "token": "text.xxs.tracking",
+      "format": "em"
+    },
+    {
+      "variable": "--size-xs",
+      "token": "text.xs.size",
+      "format": "px"
+    },
+    {
+      "variable": "--line-xs",
+      "token": "text.xs.lineHeight",
+      "format": "px"
+    },
+    {
+      "variable": "--letter-spacing-xs",
+      "token": "text.xs.tracking",
+      "format": "em"
+    },
+    {
+      "variable": "--size-s",
+      "token": "text.s.size",
+      "format": "px"
+    },
+    {
+      "variable": "--line-s",
+      "token": "text.s.lineHeight",
+      "format": "px"
+    },
+    {
+      "variable": "--letter-spacing-s",
+      "token": "text.s.tracking",
+      "format": "em"
+    },
+    {
+      "variable": "--size-m",
+      "token": "text.m.size",
+      "format": "px"
+    },
+    {
+      "variable": "--line-m",
+      "token": "text.m.lineHeight",
+      "format": "px"
+    },
+    {
+      "variable": "--letter-spacing-m",
+      "token": "text.m.tracking",
+      "format": "em"
+    },
+    {
+      "variable": "--size-l",
+      "token": "text.l.size",
+      "format": "px"
+    },
+    {
+      "variable": "--line-l",
+      "token": "text.l.lineHeight",
+      "format": "px"
+    },
+    {
+      "variable": "--letter-spacing-l",
+      "token": "text.l.tracking",
+      "format": "em"
+    },
+    {
+      "variable": "--size-xl",
+      "token": "text.xl.size",
+      "format": "px"
+    },
+    {
+      "variable": "--line-xl",
+      "token": "text.xl.lineHeight",
+      "format": "px"
+    },
+    {
+      "variable": "--letter-spacing-xl",
+      "token": "text.xl.tracking",
+      "format": "em"
+    },
+    {
+      "variable": "--size-xxl",
+      "token": "text.xxl.size",
+      "format": "px"
+    },
+    {
+      "variable": "--line-xxl",
+      "token": "text.xxl.lineHeight",
+      "format": "px"
+    },
+    {
+      "variable": "--letter-spacing-xxl",
+      "token": "text.xxl.tracking",
+      "format": "em"
+    },
+    {
+      "variable": "--tracking-xs",
+      "token": "tracking.xs",
+      "format": "em"
+    },
+    {
+      "variable": "--tracking-s",
+      "token": "tracking.s",
+      "format": "em"
+    },
+    {
+      "variable": "--tracking-m",
+      "token": "tracking.m",
+      "format": "em"
+    },
+    {
+      "variable": "--tracking-l",
+      "token": "tracking.l",
+      "format": "em"
+    },
+    {
+      "variable": "--tracking-xl",
+      "token": "tracking.xl",
+      "format": "em"
+    },
+    {
+      "variable": "--radius-zero",
+      "token": "radius.zero",
+      "format": "px"
+    },
+    {
+      "variable": "--radius-xs",
+      "token": "radius.xs",
+      "format": "px"
+    },
+    {
+      "variable": "--radius-s",
+      "token": "radius.s",
+      "format": "px"
+    },
+    {
+      "variable": "--radius-m",
+      "token": "radius.m",
+      "format": "px"
+    },
+    {
+      "variable": "--radius-l",
+      "token": "radius.l",
+      "format": "px"
+    },
+    {
+      "variable": "--radius-xl",
+      "token": "radius.xl",
+      "format": "px"
+    },
+    {
+      "variable": "--border-none",
+      "token": "border.none",
+      "format": "px"
+    },
+    {
+      "variable": "--border-s",
+      "token": "border.s",
+      "format": "px"
+    },
+    {
+      "variable": "--border-m",
+      "token": "border.m",
+      "format": "px"
+    },
+    {
+      "variable": "--border-l",
+      "token": "border.l",
+      "format": "px"
+    },
+    {
+      "variable": "--shadow-s",
+      "token": "shadow.s"
+    },
+    {
+      "variable": "--shadow-m",
+      "token": "shadow.m"
+    },
+    {
+      "variable": "--shadow-l",
+      "token": "shadow.l"
+    },
+    {
+      "variable": "--font-data",
+      "token": "font.data"
+    },
+    {
+      "variable": "--weight-data-regular",
+      "token": "weight.data.regular",
+      "format": "number"
+    },
+    {
+      "variable": "--weight-data-medium",
+      "token": "weight.data.medium",
+      "format": "number"
+    },
+    {
+      "variable": "--weight-data-heavy",
+      "token": "weight.data.heavy",
+      "format": "number"
+    },
+    {
+      "variable": "--cte-canvas",
+      "token": "neutral-1"
+    },
+    {
+      "variable": "--cte-surface",
+      "token": "neutral-2"
+    },
+    {
+      "variable": "--cte-surface-muted",
+      "token": "neutral-3"
+    },
+    {
+      "variable": "--cte-text",
+      "token": "neutral-10"
+    },
+    {
+      "variable": "--cte-text-muted",
+      "token": "neutral-7"
+    },
+    {
+      "variable": "--cte-border",
+      "token": "neutral-4-transparent"
+    },
+    {
+      "variable": "--cte-accent",
+      "token": "color-1"
+    },
+    {
+      "variable": "--cte-accent-text",
+      "token": "on:color-1"
+    },
+    {
+      "variable": "--cte-danger",
+      "token": "error"
+    },
+    {
+      "variable": "--cte-focus",
+      "token": "color-1"
+    },
+    {
+      "variable": "--border-default-color",
+      "token": "neutral-4-transparent"
+    },
+    {
+      "variable": "--option-badge-background",
+      "token": "neutral-3"
+    },
+    {
+      "variable": "--option-badge-foreground",
+      "token": "neutral-10"
+    },
+    {
+      "variable": "--navigation-active-background",
+      "token": "neutral-3"
+    },
+    {
+      "variable": "--navigation-active-foreground",
+      "token": "neutral-10"
+    },
+    {
+      "variable": "--cte-font",
+      "token": "font.body"
+    },
+    {
+      "variable": "--cte-font-size",
+      "token": "text.s.size",
+      "format": "px"
+    },
+    {
+      "variable": "--cte-font-weight",
+      "token": "weight.body.regular",
+      "format": "number"
+    },
+    {
+      "variable": "--cte-line-height",
+      "token": "text.s.lineHeight",
+      "format": "px"
+    },
+    {
+      "variable": "--cte-letter-spacing",
+      "token": "text.s.tracking",
+      "format": "em"
+    },
+    {
+      "variable": "--cte-detail-font-size",
+      "token": "text.xs.size",
+      "format": "px"
+    },
+    {
+      "variable": "--cte-detail-line-height",
+      "token": "text.xs.lineHeight",
+      "format": "px"
+    },
+    {
+      "variable": "--cte-detail-letter-spacing",
+      "token": "text.xs.tracking",
+      "format": "em"
+    },
+    {
+      "variable": "--motion-duration",
+      "token": "motion.small.duration",
+      "format": "ms"
+    },
+    {
+      "variable": "--motion-easing",
+      "token": "motion.small.easing"
+    },
+    {
+      "variable": "--motion-large-duration",
+      "token": "motion.large.duration",
+      "format": "ms"
+    },
+    {
+      "variable": "--motion-large-easing",
+      "token": "motion.large.easing"
+    }
+  ],
+  "fixed": []
+}

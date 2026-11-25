@@ -1,0 +1,5069 @@
+{
+  "format": "graphical-install-report-v1",
+  "dryRun": false,
+  "project": "graphical",
+  "inputs": {
+    "inventory": "graphical/install/style-inventory.json",
+    "input": "graphical/install/import.json",
+    "keep": []
+  },
+  "totals": [
+    {
+      "label": "Colors",
+      "before": 34,
+      "after": 17,
+      "derived": 0,
+      "kept": 0
+    },
+    {
+      "label": "Text sizes",
+      "before": 7,
+      "after": 7,
+      "derived": 0,
+      "kept": 0
+    },
+    {
+      "label": "Font weights",
+      "before": 3,
+      "after": 3,
+      "derived": 0,
+      "kept": 0
+    },
+    {
+      "label": "Letter spacing",
+      "before": 4,
+      "after": 4,
+      "derived": 0,
+      "kept": 0
+    },
+    {
+      "label": "Spacing",
+      "before": 7,
+      "after": 7,
+      "derived": 0,
+      "kept": 0
+    },
+    {
+      "label": "Corners",
+      "before": 5,
+      "after": 4,
+      "derived": 0,
+      "kept": 0
+    },
+    {
+      "label": "Shadows",
+      "before": 3,
+      "after": 3,
+      "derived": 0,
+      "kept": 0
+    }
+  ],
+  "families": {
+    "radius": {
+      "rewritten": 90,
+      "removed": 0,
+      "skipped": 0,
+      "tokens": 0,
+      "kept": 0,
+      "preserved": 1
+    },
+    "font-weight": {
+      "rewritten": 77,
+      "removed": 0,
+      "skipped": 0,
+      "tokens": 1,
+      "kept": 0,
+      "preserved": 0
+    },
+    "font-size": {
+      "rewritten": 251,
+      "removed": 0,
+      "skipped": 0,
+      "tokens": 0,
+      "kept": 0,
+      "preserved": 0
+    },
+    "spacing": {
+      "rewritten": 4,
+      "removed": 0,
+      "skipped": 0,
+      "tokens": 493,
+      "kept": 0,
+      "preserved": 7
+    },
+    "color": {
+      "rewritten": 0,
+      "removed": 0,
+      "skipped": 0,
+      "tokens": 87,
+      "kept": 8,
+      "preserved": 340
+    },
+    "line-height": {
+      "rewritten": 1,
+      "removed": 48,
+      "skipped": 0,
+      "tokens": 1,
+      "kept": 0,
+      "preserved": 0
+    },
+    "font-family": {
+      "rewritten": 63,
+      "removed": 0,
+      "skipped": 0,
+      "tokens": 0,
+      "kept": 0,
+      "preserved": 0
+    },
+    "border-width": {
+      "rewritten": 0,
+      "removed": 0,
+      "skipped": 0,
+      "tokens": 0,
+      "kept": 0,
+      "preserved": 4
+    },
+    "shadow": {
+      "rewritten": 0,
+      "removed": 0,
+      "skipped": 0,
+      "tokens": 0,
+      "kept": 6,
+      "preserved": 2
+    },
+    "letter-spacing": {
+      "rewritten": 0,
+      "removed": 8,
+      "skipped": 0,
+      "tokens": 9,
+      "kept": 0,
+      "preserved": 0
+    },
+    "token": {
+      "rewritten": 114,
+      "removed": 0,
+      "skipped": 0,
+      "tokens": 0,
+      "kept": 0,
+      "preserved": 0
+    }
+  },
+  "files": [
+    "apps/desktop/src/renderer/components/chat/answer-text.tsx",
+    "apps/desktop/src/renderer/components/chat/chat-screen.tsx",
+    "apps/desktop/src/renderer/components/chat/model-picker.tsx",
+    "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+    "apps/desktop/src/renderer/components/episode/episode-menu.tsx",
+    "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+    "apps/desktop/src/renderer/components/episode/privacy-line.tsx",
+    "apps/desktop/src/renderer/components/episode/same-moment-line.tsx",
+    "apps/desktop/src/renderer/components/episode/segment-editor.tsx",
+    "apps/desktop/src/renderer/components/episode/transcribe-button.tsx",
+    "apps/desktop/src/renderer/components/episode/transcript.tsx",
+    "apps/desktop/src/renderer/components/episode/voice-name.tsx",
+    "apps/desktop/src/renderer/components/imports/imports-screen.tsx",
+    "apps/desktop/src/renderer/components/journal/journal-reminder.tsx",
+    "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+    "apps/desktop/src/renderer/components/models/model-panel.tsx",
+    "apps/desktop/src/renderer/components/people/people-screen.tsx",
+    "apps/desktop/src/renderer/components/people/person-screen.tsx",
+    "apps/desktop/src/renderer/components/player/player-bar.tsx",
+    "apps/desktop/src/renderer/components/player/speech-scrubber.tsx",
+    "apps/desktop/src/renderer/components/search/search-menu.tsx",
+    "apps/desktop/src/renderer/components/search/search-screen.tsx",
+    "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+    "apps/desktop/src/renderer/components/settings/browser-section.tsx",
+    "apps/desktop/src/renderer/components/settings/chat-section.tsx",
+    "apps/desktop/src/renderer/components/settings/dictation-section.tsx",
+    "apps/desktop/src/renderer/components/settings/dictation-voice-switch.tsx",
+    "apps/desktop/src/renderer/components/settings/journal-section.tsx",
+    "apps/desktop/src/renderer/components/settings/live-text-section.tsx",
+    "apps/desktop/src/renderer/components/settings/login-item-switch.tsx",
+    "apps/desktop/src/renderer/components/settings/notch-switch.tsx",
+    "apps/desktop/src/renderer/components/settings/phone-section.tsx",
+    "apps/desktop/src/renderer/components/settings/privacy-section.tsx",
+    "apps/desktop/src/renderer/components/settings/recognition-switch.tsx",
+    "apps/desktop/src/renderer/components/settings/settings-screen.tsx",
+    "apps/desktop/src/renderer/components/settings/updates-section.tsx",
+    "apps/desktop/src/renderer/components/shell/forget-dialog.tsx",
+    "apps/desktop/src/renderer/components/shell/listening-banner.tsx",
+    "apps/desktop/src/renderer/components/shell/listening-panel.tsx",
+    "apps/desktop/src/renderer/components/status/analysis-checks.tsx",
+    "apps/desktop/src/renderer/components/status/analysis-section.tsx",
+    "apps/desktop/src/renderer/components/status/memory-bar.tsx",
+    "apps/desktop/src/renderer/components/status/section.tsx",
+    "apps/desktop/src/renderer/components/status/status-screen.tsx",
+    "apps/desktop/src/renderer/components/today/day-menu.tsx",
+    "apps/desktop/src/renderer/components/today/ongoing.tsx",
+    "apps/desktop/src/renderer/components/today/today-rows.tsx",
+    "apps/desktop/src/renderer/components/today/today-screen.tsx",
+    "apps/desktop/src/renderer/components/welcome/welcome-screen.tsx",
+    "packages/ui/src/components/accordion.tsx",
+    "packages/ui/src/components/badge.tsx",
+    "packages/ui/src/components/button.tsx",
+    "packages/ui/src/components/collapsible.tsx",
+    "packages/ui/src/components/command-palette.tsx",
+    "packages/ui/src/components/input.tsx",
+    "packages/ui/src/components/menu.tsx",
+    "packages/ui/src/components/radio-group.tsx",
+    "packages/ui/src/components/toggle.tsx",
+    "packages/ui/src/components/toolbar.tsx",
+    "packages/ui/src/design-system/design-system-page.tsx",
+    "packages/ui/src/design-system/section.tsx",
+    "packages/ui/src/design-system/sections/alert-dialog.tsx",
+    "packages/ui/src/design-system/sections/badge.tsx",
+    "packages/ui/src/design-system/sections/command-palette.tsx",
+    "packages/ui/src/design-system/sections/context-menu.tsx",
+    "packages/ui/src/design-system/sections/dialog.tsx",
+    "packages/ui/src/design-system/sections/foundations.tsx",
+    "packages/ui/src/design-system/sections/kbd.tsx",
+    "packages/ui/src/design-system/sections/menu.tsx",
+    "packages/ui/src/design-system/sections/radio-group.tsx",
+    "packages/ui/src/design-system/sections/scroll-area.tsx",
+    "packages/ui/src/styles/base.css",
+    "packages/ui/src/styles/theme.css",
+    "packages/ui/src/styles/tokens.css"
+  ],
+  "written": [
+    "graphical/project.json",
+    "graphical/themes/graphical.json",
+    "graphical/role-map.json",
+    "graphical/generated/theme.css",
+    "graphical/README.md",
+    "graphical/generated/tailwind-theme.css",
+    "graphical/install/install-report.json",
+    "graphical/install/install-report.md"
+  ],
+  "fonts": {
+    "font-ui": "body",
+    "font-brand": "display",
+    "font-editorial": "body"
+  },
+  "changes": [
+    {
+      "path": "apps/desktop/src/renderer/components/chat/answer-text.tsx",
+      "line": 9,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/answer-text.tsx",
+      "line": 18,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/answer-text.tsx",
+      "line": 30,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/answer-text.tsx",
+      "line": 30,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/chat-screen.tsx",
+      "line": 117,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/chat-screen.tsx",
+      "line": 129,
+      "text": "rounded-m",
+      "family": "radius",
+      "after": "corner-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/chat-screen.tsx",
+      "line": 137,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/chat-screen.tsx",
+      "line": 145,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/chat-screen.tsx",
+      "line": 150,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/chat-screen.tsx",
+      "line": 152,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/chat-screen.tsx",
+      "line": 194,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/chat-screen.tsx",
+      "line": 223,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/chat-screen.tsx",
+      "line": 282,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/chat-screen.tsx",
+      "line": 286,
+      "text": "rounded-m",
+      "family": "radius",
+      "after": "corner-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/chat-screen.tsx",
+      "line": 295,
+      "text": "text-m",
+      "family": "font-size",
+      "after": "text-body-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/chat-screen.tsx",
+      "line": 332,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/chat-screen.tsx",
+      "line": 336,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/chat-screen.tsx",
+      "line": 379,
+      "text": "text-xl",
+      "family": "font-size",
+      "after": "text-display-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/chat-screen.tsx",
+      "line": 379,
+      "text": "font-brand-heavy",
+      "family": "font-weight",
+      "after": "font-heavy"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/chat-screen.tsx",
+      "line": 295,
+      "text": "leading-m",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/chat-screen.tsx",
+      "line": 379,
+      "text": "font-brand",
+      "family": "font-family",
+      "after": "font-display"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/chat-screen.tsx",
+      "line": 379,
+      "text": "leading-xl",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/chat/model-picker.tsx",
+      "line": 94,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 216,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 216,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 234,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 257,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 257,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 324,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 344,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 367,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 374,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 374,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 387,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 398,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 405,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 413,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 421,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 428,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 438,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 518,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 518,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 568,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 572,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 216,
+      "text": "leading-s",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 234,
+      "text": "leading-xs",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 257,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 257,
+      "text": "leading-s",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 367,
+      "text": "leading-s",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 374,
+      "text": "leading-s",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 398,
+      "text": "leading-xs",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 421,
+      "text": "leading-xs",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 518,
+      "text": "leading-s",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-menu.tsx",
+      "line": 178,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 134,
+      "text": "rounded-m",
+      "family": "radius",
+      "after": "corner-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 222,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 230,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 241,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 241,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 241,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 309,
+      "text": "text-xl",
+      "family": "font-size",
+      "after": "text-display-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 309,
+      "text": "font-brand-heavy",
+      "family": "font-weight",
+      "after": "font-heavy"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 394,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 394,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 403,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 405,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 418,
+      "text": "rounded-full",
+      "family": "radius",
+      "after": "corner-full"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 458,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 508,
+      "text": "rounded-m",
+      "family": "radius",
+      "after": "corner-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 512,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 521,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 521,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 241,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 241,
+      "text": "leading-s",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 309,
+      "text": "font-brand",
+      "family": "font-family",
+      "after": "font-display"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 309,
+      "text": "leading-xl",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 394,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 403,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/episode-screen.tsx",
+      "line": 521,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/privacy-line.tsx",
+      "line": 20,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/same-moment-line.tsx",
+      "line": 58,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/same-moment-line.tsx",
+      "line": 61,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/same-moment-line.tsx",
+      "line": 76,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/same-moment-line.tsx",
+      "line": 85,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/segment-editor.tsx",
+      "line": 100,
+      "text": "text-m",
+      "family": "font-size",
+      "after": "text-body-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/segment-editor.tsx",
+      "line": 100,
+      "text": "font-editorial-regular",
+      "family": "font-weight",
+      "after": "font-regular"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/segment-editor.tsx",
+      "line": 100,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/segment-editor.tsx",
+      "line": 112,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/segment-editor.tsx",
+      "line": 112,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/segment-editor.tsx",
+      "line": 118,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/segment-editor.tsx",
+      "line": 100,
+      "text": "font-editorial",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/segment-editor.tsx",
+      "line": 100,
+      "text": "leading-m",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/transcribe-button.tsx",
+      "line": 35,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/transcript.tsx",
+      "line": 689,
+      "text": "rounded-m",
+      "family": "radius",
+      "after": "corner-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/transcript.tsx",
+      "line": 693,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/transcript.tsx",
+      "line": 694,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/transcript.tsx",
+      "line": 698,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/transcript.tsx",
+      "line": 875,
+      "text": "rounded-m",
+      "family": "radius",
+      "after": "corner-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/transcript.tsx",
+      "line": 879,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/transcript.tsx",
+      "line": 879,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/transcript.tsx",
+      "line": 879,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/transcript.tsx",
+      "line": 889,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/transcript.tsx",
+      "line": 944,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/transcript.tsx",
+      "line": 944,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/transcript.tsx",
+      "line": 693,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/transcript.tsx",
+      "line": 879,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/transcript.tsx",
+      "line": 879,
+      "text": "leading-s",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/transcript.tsx",
+      "line": 944,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/transcript.tsx",
+      "line": 944,
+      "text": "leading-xs",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/voice-name.tsx",
+      "line": 157,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/voice-name.tsx",
+      "line": 198,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/voice-name.tsx",
+      "line": 288,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/voice-name.tsx",
+      "line": 293,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/voice-name.tsx",
+      "line": 346,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/voice-name.tsx",
+      "line": 346,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/imports/imports-screen.tsx",
+      "line": 153,
+      "text": "rounded-m",
+      "family": "radius",
+      "after": "corner-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/imports/imports-screen.tsx",
+      "line": 168,
+      "text": "text-xl",
+      "family": "font-size",
+      "after": "text-display-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/imports/imports-screen.tsx",
+      "line": 168,
+      "text": "font-brand-heavy",
+      "family": "font-weight",
+      "after": "font-heavy"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/imports/imports-screen.tsx",
+      "line": 170,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/imports/imports-screen.tsx",
+      "line": 241,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/imports/imports-screen.tsx",
+      "line": 244,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/imports/imports-screen.tsx",
+      "line": 245,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/imports/imports-screen.tsx",
+      "line": 250,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/imports/imports-screen.tsx",
+      "line": 168,
+      "text": "font-brand",
+      "family": "font-family",
+      "after": "font-display"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/imports/imports-screen.tsx",
+      "line": 168,
+      "text": "leading-xl",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-reminder.tsx",
+      "line": 35,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-reminder.tsx",
+      "line": 35,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 97,
+      "text": "text-xl",
+      "family": "font-size",
+      "after": "text-display-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 97,
+      "text": "font-brand-heavy",
+      "family": "font-weight",
+      "after": "font-heavy"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 148,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 197,
+      "text": "text-m",
+      "family": "font-size",
+      "after": "text-body-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 197,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 225,
+      "text": "text-m",
+      "family": "font-size",
+      "after": "text-body-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 225,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 242,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 265,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 317,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 317,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 459,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 591,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 633,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 647,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 651,
+      "text": "font-editorial-regular",
+      "family": "font-weight",
+      "after": "font-regular"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 693,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 693,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 737,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 747,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 747,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 97,
+      "text": "font-brand",
+      "family": "font-family",
+      "after": "font-display"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 97,
+      "text": "leading-xl",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 197,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 197,
+      "text": "leading-m",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 225,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 225,
+      "text": "leading-m",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/journal/journal-screen.tsx",
+      "line": 651,
+      "text": "font-editorial",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/models/model-panel.tsx",
+      "line": 158,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/models/model-panel.tsx",
+      "line": 169,
+      "text": "rounded-m",
+      "family": "radius",
+      "after": "corner-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/models/model-panel.tsx",
+      "line": 171,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/models/model-panel.tsx",
+      "line": 172,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/models/model-panel.tsx",
+      "line": 181,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/models/model-panel.tsx",
+      "line": 188,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/models/model-panel.tsx",
+      "line": 192,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/models/model-panel.tsx",
+      "line": 193,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/models/model-panel.tsx",
+      "line": 224,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/models/model-panel.tsx",
+      "line": 237,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/models/model-panel.tsx",
+      "line": 258,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/models/model-panel.tsx",
+      "line": 265,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/models/model-panel.tsx",
+      "line": 265,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/models/model-panel.tsx",
+      "line": 271,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/models/model-panel.tsx",
+      "line": 171,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/models/model-panel.tsx",
+      "line": 265,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/people-screen.tsx",
+      "line": 23,
+      "text": "text-xl",
+      "family": "font-size",
+      "after": "text-display-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/people-screen.tsx",
+      "line": 23,
+      "text": "font-brand-heavy",
+      "family": "font-weight",
+      "after": "font-heavy"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/people-screen.tsx",
+      "line": 51,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/people-screen.tsx",
+      "line": 53,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/people-screen.tsx",
+      "line": 55,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/people-screen.tsx",
+      "line": 82,
+      "text": "text-m",
+      "family": "font-size",
+      "after": "text-body-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/people-screen.tsx",
+      "line": 82,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/people-screen.tsx",
+      "line": 85,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/people-screen.tsx",
+      "line": 106,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/people-screen.tsx",
+      "line": 113,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/people-screen.tsx",
+      "line": 113,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/people-screen.tsx",
+      "line": 23,
+      "text": "font-brand",
+      "family": "font-family",
+      "after": "font-display"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/people-screen.tsx",
+      "line": 23,
+      "text": "leading-xl",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/people-screen.tsx",
+      "line": 53,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/people-screen.tsx",
+      "line": 82,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/people-screen.tsx",
+      "line": 82,
+      "text": "leading-m",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/person-screen.tsx",
+      "line": 45,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/person-screen.tsx",
+      "line": 45,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/person-screen.tsx",
+      "line": 144,
+      "text": "text-xl",
+      "family": "font-size",
+      "after": "text-display-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/person-screen.tsx",
+      "line": 144,
+      "text": "font-brand-heavy",
+      "family": "font-weight",
+      "after": "font-heavy"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/person-screen.tsx",
+      "line": 242,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/person-screen.tsx",
+      "line": 259,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/person-screen.tsx",
+      "line": 261,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/person-screen.tsx",
+      "line": 271,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/person-screen.tsx",
+      "line": 144,
+      "text": "font-brand",
+      "family": "font-family",
+      "after": "font-display"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/people/person-screen.tsx",
+      "line": 144,
+      "text": "leading-xl",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/player/player-bar.tsx",
+      "line": 52,
+      "text": "rounded-m",
+      "family": "radius",
+      "after": "corner-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/player/player-bar.tsx",
+      "line": 129,
+      "text": "rounded-full",
+      "family": "radius",
+      "after": "corner-full"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/player/player-bar.tsx",
+      "line": 144,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/player/player-bar.tsx",
+      "line": 144,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/player/player-bar.tsx",
+      "line": 144,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/player/player-bar.tsx",
+      "line": 152,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/player/player-bar.tsx",
+      "line": 156,
+      "text": "text-xxs",
+      "family": "font-size",
+      "after": "text-body-xxs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/player/player-bar.tsx",
+      "line": 173,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/player/player-bar.tsx",
+      "line": 144,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/player/player-bar.tsx",
+      "line": 144,
+      "text": "leading-s",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/player/speech-scrubber.tsx",
+      "line": 71,
+      "text": "rounded-full",
+      "family": "radius",
+      "after": "corner-full"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/player/speech-scrubber.tsx",
+      "line": 75,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/player/speech-scrubber.tsx",
+      "line": 75,
+      "text": "px-0",
+      "family": "spacing",
+      "after": "px-zero"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-menu.tsx",
+      "line": 80,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 88,
+      "text": "text-xl",
+      "family": "font-size",
+      "after": "text-display-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 88,
+      "text": "font-brand-heavy",
+      "family": "font-weight",
+      "after": "font-heavy"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 309,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 316,
+      "text": "text-m",
+      "family": "font-size",
+      "after": "text-body-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 316,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 392,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 394,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 402,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 425,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 428,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 428,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 476,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 478,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 481,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 481,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 88,
+      "text": "font-brand",
+      "family": "font-family",
+      "after": "font-display"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 88,
+      "text": "leading-xl",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 316,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 316,
+      "text": "leading-m",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 394,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 428,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 481,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 98,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 165,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 165,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 225,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 232,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 249,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 307,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 311,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 420,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 421,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 433,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 505,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 518,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 519,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 546,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 549,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 585,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 587,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 589,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 596,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 614,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 165,
+      "text": "leading-xs",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 420,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 518,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 549,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/agents-section.tsx",
+      "line": 585,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/browser-section.tsx",
+      "line": 70,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/browser-section.tsx",
+      "line": 78,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/browser-section.tsx",
+      "line": 85,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/browser-section.tsx",
+      "line": 102,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/browser-section.tsx",
+      "line": 109,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/browser-section.tsx",
+      "line": 122,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/browser-section.tsx",
+      "line": 123,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/browser-section.tsx",
+      "line": 136,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/chat-section.tsx",
+      "line": 88,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/chat-section.tsx",
+      "line": 94,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/chat-section.tsx",
+      "line": 113,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/dictation-section.tsx",
+      "line": 34,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/dictation-section.tsx",
+      "line": 36,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/dictation-section.tsx",
+      "line": 40,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/dictation-section.tsx",
+      "line": 49,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/dictation-section.tsx",
+      "line": 81,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/dictation-voice-switch.tsx",
+      "line": 40,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/dictation-voice-switch.tsx",
+      "line": 45,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/journal-section.tsx",
+      "line": 72,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/journal-section.tsx",
+      "line": 74,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/journal-section.tsx",
+      "line": 81,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/journal-section.tsx",
+      "line": 81,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/journal-section.tsx",
+      "line": 95,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/journal-section.tsx",
+      "line": 101,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/journal-section.tsx",
+      "line": 81,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/live-text-section.tsx",
+      "line": 36,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/live-text-section.tsx",
+      "line": 37,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/live-text-section.tsx",
+      "line": 39,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/login-item-switch.tsx",
+      "line": 50,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/login-item-switch.tsx",
+      "line": 52,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/notch-switch.tsx",
+      "line": 28,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/notch-switch.tsx",
+      "line": 33,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/phone-section.tsx",
+      "line": 78,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/phone-section.tsx",
+      "line": 79,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/phone-section.tsx",
+      "line": 205,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/phone-section.tsx",
+      "line": 220,
+      "text": "text-xxl",
+      "family": "font-size",
+      "after": "text-display-xl"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/phone-section.tsx",
+      "line": 227,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/phone-section.tsx",
+      "line": 257,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/phone-section.tsx",
+      "line": 262,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/phone-section.tsx",
+      "line": 275,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/phone-section.tsx",
+      "line": 337,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/phone-section.tsx",
+      "line": 346,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/phone-section.tsx",
+      "line": 355,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/phone-section.tsx",
+      "line": 387,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/phone-section.tsx",
+      "line": 389,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/phone-section.tsx",
+      "line": 402,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/phone-section.tsx",
+      "line": 78,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/phone-section.tsx",
+      "line": 220,
+      "text": "leading-xxl",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/privacy-section.tsx",
+      "line": 212,
+      "text": "text-m",
+      "family": "font-size",
+      "after": "text-body-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/privacy-section.tsx",
+      "line": 282,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/privacy-section.tsx",
+      "line": 299,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/privacy-section.tsx",
+      "line": 303,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/privacy-section.tsx",
+      "line": 313,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/privacy-section.tsx",
+      "line": 314,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/privacy-section.tsx",
+      "line": 331,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/privacy-section.tsx",
+      "line": 386,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/privacy-section.tsx",
+      "line": 460,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/privacy-section.tsx",
+      "line": 603,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/privacy-section.tsx",
+      "line": 621,
+      "text": "font-ui-regular",
+      "family": "font-weight",
+      "after": "font-regular"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/privacy-section.tsx",
+      "line": 769,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/privacy-section.tsx",
+      "line": 793,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/privacy-section.tsx",
+      "line": 801,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/privacy-section.tsx",
+      "line": 303,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/privacy-section.tsx",
+      "line": 331,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/recognition-switch.tsx",
+      "line": 35,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/recognition-switch.tsx",
+      "line": 40,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/settings-screen.tsx",
+      "line": 34,
+      "text": "text-m",
+      "family": "font-size",
+      "after": "text-body-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/settings-screen.tsx",
+      "line": 34,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/settings-screen.tsx",
+      "line": 45,
+      "text": "text-xl",
+      "family": "font-size",
+      "after": "text-display-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/settings-screen.tsx",
+      "line": 45,
+      "text": "font-brand-heavy",
+      "family": "font-weight",
+      "after": "font-heavy"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/settings-screen.tsx",
+      "line": 34,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/settings-screen.tsx",
+      "line": 34,
+      "text": "leading-m",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/settings-screen.tsx",
+      "line": 45,
+      "text": "font-brand",
+      "family": "font-family",
+      "after": "font-display"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/settings-screen.tsx",
+      "line": 45,
+      "text": "leading-xl",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/updates-section.tsx",
+      "line": 28,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/updates-section.tsx",
+      "line": 31,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/updates-section.tsx",
+      "line": 49,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/updates-section.tsx",
+      "line": 49,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/updates-section.tsx",
+      "line": 49,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/updates-section.tsx",
+      "line": 60,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/settings/updates-section.tsx",
+      "line": 49,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/forget-dialog.tsx",
+      "line": 88,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/listening-banner.tsx",
+      "line": 34,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/listening-banner.tsx",
+      "line": 101,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/listening-banner.tsx",
+      "line": 101,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/listening-banner.tsx",
+      "line": 101,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/listening-banner.tsx",
+      "line": 101,
+      "text": "leading-s",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/listening-panel.tsx",
+      "line": 62,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/listening-panel.tsx",
+      "line": 89,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/listening-panel.tsx",
+      "line": 130,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/listening-panel.tsx",
+      "line": 130,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/listening-panel.tsx",
+      "line": 190,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/listening-panel.tsx",
+      "line": 195,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/listening-panel.tsx",
+      "line": 200,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/listening-panel.tsx",
+      "line": 218,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/listening-panel.tsx",
+      "line": 218,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/listening-panel.tsx",
+      "line": 130,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/listening-panel.tsx",
+      "line": 130,
+      "text": "leading-s",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/status/analysis-checks.tsx",
+      "line": 99,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/status/analysis-checks.tsx",
+      "line": 127,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/status/analysis-checks.tsx",
+      "line": 153,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/status/analysis-section.tsx",
+      "line": 63,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/status/memory-bar.tsx",
+      "line": 25,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/status/memory-bar.tsx",
+      "line": 40,
+      "text": "rounded-full",
+      "family": "radius",
+      "after": "corner-full"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/status/memory-bar.tsx",
+      "line": 42,
+      "text": "rounded-full",
+      "family": "radius",
+      "after": "corner-full"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/status/memory-bar.tsx",
+      "line": 56,
+      "text": "rounded-full",
+      "family": "radius",
+      "after": "corner-full"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/status/memory-bar.tsx",
+      "line": 60,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/status/section.tsx",
+      "line": 8,
+      "text": "text-m",
+      "family": "font-size",
+      "after": "text-body-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/status/section.tsx",
+      "line": 8,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/status/section.tsx",
+      "line": 8,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/status/section.tsx",
+      "line": 8,
+      "text": "leading-m",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/status/status-screen.tsx",
+      "line": 52,
+      "text": "text-xl",
+      "family": "font-size",
+      "after": "text-display-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/status/status-screen.tsx",
+      "line": 52,
+      "text": "font-brand-heavy",
+      "family": "font-weight",
+      "after": "font-heavy"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/status/status-screen.tsx",
+      "line": 250,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/status/status-screen.tsx",
+      "line": 306,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/status/status-screen.tsx",
+      "line": 52,
+      "text": "font-brand",
+      "family": "font-family",
+      "after": "font-display"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/status/status-screen.tsx",
+      "line": 52,
+      "text": "leading-xl",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/day-menu.tsx",
+      "line": 113,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/ongoing.tsx",
+      "line": 78,
+      "text": "rounded-m",
+      "family": "radius",
+      "after": "corner-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/ongoing.tsx",
+      "line": 80,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/ongoing.tsx",
+      "line": 82,
+      "text": "rounded-full",
+      "family": "radius",
+      "after": "corner-full"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/ongoing.tsx",
+      "line": 83,
+      "text": "rounded-full",
+      "family": "radius",
+      "after": "corner-full"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/ongoing.tsx",
+      "line": 86,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/ongoing.tsx",
+      "line": 114,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/ongoing.tsx",
+      "line": 86,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/today-rows.tsx",
+      "line": 37,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/today-rows.tsx",
+      "line": 100,
+      "text": "text-m",
+      "family": "font-size",
+      "after": "text-body-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/today-rows.tsx",
+      "line": 101,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/today-rows.tsx",
+      "line": 123,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/today-rows.tsx",
+      "line": 166,
+      "text": "text-m",
+      "family": "font-size",
+      "after": "text-body-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/today-rows.tsx",
+      "line": 166,
+      "text": "font-ui-regular",
+      "family": "font-weight",
+      "after": "font-regular"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/today-rows.tsx",
+      "line": 174,
+      "text": "font-ui-regular",
+      "family": "font-weight",
+      "after": "font-regular"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/today-rows.tsx",
+      "line": 291,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/today-rows.tsx",
+      "line": 299,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/today-rows.tsx",
+      "line": 324,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/today-rows.tsx",
+      "line": 100,
+      "text": "leading-m",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/today-rows.tsx",
+      "line": 166,
+      "text": "leading-m",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/today-screen.tsx",
+      "line": 75,
+      "text": "text-xl",
+      "family": "font-size",
+      "after": "text-display-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/today-screen.tsx",
+      "line": 75,
+      "text": "font-brand-heavy",
+      "family": "font-weight",
+      "after": "font-heavy"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/today-screen.tsx",
+      "line": 96,
+      "text": "rounded-full",
+      "family": "radius",
+      "after": "corner-full"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/today-screen.tsx",
+      "line": 270,
+      "text": "text-m",
+      "family": "font-size",
+      "after": "text-body-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/today-screen.tsx",
+      "line": 270,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/today-screen.tsx",
+      "line": 75,
+      "text": "font-brand",
+      "family": "font-family",
+      "after": "font-display"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/today-screen.tsx",
+      "line": 75,
+      "text": "leading-xl",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/today-screen.tsx",
+      "line": 270,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/today-screen.tsx",
+      "line": 270,
+      "text": "leading-m",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/welcome/welcome-screen.tsx",
+      "line": 90,
+      "text": "text-xl",
+      "family": "font-size",
+      "after": "text-display-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/welcome/welcome-screen.tsx",
+      "line": 90,
+      "text": "font-brand-heavy",
+      "family": "font-weight",
+      "after": "font-heavy"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/welcome/welcome-screen.tsx",
+      "line": 109,
+      "text": "text-m",
+      "family": "font-size",
+      "after": "text-body-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/welcome/welcome-screen.tsx",
+      "line": 192,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/welcome/welcome-screen.tsx",
+      "line": 193,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/welcome/welcome-screen.tsx",
+      "line": 209,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/welcome/welcome-screen.tsx",
+      "line": 212,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/welcome/welcome-screen.tsx",
+      "line": 277,
+      "text": "text-m",
+      "family": "font-size",
+      "after": "text-body-m"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/welcome/welcome-screen.tsx",
+      "line": 90,
+      "text": "font-brand",
+      "family": "font-family",
+      "after": "font-display"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/welcome/welcome-screen.tsx",
+      "line": 90,
+      "text": "leading-xl",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/welcome/welcome-screen.tsx",
+      "line": 109,
+      "text": "leading-m",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/welcome/welcome-screen.tsx",
+      "line": 192,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/welcome/welcome-screen.tsx",
+      "line": 277,
+      "text": "leading-m",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "packages/ui/src/components/accordion.tsx",
+      "line": 35,
+      "text": "text-m",
+      "family": "font-size",
+      "after": "text-body-m"
+    },
+    {
+      "path": "packages/ui/src/components/accordion.tsx",
+      "line": 51,
+      "text": "px-0",
+      "family": "spacing",
+      "after": "px-zero"
+    },
+    {
+      "path": "packages/ui/src/components/accordion.tsx",
+      "line": 51,
+      "text": "pt-0",
+      "family": "spacing",
+      "after": "pt-zero"
+    },
+    {
+      "path": "packages/ui/src/components/accordion.tsx",
+      "line": 52,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "packages/ui/src/components/accordion.tsx",
+      "line": 52,
+      "text": "font-ui-regular",
+      "family": "font-weight",
+      "after": "font-regular"
+    },
+    {
+      "path": "packages/ui/src/components/accordion.tsx",
+      "line": 52,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "packages/ui/src/components/accordion.tsx",
+      "line": 52,
+      "text": "leading-s",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "packages/ui/src/components/accordion.tsx",
+      "line": 52,
+      "text": "tracking-l",
+      "family": "letter-spacing",
+      "after": ""
+    },
+    {
+      "path": "packages/ui/src/components/badge.tsx",
+      "line": 20,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "packages/ui/src/components/badge.tsx",
+      "line": 21,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "packages/ui/src/components/badge.tsx",
+      "line": 21,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "packages/ui/src/components/badge.tsx",
+      "line": 21,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "packages/ui/src/components/badge.tsx",
+      "line": 21,
+      "text": "leading-xs",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "packages/ui/src/components/badge.tsx",
+      "line": 21,
+      "text": "tracking-l",
+      "family": "letter-spacing",
+      "after": ""
+    },
+    {
+      "path": "packages/ui/src/components/button.tsx",
+      "line": 14,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "packages/ui/src/components/button.tsx",
+      "line": 14,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "packages/ui/src/components/button.tsx",
+      "line": 14,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "packages/ui/src/components/button.tsx",
+      "line": 14,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "packages/ui/src/components/button.tsx",
+      "line": 14,
+      "text": "leading-s",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "packages/ui/src/components/button.tsx",
+      "line": 14,
+      "text": "tracking-l",
+      "family": "letter-spacing",
+      "after": ""
+    },
+    {
+      "path": "packages/ui/src/components/collapsible.tsx",
+      "line": 33,
+      "text": "text-m",
+      "family": "font-size",
+      "after": "text-body-m"
+    },
+    {
+      "path": "packages/ui/src/components/collapsible.tsx",
+      "line": 49,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "packages/ui/src/components/collapsible.tsx",
+      "line": 49,
+      "text": "font-ui-regular",
+      "family": "font-weight",
+      "after": "font-regular"
+    },
+    {
+      "path": "packages/ui/src/components/collapsible.tsx",
+      "line": 49,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "packages/ui/src/components/collapsible.tsx",
+      "line": 49,
+      "text": "leading-s",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "packages/ui/src/components/collapsible.tsx",
+      "line": 49,
+      "text": "tracking-l",
+      "family": "letter-spacing",
+      "after": ""
+    },
+    {
+      "path": "packages/ui/src/components/command-palette.tsx",
+      "line": 326,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "packages/ui/src/components/command-palette.tsx",
+      "line": 326,
+      "text": "font-ui-regular",
+      "family": "font-weight",
+      "after": "font-regular"
+    },
+    {
+      "path": "packages/ui/src/components/command-palette.tsx",
+      "line": 326,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "packages/ui/src/components/input.tsx",
+      "line": 13,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "packages/ui/src/components/input.tsx",
+      "line": 14,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "packages/ui/src/components/input.tsx",
+      "line": 14,
+      "text": "font-ui-regular",
+      "family": "font-weight",
+      "after": "font-regular"
+    },
+    {
+      "path": "packages/ui/src/components/input.tsx",
+      "line": 14,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "packages/ui/src/components/input.tsx",
+      "line": 14,
+      "text": "leading-s",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "packages/ui/src/components/input.tsx",
+      "line": 14,
+      "text": "tracking-l",
+      "family": "letter-spacing",
+      "after": ""
+    },
+    {
+      "path": "packages/ui/src/components/menu.tsx",
+      "line": 42,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "packages/ui/src/components/menu.tsx",
+      "line": 43,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "packages/ui/src/components/menu.tsx",
+      "line": 43,
+      "text": "font-ui-regular",
+      "family": "font-weight",
+      "after": "font-regular"
+    },
+    {
+      "path": "packages/ui/src/components/menu.tsx",
+      "line": 43,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "packages/ui/src/components/menu.tsx",
+      "line": 43,
+      "text": "leading-s",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "packages/ui/src/components/menu.tsx",
+      "line": 43,
+      "text": "tracking-l",
+      "family": "letter-spacing",
+      "after": ""
+    },
+    {
+      "path": "packages/ui/src/components/radio-group.tsx",
+      "line": 69,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "packages/ui/src/components/radio-group.tsx",
+      "line": 69,
+      "text": "font-ui-regular",
+      "family": "font-weight",
+      "after": "font-regular"
+    },
+    {
+      "path": "packages/ui/src/components/radio-group.tsx",
+      "line": 78,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "packages/ui/src/components/radio-group.tsx",
+      "line": 69,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "packages/ui/src/components/radio-group.tsx",
+      "line": 69,
+      "text": "leading-s",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "packages/ui/src/components/radio-group.tsx",
+      "line": 69,
+      "text": "tracking-l",
+      "family": "letter-spacing",
+      "after": ""
+    },
+    {
+      "path": "packages/ui/src/components/toggle.tsx",
+      "line": 15,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "packages/ui/src/components/toggle.tsx",
+      "line": 15,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "packages/ui/src/components/toggle.tsx",
+      "line": 15,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "packages/ui/src/components/toggle.tsx",
+      "line": 15,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "packages/ui/src/components/toggle.tsx",
+      "line": 15,
+      "text": "leading-s",
+      "family": "line-height",
+      "after": ""
+    },
+    {
+      "path": "packages/ui/src/components/toggle.tsx",
+      "line": 15,
+      "text": "tracking-l",
+      "family": "letter-spacing",
+      "after": ""
+    },
+    {
+      "path": "packages/ui/src/components/toolbar.tsx",
+      "line": 28,
+      "text": "p-0",
+      "family": "spacing",
+      "after": "p-zero"
+    },
+    {
+      "path": "packages/ui/src/design-system/design-system-page.tsx",
+      "line": 56,
+      "text": "text-l",
+      "family": "font-size",
+      "after": "text-display-xxs"
+    },
+    {
+      "path": "packages/ui/src/design-system/design-system-page.tsx",
+      "line": 56,
+      "text": "font-brand-heavy",
+      "family": "font-weight",
+      "after": "font-heavy"
+    },
+    {
+      "path": "packages/ui/src/design-system/design-system-page.tsx",
+      "line": 56,
+      "text": "font-brand",
+      "family": "font-family",
+      "after": "font-display"
+    },
+    {
+      "path": "packages/ui/src/design-system/section.tsx",
+      "line": 15,
+      "text": "text-l",
+      "family": "font-size",
+      "after": "text-display-xxs"
+    },
+    {
+      "path": "packages/ui/src/design-system/section.tsx",
+      "line": 15,
+      "text": "font-brand-heavy",
+      "family": "font-weight",
+      "after": "font-heavy"
+    },
+    {
+      "path": "packages/ui/src/design-system/section.tsx",
+      "line": 33,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "packages/ui/src/design-system/section.tsx",
+      "line": 33,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "packages/ui/src/design-system/section.tsx",
+      "line": 15,
+      "text": "font-brand",
+      "family": "font-family",
+      "after": "font-display"
+    },
+    {
+      "path": "packages/ui/src/design-system/section.tsx",
+      "line": 33,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/alert-dialog.tsx",
+      "line": 20,
+      "text": "rounded-m",
+      "family": "radius",
+      "after": "corner-m"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/badge.tsx",
+      "line": 8,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/badge.tsx",
+      "line": 47,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/badge.tsx",
+      "line": 52,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/command-palette.tsx",
+      "line": 249,
+      "text": "rounded-m",
+      "family": "radius",
+      "after": "corner-m"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/command-palette.tsx",
+      "line": 266,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/context-menu.tsx",
+      "line": 26,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/context-menu.tsx",
+      "line": 26,
+      "text": "font-ui-regular",
+      "family": "font-weight",
+      "after": "font-regular"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/context-menu.tsx",
+      "line": 65,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/context-menu.tsx",
+      "line": 65,
+      "text": "font-ui-regular",
+      "family": "font-weight",
+      "after": "font-regular"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/context-menu.tsx",
+      "line": 92,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/context-menu.tsx",
+      "line": 95,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/dialog.tsx",
+      "line": 34,
+      "text": "rounded-m",
+      "family": "radius",
+      "after": "corner-m"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/dialog.tsx",
+      "line": 76,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 27,
+      "text": "text-xxl",
+      "family": "font-size",
+      "after": "text-display-xl"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 28,
+      "text": "text-xl",
+      "family": "font-size",
+      "after": "text-display-m"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 29,
+      "text": "text-l",
+      "family": "font-size",
+      "after": "text-body-xxl"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 30,
+      "text": "text-m",
+      "family": "font-size",
+      "after": "text-body-m"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 31,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 32,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 33,
+      "text": "text-xxs",
+      "family": "font-size",
+      "after": "text-body-xxs"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 36,
+      "text": "font-ui-regular",
+      "family": "font-weight",
+      "after": "font-regular"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 37,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 38,
+      "text": "font-ui-heavy",
+      "family": "font-weight",
+      "after": "font-heavy"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 50,
+      "text": "rounded-zero",
+      "family": "radius",
+      "after": "corner-zero"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 51,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 52,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 53,
+      "text": "rounded-m",
+      "family": "radius",
+      "after": "corner-m"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 54,
+      "text": "rounded-l",
+      "family": "radius",
+      "after": "corner-l"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 55,
+      "text": "rounded-xl",
+      "family": "radius",
+      "after": "corner-l"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 56,
+      "text": "rounded-full",
+      "family": "radius",
+      "after": "corner-full"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 109,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 115,
+      "text": "text-xxs",
+      "family": "font-size",
+      "after": "text-body-xxs"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 123,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 170,
+      "text": "text-xxs",
+      "family": "font-size",
+      "after": "text-body-xxs"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 171,
+      "text": "text-xxs",
+      "family": "font-size",
+      "after": "text-body-xxs"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 181,
+      "text": "text-m",
+      "family": "font-size",
+      "after": "text-body-m"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 185,
+      "text": "text-m",
+      "family": "font-size",
+      "after": "text-body-m"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 193,
+      "text": "text-xxs",
+      "family": "font-size",
+      "after": "text-body-xxs"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 194,
+      "text": "rounded-zero",
+      "family": "radius",
+      "after": "corner-zero"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 202,
+      "text": "text-xxs",
+      "family": "font-size",
+      "after": "text-body-xxs"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 209,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 210,
+      "text": "text-xxs",
+      "family": "font-size",
+      "after": "text-body-xxs"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 225,
+      "text": "rounded-xs",
+      "family": "radius",
+      "after": "corner-xs"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 227,
+      "text": "text-l",
+      "family": "font-size",
+      "after": "text-body-xxl"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/foundations.tsx",
+      "line": 228,
+      "text": "text-xxs",
+      "family": "font-size",
+      "after": "text-body-xxs"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/kbd.tsx",
+      "line": 9,
+      "text": "text-xs",
+      "family": "font-size",
+      "after": "text-body-xs"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/kbd.tsx",
+      "line": 77,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/menu.tsx",
+      "line": 117,
+      "text": "rounded-s",
+      "family": "radius",
+      "after": "corner-s"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/radio-group.tsx",
+      "line": 10,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/radio-group.tsx",
+      "line": 10,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/radio-group.tsx",
+      "line": 29,
+      "text": "text-s",
+      "family": "font-size",
+      "after": "text-body-s"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/radio-group.tsx",
+      "line": 29,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/radio-group.tsx",
+      "line": 10,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/radio-group.tsx",
+      "line": 29,
+      "text": "font-ui",
+      "family": "font-family",
+      "after": "font-body"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/scroll-area.tsx",
+      "line": 42,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/scroll-area.tsx",
+      "line": 70,
+      "text": "rounded-full",
+      "family": "radius",
+      "after": "corner-full"
+    },
+    {
+      "path": "packages/ui/src/design-system/sections/scroll-area.tsx",
+      "line": 79,
+      "text": "font-ui-medium",
+      "family": "font-weight",
+      "after": "font-medium"
+    },
+    {
+      "path": "packages/ui/src/styles/base.css",
+      "line": 18,
+      "text": "body,:where(.light,.dark,[data-theme]):not(html) {font-family:var(--cte-font)}",
+      "family": "font-family",
+      "after": "var(--font-body)"
+    },
+    {
+      "path": "packages/ui/src/styles/base.css",
+      "line": 19,
+      "text": "body,:where(.light,.dark,[data-theme]):not(html) {font-size:var(--cte-font-size)}",
+      "family": "font-size",
+      "after": "var(--size-s)"
+    },
+    {
+      "path": "packages/ui/src/styles/base.css",
+      "line": 21,
+      "text": "line-height: var(--cte-line-height);",
+      "family": "line-height",
+      "after": "var(--line-s)"
+    },
+    {
+      "path": "packages/ui/src/styles/theme.css",
+      "line": 28,
+      "text": "--font-ui: \"Timeless Grotesk\", sans-serif",
+      "family": "token",
+      "after": "var(--font-body)"
+    },
+    {
+      "path": "packages/ui/src/styles/theme.css",
+      "line": 29,
+      "text": "--font-brand: \"Timeless Grotesk\", sans-serif",
+      "family": "token",
+      "after": "var(--font-display)"
+    },
+    {
+      "path": "packages/ui/src/styles/theme.css",
+      "line": 30,
+      "text": "--font-editorial: \"Timeless Grotesk\", sans-serif",
+      "family": "token",
+      "after": "var(--font-body)"
+    },
+    {
+      "path": "packages/ui/src/styles/theme.css",
+      "line": 31,
+      "text": "--font-data: \"Timeless Grotesk\", sans-serif",
+      "family": "token",
+      "after": "var(--font-data)"
+    },
+    {
+      "path": "packages/ui/src/styles/theme.css",
+      "line": 33,
+      "text": "--tracking-xs: -0.02em",
+      "family": "token",
+      "after": "var(--tracking-xs)"
+    },
+    {
+      "path": "packages/ui/src/styles/theme.css",
+      "line": 34,
+      "text": "--tracking-s: -0.01em",
+      "family": "token",
+      "after": "var(--tracking-s)"
+    },
+    {
+      "path": "packages/ui/src/styles/theme.css",
+      "line": 35,
+      "text": "--tracking-m: 0em",
+      "family": "token",
+      "after": "var(--tracking-m)"
+    },
+    {
+      "path": "packages/ui/src/styles/theme.css",
+      "line": 36,
+      "text": "--tracking-l: 0.01em",
+      "family": "token",
+      "after": "var(--tracking-l)"
+    },
+    {
+      "path": "packages/ui/src/styles/theme.css",
+      "line": 37,
+      "text": "--tracking-xl: 0.02em",
+      "family": "token",
+      "after": "var(--tracking-xl)"
+    },
+    {
+      "path": "packages/ui/src/styles/theme.css",
+      "line": 39,
+      "text": "--radius-zero: 0px",
+      "family": "token",
+      "after": "var(--radius-zero)"
+    },
+    {
+      "path": "packages/ui/src/styles/theme.css",
+      "line": 40,
+      "text": "--radius-xs: 8px",
+      "family": "token",
+      "after": "var(--radius-xs)"
+    },
+    {
+      "path": "packages/ui/src/styles/theme.css",
+      "line": 41,
+      "text": "--radius-s: 12px",
+      "family": "token",
+      "after": "var(--radius-s)"
+    },
+    {
+      "path": "packages/ui/src/styles/theme.css",
+      "line": 42,
+      "text": "--radius-m: 18px",
+      "family": "token",
+      "after": "var(--radius-m)"
+    },
+    {
+      "path": "packages/ui/src/styles/theme.css",
+      "line": 43,
+      "text": "--radius-l: 28px",
+      "family": "token",
+      "after": "var(--radius-l)"
+    },
+    {
+      "path": "packages/ui/src/styles/theme.css",
+      "line": 44,
+      "text": "--radius-xl: 30px",
+      "family": "token",
+      "after": "var(--radius-l)"
+    },
+    {
+      "path": "packages/ui/src/styles/theme.css",
+      "line": 50,
+      "text": "--shadow-s: 0px 2px 4px 0px #00000000",
+      "family": "token",
+      "after": "var(--shadow-s)"
+    },
+    {
+      "path": "packages/ui/src/styles/theme.css",
+      "line": 51,
+      "text": "--shadow-m: 0px 2px 6px 0px #0000000d, 0px 8px 24px 0px #00000013",
+      "family": "token",
+      "after": "var(--shadow-m)"
+    },
+    {
+      "path": "packages/ui/src/styles/theme.css",
+      "line": 52,
+      "text": "--shadow-l: 0px 16px 48px 0px #00000000",
+      "family": "token",
+      "after": "var(--shadow-l)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 32,
+      "text": "--motion-duration: 200ms",
+      "family": "token",
+      "after": "var(--motion-duration)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 33,
+      "text": "--motion-easing: cubic-bezier(0.16, 1, 0.3, 1)",
+      "family": "token",
+      "after": "var(--motion-easing)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 39,
+      "text": "--motion-large-duration: 360ms",
+      "family": "token",
+      "after": "var(--motion-large-duration)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 40,
+      "text": "--motion-large-easing: cubic-bezier(0.22, 1, 0.36, 1)",
+      "family": "token",
+      "after": "var(--motion-large-easing)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 53,
+      "text": "--space-zero: 0px",
+      "family": "token",
+      "after": "var(--space-zero)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 54,
+      "text": "--space-xxs: 4px",
+      "family": "token",
+      "after": "var(--space-xxs)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 55,
+      "text": "--space-xs: 8px",
+      "family": "token",
+      "after": "var(--space-xs)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 56,
+      "text": "--space-s: 13px",
+      "family": "token",
+      "after": "var(--space-s)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 57,
+      "text": "--space-m: 17px",
+      "family": "token",
+      "after": "var(--space-m)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 58,
+      "text": "--space-l: 25px",
+      "family": "token",
+      "after": "var(--space-l)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 59,
+      "text": "--space-xl: 34px",
+      "family": "token",
+      "after": "var(--space-xl)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 60,
+      "text": "--space-xxl: 51px",
+      "family": "token",
+      "after": "var(--space-xxl)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 62,
+      "text": "--size-xxs: 10px",
+      "family": "token",
+      "after": "var(--size-xxs)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 63,
+      "text": "--line-xxs: 14px",
+      "family": "token",
+      "after": "var(--line-xxs)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 64,
+      "text": "--size-xs: 12px",
+      "family": "token",
+      "after": "var(--size-xs)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 65,
+      "text": "--line-xs: 16px",
+      "family": "token",
+      "after": "var(--line-xs)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 66,
+      "text": "--size-s: 14px",
+      "family": "token",
+      "after": "var(--size-s)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 67,
+      "text": "--line-s: 20px",
+      "family": "token",
+      "after": "var(--line-s)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 68,
+      "text": "--size-m: 16px",
+      "family": "token",
+      "after": "var(--size-m)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 69,
+      "text": "--line-m: 25px",
+      "family": "token",
+      "after": "var(--line-xl)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 70,
+      "text": "--size-l: 25px",
+      "family": "token",
+      "after": "var(--size-xxl)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 71,
+      "text": "--line-l: 33px",
+      "family": "token",
+      "after": "var(--line-xxl)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 72,
+      "text": "--size-xl: 37px",
+      "family": "token",
+      "after": "var(--display-size-m)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 73,
+      "text": "--line-xl: 41px",
+      "family": "token",
+      "after": "var(--line-xxl)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 74,
+      "text": "--size-xxl: 49px",
+      "family": "token",
+      "after": "var(--display-size-xl)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 75,
+      "text": "--line-xxl: 53px",
+      "family": "token",
+      "after": "var(--line-xxl)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 78,
+      "text": "--letter-spacing-xxs: var(--tracking-xl)",
+      "family": "token",
+      "after": "var(--letter-spacing-xxs)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 79,
+      "text": "--letter-spacing-xs: var(--tracking-l)",
+      "family": "token",
+      "after": "var(--letter-spacing-xs)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 80,
+      "text": "--letter-spacing-s: var(--tracking-l)",
+      "family": "token",
+      "after": "var(--letter-spacing-s)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 81,
+      "text": "--letter-spacing-m: var(--tracking-m)",
+      "family": "token",
+      "after": "var(--letter-spacing-m)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 82,
+      "text": "--letter-spacing-l: var(--tracking-s)",
+      "family": "token",
+      "after": "var(--letter-spacing-l)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 83,
+      "text": "--letter-spacing-xl: var(--tracking-s)",
+      "family": "token",
+      "after": "var(--letter-spacing-xl)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 84,
+      "text": "--letter-spacing-xxl: var(--tracking-xs)",
+      "family": "token",
+      "after": "var(--letter-spacing-xxl)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 86,
+      "text": "--border-none: 0px",
+      "family": "token",
+      "after": "var(--border-none)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 87,
+      "text": "--border-s: 0px",
+      "family": "token",
+      "after": "var(--border-none)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 88,
+      "text": "--border-m: 0px",
+      "family": "token",
+      "after": "var(--border-none)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 89,
+      "text": "--border-l: 0px",
+      "family": "token",
+      "after": "var(--border-none)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 91,
+      "text": "--weight-ui-regular: 400",
+      "family": "token",
+      "after": "var(--weight-body-regular)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 92,
+      "text": "--weight-ui-medium: 500",
+      "family": "token",
+      "after": "var(--weight-body-medium)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 93,
+      "text": "--weight-ui-heavy: 600",
+      "family": "token",
+      "after": "var(--weight-body-heavy)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 94,
+      "text": "--weight-brand-regular: 400",
+      "family": "token",
+      "after": "var(--weight-display-regular)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 95,
+      "text": "--weight-brand-medium: 500",
+      "family": "token",
+      "after": "var(--weight-display-medium)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 96,
+      "text": "--weight-brand-heavy: 600",
+      "family": "token",
+      "after": "var(--weight-display-heavy)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 97,
+      "text": "--weight-editorial-regular: 400",
+      "family": "token",
+      "after": "var(--weight-body-regular)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 98,
+      "text": "--weight-editorial-medium: 500",
+      "family": "token",
+      "after": "var(--weight-body-medium)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 99,
+      "text": "--weight-editorial-heavy: 600",
+      "family": "token",
+      "after": "var(--weight-body-heavy)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 100,
+      "text": "--weight-data-regular: 400",
+      "family": "token",
+      "after": "var(--weight-data-regular)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 101,
+      "text": "--weight-data-medium: 500",
+      "family": "token",
+      "after": "var(--weight-data-medium)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 102,
+      "text": "--weight-data-heavy: 600",
+      "family": "token",
+      "after": "var(--weight-data-heavy)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 105,
+      "text": "--color-1: #ff5a00",
+      "family": "token",
+      "after": "var(--color-1)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 106,
+      "text": "--color-2: #153d85",
+      "family": "token",
+      "after": "var(--color-2)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 107,
+      "text": "--color-3: #bfe8f5",
+      "family": "token",
+      "after": "var(--color-3)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 108,
+      "text": "--color-4: #ffd0b0",
+      "family": "token",
+      "after": "var(--color-4)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 109,
+      "text": "--success: #00906c",
+      "family": "token",
+      "after": "var(--success)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 110,
+      "text": "--warning: #ffea00",
+      "family": "token",
+      "after": "var(--warning)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 111,
+      "text": "--error: #fc032d",
+      "family": "token",
+      "after": "var(--error)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 117,
+      "text": "--cte-font: var(--font-ui)",
+      "family": "token",
+      "after": "var(--font-body)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 119,
+      "text": "--cte-font-weight: var(--weight-ui-regular)",
+      "family": "token",
+      "after": "var(--weight-body-regular)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 133,
+      "text": "--neutral-1: #ffffff",
+      "family": "token",
+      "after": "var(--neutral-1)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 134,
+      "text": "--neutral-2: #fbfbfb",
+      "family": "token",
+      "after": "var(--neutral-2)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 135,
+      "text": "--neutral-3: #f4f4f4",
+      "family": "token",
+      "after": "var(--neutral-3)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 136,
+      "text": "--neutral-4: #e7e7e7",
+      "family": "token",
+      "after": "var(--neutral-4)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 137,
+      "text": "--neutral-5: #cdcdcd",
+      "family": "token",
+      "after": "var(--neutral-5)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 138,
+      "text": "--neutral-6: #a1a1a1",
+      "family": "token",
+      "after": "var(--neutral-6)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 139,
+      "text": "--neutral-7: #7d7d7d",
+      "family": "token",
+      "after": "var(--neutral-7)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 140,
+      "text": "--neutral-8: #555555",
+      "family": "token",
+      "after": "var(--neutral-8)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 141,
+      "text": "--neutral-9: #333333",
+      "family": "token",
+      "after": "var(--neutral-9)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 142,
+      "text": "--neutral-10: #000000",
+      "family": "token",
+      "after": "var(--neutral-10)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 149,
+      "text": "--neutral-1: #000000",
+      "family": "token",
+      "after": "var(--neutral-1)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 150,
+      "text": "--neutral-2: #202020",
+      "family": "token",
+      "after": "var(--neutral-2)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 151,
+      "text": "--neutral-3: #2b2b2b",
+      "family": "token",
+      "after": "var(--neutral-3)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 152,
+      "text": "--neutral-4: #3d3d3d",
+      "family": "token",
+      "after": "var(--neutral-4)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 153,
+      "text": "--neutral-5: #565656",
+      "family": "token",
+      "after": "var(--neutral-5)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 154,
+      "text": "--neutral-6: #838383",
+      "family": "token",
+      "after": "var(--neutral-6)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 155,
+      "text": "--neutral-7: #ababab",
+      "family": "token",
+      "after": "var(--neutral-7)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 156,
+      "text": "--neutral-8: #cfcfcf",
+      "family": "token",
+      "after": "var(--neutral-8)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 157,
+      "text": "--neutral-9: #f4f4f4",
+      "family": "token",
+      "after": "var(--neutral-9)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 158,
+      "text": "--neutral-10: #ffffff",
+      "family": "token",
+      "after": "var(--neutral-10)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 169,
+      "text": "--color-1-transparent: color-mix(in srgb, var(--color-1) 20%, transparent)",
+      "family": "token",
+      "after": "var(--color-1-transparent)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 170,
+      "text": "--color-2-transparent: color-mix(in srgb, var(--color-2) 20%, transparent)",
+      "family": "token",
+      "after": "var(--color-2-transparent)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 171,
+      "text": "--color-3-transparent: color-mix(in srgb, var(--color-3) 20%, transparent)",
+      "family": "token",
+      "after": "var(--color-3-transparent)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 172,
+      "text": "--color-4-transparent: color-mix(in srgb, var(--color-4) 20%, transparent)",
+      "family": "token",
+      "after": "var(--color-4-transparent)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 173,
+      "text": "--neutral-1-transparent: color-mix(in srgb, var(--neutral-1) 20%, transparent)",
+      "family": "token",
+      "after": "var(--neutral-1-transparent)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 174,
+      "text": "--neutral-2-transparent: color-mix(in srgb, var(--neutral-2) 20%, transparent)",
+      "family": "token",
+      "after": "var(--neutral-2-transparent)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 175,
+      "text": "--neutral-3-transparent: color-mix(in srgb, var(--neutral-3) 20%, transparent)",
+      "family": "token",
+      "after": "var(--neutral-3-transparent)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 176,
+      "text": "--neutral-4-transparent: color-mix(in srgb, var(--neutral-4) 20%, transparent)",
+      "family": "token",
+      "after": "var(--neutral-4-transparent)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 177,
+      "text": "--neutral-5-transparent: color-mix(in srgb, var(--neutral-5) 20%, transparent)",
+      "family": "token",
+      "after": "var(--neutral-5-transparent)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 178,
+      "text": "--neutral-6-transparent: color-mix(in srgb, var(--neutral-6) 20%, transparent)",
+      "family": "token",
+      "after": "var(--neutral-6-transparent)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 179,
+      "text": "--neutral-7-transparent: color-mix(in srgb, var(--neutral-7) 20%, transparent)",
+      "family": "token",
+      "after": "var(--neutral-7-transparent)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 180,
+      "text": "--neutral-8-transparent: color-mix(in srgb, var(--neutral-8) 20%, transparent)",
+      "family": "token",
+      "after": "var(--neutral-8-transparent)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 181,
+      "text": "--neutral-9-transparent: color-mix(in srgb, var(--neutral-9) 20%, transparent)",
+      "family": "token",
+      "after": "var(--neutral-9-transparent)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 182,
+      "text": "--neutral-10-transparent: color-mix(in srgb, var(--neutral-10) 20%, transparent)",
+      "family": "token",
+      "after": "var(--neutral-10-transparent)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 183,
+      "text": "--success-transparent: color-mix(in srgb, var(--success) 20%, transparent)",
+      "family": "token",
+      "after": "var(--success-transparent)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 184,
+      "text": "--warning-transparent: color-mix(in srgb, var(--warning) 20%, transparent)",
+      "family": "token",
+      "after": "var(--warning-transparent)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 185,
+      "text": "--error-transparent: color-mix(in srgb, var(--error) 20%, transparent)",
+      "family": "token",
+      "after": "var(--error-transparent)"
+    },
+    {
+      "path": "packages/ui/src/styles/tokens.css",
+      "line": 213,
+      "text": "--cte-accent-text: var(--neutral-2)",
+      "family": "token",
+      "after": "var(--on-color-1)"
+    }
+  ],
+  "skipped": [],
+  "kept": [],
+  "overrides": [
+    {
+      "path": "packages/ui/src/styles/base.css",
+      "line": 22,
+      "text": "letter-spacing: var(--cte-letter-spacing);",
+      "style": "Body S",
+      "kind": "letter-spacing",
+      "reason": "kept"
+    }
+  ],
+  "choices": [],
+  "tidied": [
+    {
+      "path": "apps/desktop/src/renderer/components/chat/chat-screen.tsx",
+      "line": 295,
+      "kind": "grouped",
+      "text": "field-sizing-content max-h-[40vh] min-h-(--line-m) resize-none bg-transparent px-xs py-xxs text-m leading-m text-cte-text placeholder:text-cte-text-muted focus:outline-none"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 216,
+      "kind": "grouped",
+      "text": "field-sizing-content min-h-(--line-xl) max-h-[16rem] resize-none rounded-s bg-neutral-2 px-xs py-xxs text-s leading-s text-cte-text focus-ring"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 374,
+      "kind": "grouped",
+      "text": "flex min-w-0 items-center gap-xxs rounded-s px-s py-xs text-start text-s leading-s focus-ring control-hover:text-cte-text"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 428,
+      "kind": "grouped",
+      "text": "flex items-center gap-xxs rounded-xs font-data tabular-nums focus-ring control-hover:text-cte-text"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 438,
+      "kind": "grouped",
+      "text": "invisible rounded-xs underline underline-offset-4 focus-ring group-hover/context:visible group-focus-within/context:visible control-hover:text-cte-text"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 518,
+      "kind": "grouped",
+      "text": "field-sizing-content min-h-(--line-m) w-[18rem] resize-none rounded-s bg-neutral-3 px-xs py-xxs text-s leading-s text-cte-text focus-ring"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/transcript.tsx",
+      "line": 879,
+      "kind": "grouped",
+      "text": "flex shrink-0 items-center gap-xxs rounded-xs font-ui font-ui-medium text-s leading-s text-cte-text-muted focus-ring control-hover:text-cte-text"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/player/speech-scrubber.tsx",
+      "line": 75,
+      "kind": "grouped",
+      "text": "relative flex h-full w-full flex-col justify-center gap-xxs overflow-visible rounded-s bg-neutral-3 px-0 py-xxs"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 425,
+      "kind": "grouped",
+      "text": "grid grid-cols-[4.5rem_5rem_minmax(0,1fr)] items-baseline gap-s rounded-s px-xs py-xs focus-ring control-hover:bg-neutral-3-transparent"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 476,
+      "kind": "grouped",
+      "text": "grid grid-cols-[4.5rem_5rem_minmax(0,1fr)] items-baseline gap-s rounded-s px-xs py-xs focus-ring control-hover:bg-neutral-3-transparent"
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/listening-panel.tsx",
+      "line": 218,
+      "kind": "grouped",
+      "text": "self-start rounded-xs text-start text-xs text-cte-text-muted underline decoration-dotted underline-offset-4 focus-ring"
+    }
+  ],
+  "multiples": [],
+  "scales": [],
+  "warnings": [
+    "The app defines variables theme.css also defines: `--color-1`, `--color-1-transparent`, `--color-2`, `--color-2-transparent`, `--color-3`, `--color-3-transparent`, `--color-4`, `--color-4-transparent`, `--neutral-1`, `--neutral-1-transparent`, `--neutral-2`, `--neutral-2-transparent`, `--neutral-3`, `--neutral-3-transparent`, `--neutral-4`, `--neutral-4-transparent`, `--neutral-5`, `--neutral-5-transparent`, `--neutral-6`, `--neutral-6-transparent`, `--neutral-7`, `--neutral-7-transparent`, `--neutral-8`, `--neutral-8-transparent`, `--neutral-9`, `--neutral-9-transparent`, `--neutral-10`, `--neutral-10-transparent`, `--success`, `--success-transparent`, `--warning`, `--warning-transparent`, `--error`, `--error-transparent`, `--space-zero`, `--space-xxs`, `--space-xs`, `--space-s`, `--space-m`, `--space-l`, `--space-xl`, `--space-xxl`, `--size-xxs`, `--line-xxs`, `--letter-spacing-xxs`, `--size-xs`, `--line-xs`, `--letter-spacing-xs`, `--size-s`, `--line-s`, `--letter-spacing-s`, `--size-m`, `--line-m`, `--letter-spacing-m`, `--size-l`, `--line-l`, `--letter-spacing-l`, `--size-xl`, `--line-xl`, `--letter-spacing-xl`, `--size-xxl`, `--line-xxl`, `--letter-spacing-xxl`, `--tracking-xs`, `--tracking-s`, `--tracking-m`, `--tracking-l`, `--tracking-xl`, `--radius-zero`, `--radius-xs`, `--radius-s`, `--radius-m`, `--radius-l`, `--radius-xl`, `--border-none`, `--border-s`, `--border-m`, `--border-l`, `--shadow-s`, `--shadow-m`, `--shadow-l`, `--font-data`, `--weight-data-regular`, `--weight-data-medium`, `--weight-data-heavy`, `--cte-canvas`, `--cte-surface`, `--cte-surface-muted`, `--cte-text`, `--cte-text-muted`, `--cte-border`, `--cte-accent`, `--cte-accent-text`, `--cte-danger`, `--cte-focus`, `--border-default-color`, `--option-badge-background`, `--option-badge-foreground`, `--navigation-active-background`, `--navigation-active-foreground`, `--emphasis-chart-fill`, `--emphasis-balance-background`, `--emphasis-rewards-background`, `--emphasis-icon-background`, `--emphasis-icon-foreground`, `--emphasis-type-background`, `--emphasis-type-foreground`, `--cte-font`, `--cte-font-size`, `--cte-font-weight`, `--cte-line-height`, `--cte-letter-spacing`, `--cte-detail-font-size`, `--cte-detail-line-height`, `--cte-detail-letter-spacing`, `--motion-duration`, `--motion-easing`, `--motion-large-duration`, `--motion-large-easing`. Rename the app’s tokens as they become aliases; otherwise whichever loads last sets both.",
+    "Install found no Prettier, so the files it rewrote keep its own formatting. Run the project’s formatter on them."
+  ],
+  "coverage": [
+    {
+      "path": "apps/desktop/src/renderer/components/chat/chat-screen.tsx",
+      "line": 186,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/context-strip.tsx",
+      "line": 446,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/transcript.tsx",
+      "line": 455,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/transcript.tsx",
+      "line": 824,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/transcript.tsx",
+      "line": 841,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/episode/voice-name.tsx",
+      "line": 124,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/player/speech-scrubber.tsx",
+      "line": 81,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/player/speech-scrubber.tsx",
+      "line": 93,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/search/search-screen.tsx",
+      "line": 446,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/app-icon.tsx",
+      "line": 29,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/app-icon.tsx",
+      "line": 34,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/app-icon.tsx",
+      "line": 60,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/app-sidebar.tsx",
+      "line": 79,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/app-sidebar.tsx",
+      "line": 42,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/app-sidebar.tsx",
+      "line": 109,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/listening-banner.tsx",
+      "line": 94,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/listening-panel.tsx",
+      "line": 80,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/shell/listening-panel.tsx",
+      "line": 127,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/status/memory-bar.tsx",
+      "line": 46,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/status/memory-bar.tsx",
+      "line": 65,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/today/ongoing.tsx",
+      "line": 106,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "apps/desktop/src/renderer/components/welcome/welcome-screen.tsx",
+      "line": 54,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper cn. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "packages/ui/src/lib/cn.ts",
+      "line": 35,
+      "kind": "unresolved-class-source",
+      "detail": "Cannot resolve class helper twMerge. Include its source or convert and review this class expression manually."
+    },
+    {
+      "path": "packages/ui/src/components/menu.tsx",
+      "line": 69,
+      "kind": "mixed-class-data",
+      "detail": "Class value menuItemTrailingClassName is also consumed as app data. Separate its class and data uses before conversion."
+    }
+  ]
+}

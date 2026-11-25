@@ -1,0 +1,706 @@
+{
+  "version": 1,
+  "selection": "Pinned before candidate VAD: 8 French oui/non across 4 declared voices plus hum; 12 yes and 12 no distinct speakers per label in lexicographic Speech Commands test archive order; creator-labelled noises; public music and FLEURS first two French validation rows.",
+  "limitations": [
+    "Source labels, not independently listened gold; non-speech sound descriptions may omit background speech.",
+    "French acoustic boundaries are provisional external review only; no validated 100–600 ms timing set.",
+    "FLEURS read speech is a media-speech proxy, not a television corpus.",
+    "CC BY-SA recordings and derived mixtures keep their source licences in the external cache. No audio or transcript is included in this patch."
+  ],
+  "sources": [
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/5/51/Fr-oui.ogg",
+      "sha256": "9e9ee7eab5ea47df02fdc9a96ff1f4c509b2c1913bc7eaaecb40567f7be3b7c2",
+      "license": "CC BY 2.0 fr",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0/fr/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Fr-oui.ogg",
+      "attribution": "Vion Nicolas",
+      "id": "fr-oui-vion",
+      "category": "short_word",
+      "role": "word",
+      "language": "fr",
+      "speaker": "vion",
+      "annotation": "source-label-only"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/7/74/Fr-non.ogg",
+      "sha256": "bf5a9ef83cabb95e220e9cfcb137e8a62a22d4449f85672a620f1c7f589548e6",
+      "license": "CC BY 2.0 fr",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0/fr/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Fr-non.ogg",
+      "attribution": "Vion Nicolas",
+      "id": "fr-non-vion",
+      "category": "short_word",
+      "role": "word",
+      "language": "fr",
+      "speaker": "vion",
+      "annotation": "source-label-only"
+    },
+    {
+      "url": "https://lasonotheque.org/UPLOAD/mp3/2431.mp3",
+      "sha256": "30e36537f43f5a95911fd5c24fb125410b8fce717cfe3de06ad3df0e04f6019a",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourcePage": "https://lasonotheque.org/porte-fermeture-1-s2431.html",
+      "attribution": "Joseph SARDIN / LaSonothèque (BigSoundBank)",
+      "id": "door-2431",
+      "category": "door",
+      "role": "noise",
+      "language": null,
+      "speaker": null,
+      "annotation": "source-label-only"
+    },
+    {
+      "url": "https://lasonotheque.org/UPLOAD/mp3/1657.mp3",
+      "sha256": "5b1d34ab151147b1ce37a005cf5487f3f6faad84e4b0cb0645c70e3f776aa4f5",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourcePage": "https://lasonotheque.org/toux-d-homme-2-s1657.html",
+      "attribution": "Joseph SARDIN / LaSonothèque (BigSoundBank)",
+      "id": "cough-1657",
+      "category": "cough",
+      "role": "noise",
+      "language": null,
+      "speaker": null,
+      "annotation": "source-label-only"
+    },
+    {
+      "url": "https://bigsoundbank.com/UPLOAD/mp3/1726.mp3",
+      "sha256": "fb32d03fab84d97c7d8f4cc5784659079a041afd3b8a9013b611ce95848260fa",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourcePage": "https://bigsoundbank.com/slow-macbook-keyboard-1-s1726.html",
+      "attribution": "Joseph SARDIN / LaSonothèque (BigSoundBank)",
+      "id": "keyboard-1726",
+      "category": "keyboard",
+      "role": "noise",
+      "language": null,
+      "speaker": null,
+      "annotation": "source-label-only"
+    },
+    {
+      "url": "https://bigsoundbank.com/UPLOAD/mp3/1189.mp3",
+      "sha256": "3ac3496c1f18e42868e555f44a7915dc2e21b896fb99971e7bef9e69e8945470",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourcePage": "https://bigsoundbank.com/large-plate-set-on-table-s1189.html",
+      "attribution": "Joseph SARDIN / LaSonothèque (BigSoundBank)",
+      "id": "dishes-1189",
+      "category": "dishes",
+      "role": "noise",
+      "language": null,
+      "speaker": null,
+      "annotation": "source-label-only"
+    },
+    {
+      "url": "https://lasonotheque.org/UPLOAD/mp3/1112.mp3",
+      "sha256": "c664c0d01e9d434eed6e1a2af507656998edc00400d98ea2513231b17746ccc8",
+      "license": "CC0 1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sourcePage": "https://lasonotheque.org/message-2-s1112.html",
+      "attribution": "Joseph SARDIN / LaSonothèque (BigSoundBank)",
+      "id": "notification-1112",
+      "category": "notification",
+      "role": "noise",
+      "language": null,
+      "speaker": null,
+      "annotation": "source-label-only"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/04/LL-Q150_%28fra%29-GrandCelinien-oui.wav",
+      "sha256": "dfd1dc4b338341933cac7a4c6f8c05336b2766d43983d379115018030e37c610",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:LL-Q150_(fra)-GrandCelinien-oui.wav",
+      "attribution": "Speaker:  GrandCelinien  \n Recorder:  GrandCelinien",
+      "id": "fr-oui-grandcelinien",
+      "category": "short_word",
+      "role": "word",
+      "language": "fr",
+      "speaker": "grandcelinien",
+      "annotation": "source-label-only"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/0b/LL-Q150_%28fra%29-GrandCelinien-non.wav",
+      "sha256": "cbe51cbebaca5626de90c1736db212437bf486f686d388c166425ee2a630400a",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:LL-Q150_(fra)-GrandCelinien-non.wav",
+      "attribution": "Speaker:  GrandCelinien  \n Recorder:  GrandCelinien",
+      "id": "fr-non-grandcelinien",
+      "category": "short_word",
+      "role": "word",
+      "language": "fr",
+      "speaker": "grandcelinien",
+      "annotation": "source-label-only"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/0f/LL-Q150_%28fra%29-Poslovitch-oui.wav",
+      "sha256": "da08fc55d6e92ba150ac6e028912477be0caeadb96e89320ffa21cf9d4f21362",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:LL-Q150_(fra)-Poslovitch-oui.wav",
+      "attribution": "Speaker:  Poslovitch  \n Recorder:  Poslovitch",
+      "id": "fr-oui-poslovitch",
+      "category": "short_word",
+      "role": "word",
+      "language": "fr",
+      "speaker": "poslovitch",
+      "annotation": "source-label-only"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/3b/LL-Q150_%28fra%29-Poslovitch-non.wav",
+      "sha256": "51fd32835e3ef2f8b88d6df4a9f696457596f67ed9a39edcad98045f7e8079a9",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:LL-Q150_(fra)-Poslovitch-non.wav",
+      "attribution": "Speaker:  Poslovitch  \n Recorder:  Poslovitch",
+      "id": "fr-non-poslovitch",
+      "category": "short_word",
+      "role": "word",
+      "language": "fr",
+      "speaker": "poslovitch",
+      "annotation": "source-label-only"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/e/e7/LL-Q150_%28fra%29-LuneMarine_%28DSwissK%29-oui.wav",
+      "sha256": "0dae4b84e4b109cb75dc442e171e623b4748d8dcde98fe07f4d7d06a59b684a1",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:LL-Q150_(fra)-LuneMarine_(DSwissK)-oui.wav",
+      "attribution": "Speaker:  LuneMarine  \n Recorder:  DSwissK",
+      "id": "fr-oui-lunemarine",
+      "category": "short_word",
+      "role": "word",
+      "language": "fr",
+      "speaker": "lunemarine",
+      "annotation": "source-label-only"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/c/c0/LL-Q150_%28fra%29-LuneMarine_%28DSwissK%29-non.wav",
+      "sha256": "d0904431804e1ff15b23231a861fc05ed2ce8d64326e0f9444410962dac9660a",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:LL-Q150_(fra)-LuneMarine_(DSwissK)-non.wav",
+      "attribution": "Speaker:  LuneMarine  \n Recorder:  DSwissK",
+      "id": "fr-non-lunemarine",
+      "category": "short_word",
+      "role": "word",
+      "language": "fr",
+      "speaker": "lunemarine",
+      "annotation": "source-label-only"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/d1/LL-Q150_%28fra%29-LoquaxFR-hum.wav",
+      "sha256": "d32f1abf6ec08b04b45e0742ee8b40e256a880dcbdaf551adb25aea53fb5e392",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:LL-Q150_(fra)-LoquaxFR-hum.wav",
+      "attribution": "Speaker:  LoquaxFR  \n Recorder:  LoquaxFR",
+      "id": "fr-hum-loquaxfr",
+      "category": "backchannel",
+      "role": "word",
+      "language": "fr",
+      "speaker": "loquaxfr",
+      "annotation": "source-label-only"
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "b2a08b7b932afa26b95002c80ed940cc348f4a604162fa4553a35397c2983c9d",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-yes-022cd682-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "022cd682",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./yes/022cd682_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "5f805478d7cc5099b45d9e86ee278b6537d65ce124abf31ffc6e61944a711b2b",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-yes-03401e93-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "03401e93",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./yes/03401e93_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "b256c643cdb96a8193b9403ce5e3682ec20f54be4d798d79658fa1922e56fcc5",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-yes-0bac8a71-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "0bac8a71",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./yes/0bac8a71_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "4392de990dd083d016aa45d80027fab85998a5e647173dd7326d66963396c2d9",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-yes-0cb74144-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "0cb74144",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./yes/0cb74144_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "a1b074417eb73028ad8cf7608fbc0ccfdb09dce14c6cdbdd42289fd9d8c4e540",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-yes-0ea0e2f4-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "0ea0e2f4",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./yes/0ea0e2f4_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "1f8e3a9c8e7b803b03bc8063678f81df0aceef3c97eef696fa3a6ec8df078059",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-yes-0fa1e7a9-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "0fa1e7a9",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./yes/0fa1e7a9_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "6ea7cf4c38cae3410e5284a4cc4bad96d7bc1bb8fd283f7c9be5ed3d09e36c49",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-yes-105a0eea-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "105a0eea",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./yes/105a0eea_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "06e91017e9b3c2e22e689cf6ca49e2db9fa7260271fd6dcf32379f21a10e4ce9",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-yes-1093c8e7-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "1093c8e7",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./yes/1093c8e7_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "d37d76ee5155aaec2b459951ffb2f4091f77daf7c215077c3e4368b87af1a3d0",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-yes-1538beb7-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "1538beb7",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./yes/1538beb7_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "72f210badafdbdd0e9d689fac5d6be4b108218aa284cb4f873ff98982b20c146",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-yes-189cbabe-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "189cbabe",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./yes/189cbabe_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "6797d4f6ae6d7ed2809fc47f8da1fbcccb9361f5f2ec00e66c0f82b6b0cc2363",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-yes-18f8afd5-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "18f8afd5",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./yes/18f8afd5_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "610dfc839174ddfba84838ba5eea2498663d7b546f144345d7eb51770b4b8c95",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-yes-1acc97de-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "1acc97de",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./yes/1acc97de_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "b3da9ec4a4b6f28e08ac5720fa56066a06a5acb1daf61a9b99c8abc5c8ce4629",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-no-03401e93-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "03401e93",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./no/03401e93_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "994a3b5a11a2b8c4f2fdbe59468b840dabcddc653116f555ed9ff39388269bad",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-no-0c40e715-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "0c40e715",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./no/0c40e715_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "a3a507ab136556c09a40bfbeafb9bdd0f68f49074fc83b88b570a9f6f9388763",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-no-0c540988-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "0c540988",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./no/0c540988_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "ded1c0fd417dd68b61b1f27ed2a4c03a349507e730b257b2381aeb90c59b5083",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-no-0cb74144-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "0cb74144",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./no/0cb74144_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "8b32ac6128039868b7f030850174f489cb220ced82ee9c155aca88f7ec7a667c",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-no-0ea0e2f4-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "0ea0e2f4",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./no/0ea0e2f4_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "bdd05f73da9c74fd6ff21e5f07fc17fd7a99ba240c7d9b28b84dd06a078288cc",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-no-1093c8e7-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "1093c8e7",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./no/1093c8e7_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "7cb3053a01cf84e6d9a2acc74ab17d642e2d0c6d87ee5670c4c6f3a614a817c2",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-no-135c6841-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "135c6841",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./no/135c6841_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "7fbcf5e3ae49fe92ae23f7aa43b46c91ad42b813c6edb14c777bf3dbbe8cf0e0",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-no-189cbabe-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "189cbabe",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./no/189cbabe_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "c27038ea4ccf18a960dec3838f1d7b4781f65f06432bbd572d33b3141afb37d5",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-no-18f8afd5-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "18f8afd5",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./no/18f8afd5_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "36d24ce7b9b9ae1f4860a9fd5ee4ec0dc500a6ad1f9cf2c591e9d5d06cee88f1",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-no-1acc97de-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "1acc97de",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./no/1acc97de_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "4449e10157b9a6396bb7f6edc2adb7586d718145c2fec388205f02956daa8414",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-no-1b4c9b89-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "1b4c9b89",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./no/1b4c9b89_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://storage.googleapis.com/download.tensorflow.org/data/speech_commands_test_set_v0.02.tar.gz",
+      "sha256": "b79af7f169c7c0e3d302e4bfd459e38807d5a3c3c61c23c7b22596836d3421a2",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://research.google/blog/launching-the-speech-commands-dataset/",
+      "attribution": "Speech Commands test set v0.02, Pete Warden / Google and contributing speakers, CC BY 4.0.",
+      "id": "speech-commands-v002-no-1cb788bc-nohash-0",
+      "category": "isolated-word",
+      "role": "word",
+      "language": "en",
+      "speaker": "1cb788bc",
+      "annotation": "source-label-only",
+      "archive": {
+        "sha256": "cc2a00c1147c2254e9be3fa0f779d8c17421dc349b86366567a8edfa9acd51df",
+        "member": "./no/1cb788bc_nohash_0.wav"
+      }
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/3/30/La_Marseillaise.ogg",
+      "sha256": "2031c4835ddae2a9e1d718bf54c1a3222038f651555104cd264c7f5927b0523c",
+      "license": "Public domain (US Navy performance; public-domain composition)",
+      "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:La_Marseillaise.ogg",
+      "attribution": "La Marseillaise, Claude Joseph Rouget de Lisle; performance by United States Navy Band, circa 1987; Wikimedia Commons recording.",
+      "id": "navy-marseillaise",
+      "category": "instrumental-music",
+      "role": "instrumental",
+      "language": null,
+      "speaker": null,
+      "annotation": "source-label-only"
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/d/de/Happy_birthday.ogg",
+      "sha256": "cab7fd6f022110111a5e35caf9b86a265d7c98a30b7aa0ad6fa2b78957c76866",
+      "license": "CC-BY-SA-3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Happy_birthday.ogg",
+      "attribution": "Happy birthday, sung by Alexander Stephens, produced and arranged by Hanns Christian Müller for mylingo; uploaded by Sselmer, 13 June 2011, Wikimedia Commons, CC BY-SA 3.0.",
+      "id": "happy-birthday",
+      "category": "singing-media",
+      "role": "vocal-media",
+      "language": null,
+      "speaker": null,
+      "annotation": "source-label-only"
+    },
+    {
+      "id": "fleurs-fr-fr-validation-0",
+      "category": "read-speech-proxy",
+      "role": "spoken-proxy",
+      "language": "fr",
+      "speaker": null,
+      "url": "https://datasets-server.huggingface.co/cached-assets/google/fleurs/--/70bb2e84b976b7e960aa89f1c648e09c59f894dd/--/fr_fr/validation/0/audio/audio.wav",
+      "sha256": "8bb53b14f4cc695c54a136a5db57e534344a225d81a6b5314ca6cdb0a12c7005",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://huggingface.co/datasets/google/fleurs",
+      "attribution": "FLEURS, Alexis Conneau et al., Google, 2022",
+      "annotation": "source-label-only",
+      "lookup": {
+        "url": "https://datasets-server.huggingface.co/rows?dataset=google%2Ffleurs&config=fr_fr&split=validation&offset=0&length=2",
+        "rowIndex": 0,
+        "revision": "70bb2e84b976b7e960aa89f1c648e09c59f894dd"
+      }
+    },
+    {
+      "id": "fleurs-fr-fr-validation-1",
+      "category": "read-speech-proxy",
+      "role": "spoken-proxy",
+      "language": "fr",
+      "speaker": null,
+      "url": "https://datasets-server.huggingface.co/cached-assets/google/fleurs/--/70bb2e84b976b7e960aa89f1c648e09c59f894dd/--/fr_fr/validation/1/audio/audio.wav",
+      "sha256": "a9f2f1630034aae5bbe5273a25166d9ed1e92bedf4d613c7398fbda92b65ed12",
+      "license": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "sourcePage": "https://huggingface.co/datasets/google/fleurs",
+      "attribution": "FLEURS, Alexis Conneau et al., Google, 2022",
+      "annotation": "source-label-only",
+      "lookup": {
+        "url": "https://datasets-server.huggingface.co/rows?dataset=google%2Ffleurs&config=fr_fr&split=validation&offset=0&length=2",
+        "rowIndex": 1,
+        "revision": "70bb2e84b976b7e960aa89f1c648e09c59f894dd"
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "@sondine/cloud-waitlist",
+  "version": "0.1.0",
+  "private": true,
+  "description": "sondine.app/cloud: the page where a user of a Mac too small for the local model leaves an e-mail, to be told when the cloud transcription is ready.",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc",
+    "test": "vitest run",
+    "deploy": "npx --yes wrangler@4.164.0 deploy"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

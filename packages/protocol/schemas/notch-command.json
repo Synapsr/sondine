@@ -1,0 +1,324 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:sondine:notch:1:notch-command",
+  "$comment": "Generated from packages/protocol/src by `pnpm --filter @sondine/protocol run gen`. Do not edit.",
+  "title": "Sondine notch command",
+  "description": "One JSON line main sends sondine-notch: what the notch shows during a call.",
+  "$ref": "#/$defs/NotchCommand",
+  "$defs": {
+    "NotchCommand": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "const": "show"
+            },
+            "view": {
+              "$ref": "#/$defs/ViewNumber"
+            },
+            "call": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/NotchCall"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "people": {
+              "maxItems": 4,
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/NotchPerson"
+              }
+            },
+            "dismiss": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "label": {
+                      "$ref": "#/$defs/NotchLabel"
+                    },
+                    "callId": {
+                      "$ref": "#/$defs/RowId"
+                    }
+                  },
+                  "required": ["label", "callId"],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "card": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/NotchCard"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "openOnHover": {
+              "type": "boolean"
+            }
+          },
+          "required": ["type", "view", "call", "people", "dismiss", "card", "openOnHover"],
+          "additionalProperties": false
+        }
+      ],
+      "description": "One line main sends sondine-notch."
+    },
+    "ViewNumber": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991,
+      "description": "Which `show` a click was made on; main counts them from 1."
+    },
+    "NotchCall": {
+      "type": "object",
+      "properties": {
+        "callId": {
+          "$ref": "#/$defs/CallKey"
+        },
+        "title": {
+          "$ref": "#/$defs/NotchLabel"
+        },
+        "detail": {
+          "$ref": "#/$defs/NotchLabel"
+        },
+        "icon": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 24576,
+              "format": "base64",
+              "contentEncoding": "base64",
+              "pattern": "^$|^(?:[0-9a-zA-Z+/]{4})*(?:(?:[0-9a-zA-Z+/]{2}==)|(?:[0-9a-zA-Z+/]{3}=))?$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "monogram": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16
+        },
+        "on": {
+          "type": "boolean"
+        },
+        "toggle": {
+          "$ref": "#/$defs/NotchLabel"
+        },
+        "announce": {
+          "type": "boolean"
+        },
+        "episode": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "episodeId": {
+                  "$ref": "#/$defs/RowId"
+                },
+                "open": {
+                  "$ref": "#/$defs/NotchLabel"
+                },
+                "end": {
+                  "$ref": "#/$defs/NotchLabel"
+                }
+              },
+              "required": ["episodeId", "open", "end"],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "mute": {
+          "$ref": "#/$defs/NotchLabel"
+        }
+      },
+      "required": [
+        "callId",
+        "title",
+        "detail",
+        "icon",
+        "monogram",
+        "on",
+        "toggle",
+        "announce",
+        "episode",
+        "mute"
+      ],
+      "additionalProperties": false,
+      "description": "The call going on, with its switch."
+    },
+    "CallKey": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "description": "The call or the card shown; the same one keeps its key."
+    },
+    "NotchLabel": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "Text main translated, shown as is."
+    },
+    "RowId": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991,
+      "description": "A row id in Sondine's database."
+    },
+    "NotchPerson": {
+      "type": "object",
+      "properties": {
+        "personId": {
+          "$ref": "#/$defs/RowId"
+        },
+        "label": {
+          "$ref": "#/$defs/NotchLabel"
+        },
+        "monogram": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 16
+        },
+        "conversations": {
+          "maxItems": 3,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NotchConversation"
+          }
+        },
+        "none": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NotchLabel"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["personId", "label", "monogram", "conversations", "none"],
+      "additionalProperties": false,
+      "description": "A person the call may be with."
+    },
+    "NotchConversation": {
+      "type": "object",
+      "properties": {
+        "episodeId": {
+          "$ref": "#/$defs/RowId"
+        },
+        "when": {
+          "$ref": "#/$defs/NotchLabel"
+        },
+        "words": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 44
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["episodeId", "when", "words"],
+      "additionalProperties": false,
+      "description": "One earlier conversation with the person."
+    },
+    "NotchCard": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/CallKey"
+        },
+        "title": {
+          "$ref": "#/$defs/NotchLabel"
+        },
+        "detail": {
+          "$ref": "#/$defs/NotchLabel"
+        },
+        "icon": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 24576,
+              "format": "base64",
+              "contentEncoding": "base64",
+              "pattern": "^$|^(?:[0-9a-zA-Z+/]{4})*(?:(?:[0-9a-zA-Z+/]{2}==)|(?:[0-9a-zA-Z+/]{3}=))?$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "monogram": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 16
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "actions": {
+          "maxItems": 2,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NotchCardAction"
+          }
+        }
+      },
+      "required": ["key", "title", "detail", "icon", "monogram", "actions"],
+      "additionalProperties": false,
+      "description": "Something said once: a call that ended, a forgotten pause."
+    },
+    "NotchCardAction": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": ["open-episode", "end-episode", "resume"]
+        },
+        "label": {
+          "$ref": "#/$defs/NotchLabel"
+        },
+        "episodeId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RowId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": ["action", "label", "episodeId"],
+      "additionalProperties": false,
+      "description": "A button of a card."
+    }
+  }
+}

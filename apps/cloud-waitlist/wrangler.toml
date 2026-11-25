@@ -1,0 +1,8 @@
+# sondine.app/cloud (README.md). The Discord webhook is a secret, never here:
+# it comes from Infisical (CLOUD_WAITLIST_WEBHOOK) through `wrangler secret put`.
+name = "sondine-cloud-waitlist"
+main = "src/worker.ts"
+compatibility_date = "2026-11-01"
+workers_dev = false
+# A route without `*` misses `/cloud?lang=fr`; the Worker answers 404 past `/cloud`.
+routes = [{ pattern = "sondine.app/cloud*", zone_name = "sondine.app" }]

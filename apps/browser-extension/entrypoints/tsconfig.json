@@ -1,0 +1,7 @@
+{
+  // The two entries run in the browser, like src/. WXT's types, which they
+  // import for defineBackground and defineContentScript, bring Vite's and
+  // Node's along: src/ keeps its own config without them.
+  "extends": "../src/tsconfig.json",
+  "include": ["."]
+}

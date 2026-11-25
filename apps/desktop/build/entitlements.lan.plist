@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- sondine-lan (Contents/Helpers), the relay for paired iPhones (ADR 008).
+     App Sandbox with network.server and network.client: Network.framework's
+     listener answers a peer on the Wi-Fi with traffic the sandbox counts as
+     outbound, so without network.client no iPhone ever connects (found on
+     Téo's iPhone, 2026-11-13; loopback was never refused). The relay's code
+     opens no connection. The app group holds core's phone socket and the TLS
+     identity. -->
+<plist version="1.0">
+  <dict>
+    <key>com.apple.security.app-sandbox</key>
+    <true/>
+    <key>com.apple.security.network.client</key>
+    <true/>
+    <key>com.apple.security.network.server</key>
+    <true/>
+    <key>com.apple.security.application-groups</key>
+    <array>
+      <string>P5G8WAJ2G2.app.sondine</string>
+    </array>
+  </dict>
+</plist>
