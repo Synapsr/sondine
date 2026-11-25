@@ -1,12 +1,12 @@
 import type { UpdateBlock } from "@sondine/api";
 import * as z from "zod";
 
-// Where Sondine's releases are published (ADR 002: GitHub Releases, on the
-// public `sondine-releases` repository), how a release names its version and
+// Where Sondine's releases are published (ADR 002: GitHub Releases of its own
+// repository since 0.8.0, ADR 041), how a release names its version and
 // its files, the hosts an update may come from (ADR 045), and the only
 // release pages the window may hand to the browser.
 
-export const RELEASES_REPO = "teo-goulois/sondine-releases";
+export const RELEASES_REPO = "Synapsr/sondine";
 
 /** The file each release carries beside its disk image, which the update check reads. */
 export const UPDATE_FEED_NAME = "sondine-mac.json";

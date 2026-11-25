@@ -13,7 +13,7 @@ const feed = {
 };
 
 const asset = "https://release-assets.githubusercontent.com/x?sig=1";
-const tagged = "https://github.com/teo-goulois/sondine-releases/releases/download/desktop-v0.8.0/f";
+const tagged = "https://github.com/Synapsr/sondine/releases/download/desktop-v0.8.0/f";
 
 /** Answers each URL as given; records what was asked. */
 function server(answers: Record<string, () => Response>) {

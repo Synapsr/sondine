@@ -189,7 +189,7 @@ engine defaults (ADR 018, Proposed), « Ouvrir Sondine à l'ouverture de
 session ». 2026-11-08: near-live text, a setting on power only (Parakeet,
 ADR 019); notarized releases (`pnpm release:mac`, the app and the DMG
 accepted by Gatekeeper); the update check, opted into in Settings (GitHub
-Releases of `sondine-releases`, ADR 002), with the app at 0.2.0, above the
+Releases, ADR 002), with the app at 0.2.0, above the
 Tauri app's last release. 2026-11-09: call context (ADR 025): live identity
 in calls only (the far side, windows of 3 s then 10 s, two agreeing, nothing
 stored), « Marie ? » and her last conversations in the menu bar and, on

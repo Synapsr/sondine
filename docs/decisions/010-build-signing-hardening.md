@@ -73,7 +73,9 @@ profiles.
   First notarized build: 2026-11-08, both « Notarized Developer ID ».
   A release is the DMG, with the two files updates read (ADR 045), attached to
   a `desktop-v<version>` release of the
-  public `teo-goulois/sondine-releases` repository; publishing one is Téo's call. Its page opens with one line
+  public `Synapsr/sondine` repository; 0.8.0, the bridge, is also on
+  `teo-goulois/sondine-releases`, its disk image alone, for the versions up to
+  0.7.0 (ADR 041). Publishing one is Téo's call. Its page opens with one line
   of requirements. Through 0.6.0: « Requires a Mac with Apple Silicon, 32 GB
   of memory and macOS 27. » From the first release with ADR 040: « Requires a
   Mac with Apple Silicon and macOS 27. Transcribing on the Mac takes 32 GB of

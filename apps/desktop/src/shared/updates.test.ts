@@ -4,6 +4,7 @@ import {
   isNewer,
   isReleaseBuild,
   isReleasePage,
+  LATEST_UPDATE_FEED,
   relaunchArgument,
   relaunchFrom,
   releasePage,
@@ -28,6 +29,19 @@ describe("releases", () => {
     expect(isNewer("0.2.0", "0.2.0")).toBe(false);
     expect(isNewer("0.1.1", "0.2.0")).toBe(false);
     expect(isNewer("", "0.2.0")).toBe(false);
+  });
+
+  it("reads the project's own repository (ADR 041)", () => {
+    expect(LATEST_UPDATE_FEED).toBe(
+      "https://github.com/Synapsr/sondine/releases/latest/download/sondine-mac.json",
+    );
+    expect(releasePage("0.8.0")).toBe(
+      "https://github.com/Synapsr/sondine/releases/tag/desktop-v0.8.0",
+    );
+    // Where the versions up to 0.7.0 look, then archived.
+    expect(
+      isReleasePage("https://github.com/teo-goulois/sondine-releases/releases/tag/desktop-v0.7.0"),
+    ).toBe(false);
   });
 
   it("lets the window open only the repository's release pages", () => {

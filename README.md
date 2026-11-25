@@ -62,7 +62,7 @@ what they keep; the rules and their reasons are in
 ## Download
 
 Get the notarized disk image from the
-[latest release](https://github.com/teo-goulois/sondine-releases/releases/latest).
+[latest release](https://github.com/Synapsr/sondine/releases/latest).
 From there it keeps itself up to date, if you say yes to its question. Without
 that yes it downloads nothing: look for a new version in Settings.
 

@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.8.0 — 2026-11-25
+
+Sondine's source code is public; it keeps itself up to date when you say yes, and its icon is in the Dock.
+
+### New
+
+#### Sondine keeps itself up to date
+
+Say yes once and Sondine looks for a new version every other day at most, downloads it, checks who signed it, and restarts when nothing is going on and the Mac is idle: never during a call, a recording, a dictation, a transcription or a sync with your iPhone, and it listens again exactly as before. « Redémarrer et mettre à jour » does it sooner, and a note says what is new. Without your yes, nothing is downloaded: check from Réglages ▸ Général. If you had turned on the daily check, Sondine asks you first.
+
+#### Find Sondine in the Dock
+
+Sondine’s icon stays in the Dock and in ⌘Tab while it runs. Click it to open the window; close the window and Sondine keeps listening. Opening Sondine from the Dock, Finder or Spotlight shows its window at once, and opening it at login still shows nothing.
+
+### Improved
+
+#### Updates come from Sondine's public source
+
+Sondine's code is now open to read, build and improve, at github.com/Synapsr/sondine, and its new versions are published there. Install this one to keep hearing about them.
+
+### Fixed
+
+#### New versions are found again
+
+The check for new versions could fail for a whole day behind an address shared with other apps or people, because GitHub limits how often that address may ask. Sondine now reads a public file without that limit, and tells you whether GitHub refused, did not answer, or said something it cannot read.
+
 ## 0.7.0 — 2026-11-25
 
 Transcription for Macs too small for the model, on another machine of yours or in a small cloud beta; your calls in the notch; and dictations in the exact words you typed.

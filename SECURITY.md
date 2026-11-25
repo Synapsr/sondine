@@ -19,8 +19,8 @@ published with credit to you, unless you prefer otherwise.
 
 ## Supported versions
 
-Only the latest release receives security fixes. Releases are listed on
-[sondine-releases](https://github.com/teo-goulois/sondine-releases/releases).
+Only the latest release receives security fixes. They are listed under
+[Releases](https://github.com/Synapsr/sondine/releases).
 
 ## Scope
 

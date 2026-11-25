@@ -72,13 +72,14 @@ a call and an episode told by their date or number.
 - **Releases live in `Synapsr/sondine`.** A separate repository was only
   needed while the source was private. GitHub's `releases/latest` is then
   always a desktop release: anything else (the ONNX Runtime archive, an
-  iPhone build) is published with `--latest=false`, because the app refuses a
-  latest tag that is not `desktop-v…`.
+  iPhone build) is published with `--latest=false`, because the app reads
+  `sondine-mac.json` (ADR 045) from the latest release, and the versions up to
+  0.7.0 refuse a latest tag that is not `desktop-v…`.
 - **No transfer of `sondine-releases`.** In this order: make
   `Synapsr/sondine` public; publish there a bridge version that reads it,
-  later than the last one published, 0.7.0 on 2026-11-25 (an equal version is
-  not announced); publish the same build in `teo-goulois/sondine-releases`, as
-  its latest; check that a 0.7.0 announces it and that the bridge version's own
+  0.8.0, later than the last one published, 0.7.0 (an equal version is not
+  announced); publish its disk image, alone, in
+  `teo-goulois/sondine-releases`, as its latest; check that a 0.7.0 announces it and that the bridge version's own
   check answers; then archive
   the old repository, kept public. Its API and downloads still answer, for the
   older apps and for the ONNX Runtime archive `native/Package.swift` pins.
@@ -100,9 +101,8 @@ a call and an episode told by their date or number.
   skill are optional.
 - `pnpm test` compiles the translations itself: a turbo cache hit on
   `typecheck` left them missing on a fresh checkout.
-- On publication day, the first commit changes the source repository's links
+- The first public commit holds the source repository's links
   (`.github/ISSUE_TEMPLATE/config.yml`).
-- The bridge version changes `apps/desktop/src/shared/updates.ts`
-  (`RELEASES_REPO` and the release-page pattern, with their test), ADR 002,
-  ADR 010, `README.md` and `SECURITY.md`, not before: the API answers 404 for
-  a private repository.
+- The bridge version is 0.8.0. It changes `apps/desktop/src/shared/updates.ts`
+  (`RELEASES_REPO`, with its tests), ADR 010, `README.md` and `SECURITY.md`. It
+  is published only once the repository is public: a private one answers 404.
