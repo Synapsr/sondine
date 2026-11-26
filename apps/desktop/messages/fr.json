@@ -1633,5 +1633,21 @@
   "update_not_started_body": "Sondine n’écoute pas. Téléchargez cette version depuis sa page et replacez-la dans Applications : vos données n’ont pas bougé.",
   "update_not_started_close": "Fermer",
   "update_not_started_open": "Ouvrir la page",
-  "tray_update_install": "Redémarrer et mettre à jour en {version}"
+  "tray_update_install": "Redémarrer et mettre à jour en {version}",
+  "settings_vocabulary_title": "Vocabulaire",
+  "vocabulary_intro": "Sondine écrit ces mots comme vous quand une transcription entend un mot qui leur ressemble. Une note aide le modèle du journal à le reconnaître.",
+  "vocabulary_word_label": "Mot",
+  "vocabulary_note_label": "Note",
+  "vocabulary_note_placeholder": "Facultatif : « le nom de mon app »",
+  "vocabulary_add": "Ajouter",
+  "vocabulary_word_of": "Mot « {word} »",
+  "vocabulary_note_of": "Note de « {word} »",
+  "vocabulary_remove": "Retirer « {word} »",
+  "vocabulary_people": "Les noms de vos Personnes en font aussi partie : {names}.",
+  "vocabulary_no_model": "Sans le modèle du journal, seuls les mots qui sonnent pareil sont corrigés.",
+  "vocabulary_learned": "Sondine écrira désormais {words}",
+  "vocabulary_unheard_title": "Ajouter « {word} » au Vocabulaire ?",
+  "vocabulary_unheard_description": "Il ne sonne pas comme ce qui a été entendu : Sondine ne l’apprend pas de cette correction.",
+  "vocabulary_quoted": "« {word} »",
+  "vocabulary_added": "« {word} » est dans le Vocabulaire"
 }

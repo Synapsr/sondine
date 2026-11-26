@@ -467,7 +467,7 @@ function fakeServices(overrides: Partial<ApiServices> = {}) {
     transcript: {
       edit: async (input) => {
         calls.push({ method: "transcript.edit", input });
-        return {};
+        return { learned: [], unheard: [] };
       },
       restore: async (input) => {
         calls.push({ method: "transcript.restore", input });
@@ -839,6 +839,15 @@ function fakeServices(overrides: Partial<ApiServices> = {}) {
         };
       },
     },
+    vocabulary: {
+      list: async () => ({ words: [], people: [], modelReads: false }),
+      add: async (input) => {
+        calls.push({ method: "vocabulary.add", input });
+        return { id: 1, word: input.word, note: input.note ?? null };
+      },
+      update: async (input) => ({ id: input.id, word: input.word, note: input.note ?? null }),
+      remove: async () => ({}),
+    },
     tags: {
       list: async () => ({ tags: [] }),
       set: async (input) => {
@@ -1080,6 +1089,10 @@ describe("contract metadata", () => {
       "usage.processCrashed",
       "usage.setSharing",
       "usage.windowOpened",
+      "vocabulary.add",
+      "vocabulary.list",
+      "vocabulary.remove",
+      "vocabulary.update",
       "voiceRead.cancel",
       "voiceRead.finish",
       "voiceRead.forget",

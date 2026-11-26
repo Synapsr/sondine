@@ -175,6 +175,12 @@ import type {
   TagRenameInput,
   TagRenameResult,
   TagSetInput,
+  VocabularyAddInput,
+  VocabularyEntry,
+  VocabularyList,
+  VocabularyRemoveInput,
+  VocabularyUpdateInput,
+  TranscriptCorrectResult,
   TagSetResult,
   DiagnosticReport,
   UsageCrashInput,
@@ -421,7 +427,8 @@ export interface ApiServices {
    * replaced.
    */
   readonly transcript: {
-    edit(input: z.output<typeof TranscriptEditInput>): Promise<TranscriptEditResult>;
+    /** Says what the Vocabulary learned from the correction (ADR 046). */
+    edit(input: z.output<typeof TranscriptEditInput>): Promise<TranscriptCorrectResult>;
     restore(input: z.output<typeof TranscriptRestoreInput>): Promise<TranscriptEditResult>;
   };
   /** ⌘Z and ⇧⌘Z over the edits made in the app this session (splits, merges, types, text, names). */
@@ -514,6 +521,17 @@ export interface ApiServices {
     set(input: z.output<typeof TagSetInput>): Promise<TagSetResult>;
     rename(input: z.output<typeof TagRenameInput>): Promise<TagRenameResult>;
     delete(input: z.output<typeof TagDeleteInput>): Promise<TagDeleteResult>;
+  };
+  /**
+   * The Vocabulary (ADR 046). `add` and `update` throw `invalid-input` for a
+   * word already in the list (without case or accents) or a full list;
+   * `update` and `remove` throw `not-found` for a word gone.
+   */
+  readonly vocabulary: {
+    list(): Promise<VocabularyList>;
+    add(input: z.output<typeof VocabularyAddInput>): Promise<VocabularyEntry>;
+    update(input: z.output<typeof VocabularyUpdateInput>): Promise<VocabularyEntry>;
+    remove(input: z.output<typeof VocabularyRemoveInput>): Promise<Record<string, never>>;
   };
   readonly statistics: {
     get(): Promise<Statistics>;

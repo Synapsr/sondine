@@ -560,6 +560,20 @@ export const router = os.router({
       guard(errors, () => context.services.display.update(input)),
     ),
   },
+  vocabulary: {
+    list: os.vocabulary.list.handler(({ context, errors }) =>
+      guard(errors, () => context.services.vocabulary.list()),
+    ),
+    add: os.vocabulary.add.handler(({ context, input, errors }) =>
+      guard(errors, () => context.services.vocabulary.add(input)),
+    ),
+    update: os.vocabulary.update.handler(({ context, input, errors }) =>
+      guard(errors, () => context.services.vocabulary.update(input)),
+    ),
+    remove: os.vocabulary.remove.handler(({ context, input, errors }) =>
+      guard(errors, () => context.services.vocabulary.remove(input)),
+    ),
+  },
   tags: {
     list: os.tags.list.handler(({ context, errors }) =>
       guard(errors, () => context.services.tags.list()),

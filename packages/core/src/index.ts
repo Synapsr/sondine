@@ -68,9 +68,24 @@ export {
   VOCABULARY_VERSION,
   applyVocabulary,
   buildVocabulary,
+  correctionLessons,
+  looksLike,
+  nameWords,
+  namesWrittenIn,
+  respell,
+  vocabularyCandidates,
   type Vocabulary,
+  type VocabularyCandidate,
   type VocabularyWord,
 } from "./text/vocabulary";
+export {
+  VOCABULARY_CHECK_BATCH,
+  VOCABULARY_CHECK_VERSION,
+  buildVocabularyCheck,
+  readVocabularyCheck,
+  type VocabularyCheckItem,
+  type VocabularyCheckRequest,
+} from "./text/vocabulary-check";
 export {
   FR_NORM_ALIGN_VERSION,
   frNormAlign,

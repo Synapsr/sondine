@@ -21,6 +21,7 @@ import { log } from "../log";
 import { Models } from "../models/models-layer";
 import { prepareWorkDirectory, providerOf } from "../chat/chat-service";
 import { JournalWork } from "./journal-work";
+import { VocabularyWork } from "./vocabulary-work";
 import { UsageStatistics } from "../usage/usage-layer";
 
 // The daily journal in core (ADR 028): its model, once Models has verified
@@ -117,6 +118,7 @@ export const journalLayer = Layer.effect(
       language: () => journalSettings(db).language,
       timeZone: () => Intl.DateTimeFormat().resolvedOptions().timeZone,
       onFailed: (code) => usage.error(usageError("journal", code)),
+      vocabulary: new VocabularyWork({ db, log }),
       log,
     });
     const server = config.textServer?.binary ?? null;

@@ -316,6 +316,27 @@ export {
   type SegmentEditInput,
 } from "./transcript-edits";
 export {
+  VOCABULARY_CHECK_DAYS,
+  VOCABULARY_MAX_ATTEMPTS,
+  VOCABULARY_WORDS_MAX,
+  addVocabularyWord,
+  finishVocabularyPass,
+  listVocabulary,
+  loadVocabularyCheck,
+  nextVocabularyEpisode,
+  removeVocabularyWord,
+  respellEpisode,
+  segmentHeard,
+  updateVocabularyWord,
+  vocabularyNamesKey,
+  vocabularyNotes,
+  vocabularyOf,
+  type VocabularyChange,
+  type VocabularyCheckTarget,
+  type VocabularyEntry,
+  type VocabularyList,
+} from "./vocabulary";
+export {
   captureUndo,
   restoreUndo,
   type UndoLevel,

@@ -585,21 +585,18 @@ export class AnalysisScheduler {
     now: number,
   ): { unit: JournalUnit; engine: TextEngine } | null {
     const journal = this.deps.journal;
-    const engine = journal?.engine() ?? null;
-    if (journal === undefined || engine === null || now < this.journalRetryAt) return null;
-    const unit = journal.next();
-    if (unit === null) return null;
-    if (picked === null || picked.engine === null) return { unit, engine };
-    return unit.requested && !picked.job.requested ? { unit, engine } : null;
+    if (journal === undefined || now < this.journalRetryAt) return null;
+    const next = journal.next();
+    if (next === null) return null;
+    if (picked === null || picked.engine === null) return next;
+    return next.unit.requested && !picked.job.requested ? next : null;
   }
 
   /** An automatic journal unit, tried when transcription is refused memory a smaller model may fit in. */
   private automaticJournal(now: number): { unit: JournalUnit; engine: TextEngine } | null {
     const journal = this.deps.journal;
-    const engine = journal?.engine() ?? null;
-    if (journal === undefined || engine === null || now < this.journalRetryAt) return null;
-    const unit = journal.next();
-    return unit === null ? null : { unit, engine };
+    if (journal === undefined || now < this.journalRetryAt) return null;
+    return journal.next();
   }
 
   /**

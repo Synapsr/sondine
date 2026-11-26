@@ -2494,6 +2494,18 @@ export type TranscriptRestoreInput = z.input<typeof TranscriptRestoreInput>;
 export const TranscriptEditResult = z.strictObject({});
 export type TranscriptEditResult = z.output<typeof TranscriptEditResult>;
 
+/** What a correction taught the Vocabulary (ADR 046), for the window to say it. */
+export const TranscriptCorrectResult = z.strictObject({
+  /** Names Sondine now writes the user's way in new transcripts. */
+  learned: z.array(z.string().max(200)).max(50),
+  /**
+   * Names the user wrote that do not sound like what was heard, so nothing
+   * was learned (« Sandrine » → « Sondine »): words to offer for the list.
+   */
+  unheard: z.array(z.string().max(200)).max(50),
+});
+export type TranscriptCorrectResult = z.output<typeof TranscriptCorrectResult>;
+
 // ⌘Z and ⇧⌘Z (M2): the user's edits of this session, undone and redone by core.
 
 /** What an undo or redo step changed. */
@@ -3302,3 +3314,42 @@ export const TagDeleteResult = z.strictObject({
   recordings: Count,
 });
 export type TagDeleteResult = z.output<typeof TagDeleteResult>;
+
+// The Vocabulary (ADR 046): the user's words, each with an optional note the
+// journal's model reads, and their People's names.
+
+const VocabularyWord = z.string().trim().min(1).max(60);
+const VocabularyNote = z.string().trim().max(200).nullable();
+
+export const VocabularyEntry = z.strictObject({
+  id: z.int().positive(),
+  word: z.string().max(60),
+  note: z.string().max(200).nullable(),
+});
+export type VocabularyEntry = z.output<typeof VocabularyEntry>;
+
+export const VocabularyList = z.strictObject({
+  /** The user's words, alphabetical. */
+  words: z.array(VocabularyEntry),
+  /** Their People's names that are not in the list, alphabetical: in the vocabulary too. */
+  people: z.array(z.string().max(80)),
+  /** Whether the journal's model is on this Mac to read names that only look like these. */
+  modelReads: z.boolean(),
+});
+export type VocabularyList = z.output<typeof VocabularyList>;
+
+export const VocabularyAddInput = z.strictObject({
+  word: VocabularyWord,
+  note: VocabularyNote.optional(),
+});
+export type VocabularyAddInput = z.input<typeof VocabularyAddInput>;
+
+export const VocabularyUpdateInput = z.strictObject({
+  id: z.int().positive(),
+  word: VocabularyWord,
+  note: VocabularyNote.optional(),
+});
+export type VocabularyUpdateInput = z.input<typeof VocabularyUpdateInput>;
+
+export const VocabularyRemoveInput = z.strictObject({ id: z.int().positive() });
+export type VocabularyRemoveInput = z.input<typeof VocabularyRemoveInput>;

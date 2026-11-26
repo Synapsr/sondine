@@ -15,3 +15,4 @@ export * from "./same-moment";
 export * from "./settings";
 export * from "./tags";
 export * from "./work";
+export * from "./vocabulary";

@@ -848,8 +848,12 @@ See [ADR 012](decisions/012-third-parties-and-biometrics.md).
   the normalizer id.
 - Phonetic keys (M4): a French/English phonetic code per word and per name
   in the personal vocabulary, so a misheard name still matches. The
-  vocabulary also biases ASR where the engine supports it (an `asr`
-  capability measured on the bench) and drives post-correction otherwise.
+  vocabulary drives post-correction (ADR 046): names the user's corrections
+  taught and their names (Settings ▸ Vocabulaire, People) by sound, at
+  publish and over the last 7 days; a word that only looks like one of the
+  list is read by the journal's model in the scheduler's journal units. It
+  may later bias ASR where an engine supports it (an `asr` capability
+  measured on the bench); nothing is sent to an engine today.
 - Filters: person, app, context, size, date range. Built: date range, size,
   context, and « Pendant que j'étais dans… » (`foregroundApp`, ADR 022): only
   the segments whose app in front at their middle is that app, the

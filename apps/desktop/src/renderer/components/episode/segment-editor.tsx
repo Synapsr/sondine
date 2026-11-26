@@ -1,13 +1,17 @@
-import type { TranscriptSegment } from "@sondine/api";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { TranscriptCorrectResult, TranscriptSegment } from "@sondine/api";
+import { useToastManager } from "@sondine/ui/components/toast";
+import { useMutation, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { useRef, useState, type FocusEvent, type KeyboardEvent } from "react";
-import { errorMessage, orpc } from "../../core/orpc";
+import { connection, errorMessage, orpc } from "../../core/orpc";
 import { m } from "../../paraglide/messages.js";
+import { getLocale } from "../../paraglide/runtime.js";
 
 // Correcting a segment's text in place (M2). Enter saves, Escape cancels,
 // leaving the field saves what changed; « Rétablir l'original » puts the
 // engine's text back. The correction is the user's: search, exports and
-// agents read it, and a new transcript of the same audio keeps it.
+// agents read it, and a new transcript of the same audio keeps it. Then a
+// toast says what the Vocabulary learned (ADR 046), or offers to add a name
+// it could not learn because it does not sound like what was heard.
 
 export interface SegmentTarget {
   readonly episodeId: number;
@@ -43,8 +47,15 @@ export function SegmentEditor({
   const reopen = () => {
     closing.current = null;
   };
+  const toasts = useToastManager();
   const edit = useMutation(
-    orpc.transcript.edit.mutationOptions({ onSuccess: refresh, onError: reopen }),
+    orpc.transcript.edit.mutationOptions({
+      onSuccess: async (result) => {
+        tellLessons(result, toasts, queryClient);
+        await refresh();
+      },
+      onError: reopen,
+    }),
   );
   const restore = useMutation(
     orpc.transcript.restore.mutationOptions({ onSuccess: refresh, onError: reopen }),
@@ -123,4 +134,42 @@ export function SegmentEditor({
       )}
     </div>
   );
+}
+
+type Toasts = ReturnType<typeof useToastManager>;
+
+/** The names, each quoted, as one list: « Téo » et « Camille ». */
+const quotedList = (words: readonly string[]) =>
+  new Intl.ListFormat(getLocale(), { type: "conjunction" }).format(
+    words.map((word) => m.vocabulary_quoted({ word })),
+  );
+
+/**
+ * What a correction taught, as toasts: the names Sondine writes the user's
+ * way from now on; a name it could not learn, with « Ajouter » to put it in
+ * the Vocabulary. The editor is gone by then: the action calls core itself.
+ */
+function tellLessons(result: TranscriptCorrectResult, toasts: Toasts, queryClient: QueryClient) {
+  if (result.learned.length > 0) {
+    toasts.add({ title: m.vocabulary_learned({ words: quotedList(result.learned) }) });
+  }
+  for (const word of result.unheard) {
+    const id = toasts.add({
+      title: m.vocabulary_unheard_title({ word }),
+      description: m.vocabulary_unheard_description(),
+      actionProps: {
+        children: m.vocabulary_add(),
+        onClick: () => {
+          toasts.close(id);
+          connection.client.vocabulary.add({ word }).then(
+            () => {
+              toasts.add({ title: m.vocabulary_added({ word }) });
+              void queryClient.invalidateQueries({ queryKey: orpc.vocabulary.key() });
+            },
+            (error: unknown) => toasts.add({ title: errorMessage(error) }),
+          );
+        },
+      },
+    });
+  }
 }

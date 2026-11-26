@@ -51,3 +51,4 @@ and link the replacement.
 | [043](043-site.md)                          | The site in a repository of its own                              | Accepted |
 | [044](044-ending-an-episode.md)             | Ending an ongoing episode by hand                                | Accepted |
 | [045](045-automatic-updates.md)             | Sondine updates itself, with a yes                               | Accepted |
+| [046](046-vocabulary.md)                    | The Vocabulary, and the journal's model for look-alikes          | Accepted |

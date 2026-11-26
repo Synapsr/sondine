@@ -17,7 +17,7 @@ import {
   type TranscriptFormat,
   type UndoStep,
 } from "@sondine/api";
-import { pageLinkAt, positionAt, siteName, webPageOf } from "@sondine/core";
+import { correctionLessons, pageLinkAt, positionAt, siteName, webPageOf } from "@sondine/core";
 import {
   analysisRequested,
   browseTag,
@@ -27,6 +27,7 @@ import {
   deletePassage,
   durableTransaction,
   deletePerson,
+  addVocabularyWord,
   editSegment,
   episodeKindOverride,
   deleteTag,
@@ -34,6 +35,12 @@ import {
   findTag,
   phoneNotes,
   listTags,
+  listVocabulary,
+  removeVocabularyWord,
+  segmentHeard,
+  updateVocabularyWord,
+  vocabularyOf,
+  type VocabularyChange,
   renameTag,
   setEpisodeTag,
   episodeNeighbours,
@@ -1029,6 +1036,19 @@ export const apiLayer = Layer.effect(
           : new ServiceFailure("not-found", `No segment ${segmentId} in this transcript.`),
       );
     };
+    /** A change of the Vocabulary list, or why it was refused. */
+    const vocabularyChanged = (
+      change: VocabularyChange,
+    ): Effect.Effect<{ readonly id: number }, ServiceFailure> =>
+      typeof change !== "string"
+        ? Effect.succeed(change)
+        : Effect.fail(
+            change === "missing"
+              ? new ServiceFailure("not-found", "This word is no longer in the list.")
+              : change === "exists"
+                ? new ServiceFailure("invalid-input", "This word is already in the list.")
+                : new ServiceFailure("invalid-input", "The list is full."),
+          );
     /** A voice's name changed: an agent answer read before must not carry the old one. */
     const named = <T extends { readonly ok: boolean }>(change: T): T => {
       if (change.ok) access.contentChanged();
@@ -2812,6 +2832,53 @@ export const apiLayer = Layer.effect(
             Effect.sync(() => updateDisplaySettings(db, input, Date.now())),
           ),
       },
+      vocabulary: {
+        list: () =>
+          call(
+            "vocabulary.list",
+            Effect.sync(() => {
+              const { words, people } = listVocabulary(db);
+              return {
+                words: [...words],
+                people: [...people],
+                modelReads: journal.work.readsVocabulary(),
+              };
+            }),
+          ),
+        add: (input) =>
+          call(
+            "vocabulary.add",
+            Effect.suspend(() => {
+              const note = input.note ?? null;
+              return vocabularyChanged(
+                addVocabularyWord(db, { word: input.word, note, nowMs: Date.now() }),
+              ).pipe(
+                Effect.map(({ id }) => ({ id, word: input.word, note: note === "" ? null : note })),
+              );
+            }),
+          ),
+        update: (input) =>
+          call(
+            "vocabulary.update",
+            Effect.suspend(() => {
+              const note = input.note ?? null;
+              return vocabularyChanged(
+                updateVocabularyWord(db, { ...input, note, nowMs: Date.now() }),
+              ).pipe(
+                Effect.map(({ id }) => ({ id, word: input.word, note: note === "" ? null : note })),
+              );
+            }),
+          ),
+        remove: (input) =>
+          call(
+            "vocabulary.remove",
+            Effect.suspend(() =>
+              removeVocabularyWord(db, input.id)
+                ? Effect.succeed({})
+                : Effect.fail(new ServiceFailure("not-found", `No word ${input.id} in the list.`)),
+            ),
+          ),
+      },
       tags: {
         list: () =>
           call(
@@ -2880,14 +2947,27 @@ export const apiLayer = Layer.effect(
         edit: (input) =>
           call(
             "transcript.edit",
-            Effect.suspend(() =>
-              corrected(
+            Effect.suspend(() => {
+              const original = segmentHeard(db, input.segmentId);
+              const edited: Effect.Effect<unknown, ServiceFailure> = corrected(
                 history.track("text", episodeScope("text", [input.episodeId]), () =>
                   editSegment(db, { ...input, nowMs: Date.now() }),
                 ),
                 input.segmentId,
-              ),
-            ),
+              );
+              // What the Vocabulary learned, read with the correction counted (ADR 046).
+              return edited.pipe(
+                Effect.map(() => {
+                  if (original === null) return { learned: [], unheard: [] };
+                  const { learned, unheard } = correctionLessons({
+                    original,
+                    text: input.text,
+                    vocabulary: vocabularyOf(db),
+                  });
+                  return { learned: [...learned], unheard: [...unheard] };
+                }),
+              );
+            }),
           ),
         restore: (input) =>
           call(

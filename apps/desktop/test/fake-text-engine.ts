@@ -5,6 +5,7 @@ import { EngineError, type EngineState, type TextEngine, type TextRequest } from
 // for its abort signal when told to hang. Heavy by default, as the real one;
 // as the user's Claude (`provider`), nothing to load and no memory here, it
 // answers a check of the commitments with `check`, or fails with `fail`.
+// The Vocabulary's questions (ADR 046) get `vocabulary`: the user's word, by default.
 
 export interface FakeTextEngine extends TextEngine {
   readonly requests: TextRequest[];
@@ -27,6 +28,7 @@ export function fakeTextEngine(
     readonly provider?: boolean;
     readonly check?: FakeCheck;
     readonly fail?: () => Error;
+    readonly vocabulary?: "user_word" | "as_written";
   } = {},
 ): FakeTextEngine {
   const provider = options.provider === true;
@@ -90,26 +92,35 @@ export function fakeTextEngine(
               heard: "conversation",
             }))
           : null;
+        const vocabulary = request.id.startsWith("vocabulary-")
+          ? (request.user.match(/^Item \d+:/gmu) ?? []).map((_, index) => ({
+              item: index + 1,
+              refers_to: "an app",
+              answer: options.vocabulary ?? "user_word",
+            }))
+          : null;
         return {
           requestId: request.id,
           text:
-            checks !== null
-              ? JSON.stringify({ checks })
-              : (options.answer ??
-                JSON.stringify({
-                  journal: [{ text: "On a parlé du budget.", cite: [1] }],
-                  commitments: [
-                    {
-                      cite: [1],
-                      who: "P1",
-                      kind: "promise",
-                      to: null,
-                      what: "envoyer le devis",
-                      due: null,
-                      dueText: null,
-                    },
-                  ],
-                })),
+            vocabulary !== null
+              ? JSON.stringify({ answers: vocabulary })
+              : checks !== null
+                ? JSON.stringify({ checks })
+                : (options.answer ??
+                  JSON.stringify({
+                    journal: [{ text: "On a parlé du budget.", cite: [1] }],
+                    commitments: [
+                      {
+                        cite: [1],
+                        who: "P1",
+                        kind: "promise",
+                        to: null,
+                        what: "envoyer le devis",
+                        due: null,
+                        dueText: null,
+                      },
+                    ],
+                  })),
           stop: "complete",
           provenance: {
             engineId: "fake-journal",

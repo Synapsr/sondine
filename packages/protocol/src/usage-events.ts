@@ -169,6 +169,11 @@ export const USAGE_RULES = {
   updates_checked: "action",
   usage_sharing_set: "never",
   usage_viewed: "never",
+  // Not in what the user said yes to (ADR 042): counting them needs a new version of the question.
+  vocabulary_listed: "never",
+  vocabulary_word_added: "never",
+  vocabulary_word_changed: "never",
+  vocabulary_word_removed: "never",
   voice_read_cancelled: "action",
   voice_read_finished: "action",
   voice_read_forgotten: "action",

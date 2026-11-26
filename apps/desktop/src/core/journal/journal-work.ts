@@ -27,6 +27,7 @@ import {
   type JournalWriter,
 } from "@sondine/db";
 import { EngineError, type TextEngine, type TextRequest, type TextResult } from "@sondine/engines";
+import type { VocabularyWork } from "./vocabulary-work";
 
 // The daily journal's work for the analysis scheduler (ADR 028): which
 // episode comes next, and one episode written, by whoever the user chose:
@@ -38,6 +39,11 @@ import { EngineError, type TextEngine, type TextRequest, type TextResult } from 
 type Fields = Readonly<Record<string, string | number | boolean | null | undefined>>;
 
 export interface JournalUnit {
+  /**
+   * `vocabulary`: the episode's names that look like the user's words,
+   * read by the model on this Mac before its journal (ADR 046).
+   */
+  readonly kind: "journal" | "vocabulary";
   readonly episodeId: number;
   /** The user asked for its day: idle and power are not waited for. */
   readonly requested: boolean;
@@ -65,6 +71,8 @@ export interface JournalWorkDeps {
   readonly onChanged?: (episodeId: number) => void;
   /** A pass failed: its code (ADR 042). */
   readonly onFailed?: (code: string) => void;
+  /** The Vocabulary's reading of names (ADR 046); none without it. */
+  readonly vocabulary?: VocabularyWork;
   readonly now?: () => number;
 }
 
@@ -96,6 +104,11 @@ export class JournalWork {
   /** The engine that writes the windows now: the user's Claude when they chose it. */
   engine(): TextEngine | null {
     return this.deps.writer() === "claude" ? this.deps.claude() : this.deps.device();
+  }
+
+  /** Whether the model on this Mac reads the names that look like the user's words (ADR 046). */
+  readsVocabulary(): boolean {
+    return this.deps.vocabulary !== undefined && this.deps.device() !== null;
   }
 
   /** Every engine the journal may hold, whoever writes now: the scheduler unloads them all. */
@@ -130,25 +143,54 @@ export class JournalWork {
   }
 
   /**
+   * The next unit and the engine for it, or null. The Vocabulary's reading
+   * of an episode comes before its journal, on the model on this Mac only,
+   * whoever writes the journal, and whether the journal is on: before a day
+   * the user asked for, that day's episodes, then any recent one before an
+   * automatic journal.
+   */
+  next(): { readonly unit: JournalUnit; readonly engine: TextEngine } | null {
+    const journal = this.nextJournal();
+    const device = this.deps.device();
+    const vocabulary = this.deps.vocabulary;
+    if (vocabulary !== undefined) {
+      // Without the model, recent transcripts still get the rule that needs none.
+      const model = device !== null;
+      const episodeId =
+        journal?.requested === true
+          ? vocabulary.next({ model, episodeId: journal.episodeId })
+          : vocabulary.next({ model });
+      if (episodeId !== null && device !== null) {
+        return {
+          unit: { kind: "vocabulary", episodeId, requested: journal?.requested === true },
+          engine: device,
+        };
+      }
+    }
+    const engine = this.engine();
+    return journal === null || engine === null ? null : { unit: journal, engine };
+  }
+
+  /**
    * The next episode to write, or null. Text leaves the Mac only for the
    * writer the user chose after being told what leaves (Settings).
    */
-  next(): JournalUnit | null {
+  private nextJournal(): JournalUnit | null {
     if (!this.deps.enabled()) return null;
     const engine = this.engine();
     if (engine === null || this.claudePaused()) return null;
     if (this.deps.writer() === "device-checked" && this.deps.claude() === null) return null;
-    const unit = nextJournalEpisode(this.deps.db, this.configKey(), this.requested);
+    const next = nextJournalEpisode(this.deps.db, this.configKey(), this.requested);
     // A day asked for is done once nothing in it is left; a rewrite that
     // failed stays, so the day still says so (until core restarts).
-    if (unit === null || !unit.requested) {
+    if (next === null || !next.requested) {
       this.requested = this.requested.filter(
         (range) =>
           range.rewriteBeforeMs !== undefined &&
           journalPending(this.deps.db, this.configKey(), range).failed > 0,
       );
     }
-    return unit;
+    return next === null ? null : { kind: "journal", ...next };
   }
 
   /**
@@ -179,6 +221,7 @@ export class JournalWork {
    * feeds, ADR 032) needs no model.
    */
   hasText(unit: JournalUnit): boolean {
+    if (unit.kind === "vocabulary") return true;
     const source = loadJournalSource(
       this.deps.db,
       unit.episodeId,
@@ -259,6 +302,13 @@ export class JournalWork {
    * the pass, which is not a failure.
    */
   async run(engine: TextEngine, unit: JournalUnit, signal: AbortSignal): Promise<JournalOutcome> {
+    if (unit.kind === "vocabulary") {
+      const { vocabulary } = this.deps;
+      // Only the model on this Mac reads for the Vocabulary.
+      if (vocabulary === undefined || engine !== this.deps.device()) return "discarded";
+      const outcome = await vocabulary.run(engine, unit.episodeId, signal);
+      return outcome === "done" ? "published" : outcome;
+    }
     const { db, log } = this.deps;
     // The scheduler chose the engine before admission: the user may have
     // chosen another writer since. Nothing goes to an engine they left.

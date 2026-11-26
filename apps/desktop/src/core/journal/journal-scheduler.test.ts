@@ -1,4 +1,4 @@
-import { setJournalSettings, type JournalWriter } from "@sondine/db";
+import { addVocabularyWord, setJournalSettings, type JournalWriter } from "@sondine/db";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { Boot, scalar, tempDb, type Run, type TempDb } from "../../../test/capture-fixture";
 import {
@@ -13,6 +13,7 @@ import { EngineError } from "@sondine/engines";
 import { AnalysisScheduler, HEAVY_ENGINE_BYTES } from "../analysis/scheduler";
 import { runEpisodePass } from "../episodes/episode-pass";
 import { JournalWork } from "./journal-work";
+import { VocabularyWork } from "./vocabulary-work";
 
 // The journal in the analysis scheduler (ADR 028): after transcription, on
 // the same admission, one heavy model at a time.
@@ -59,17 +60,23 @@ function scheduled(
     writer?: () => JournalWriter;
     claude?: FakeTextEngine;
     enabled?: () => boolean;
+    device?: () => FakeTextEngine | null;
   } = {},
 ): { scheduler: AnalysisScheduler; work: JournalWork } {
   const work = new JournalWork({
     db: temp.db,
-    device: () => text,
+    device: writing.device ?? (() => text),
     claude: () => writing.claude ?? null,
     writer: writing.writer ?? (() => "device"),
     enabled: writing.enabled ?? (() => true),
     language: () => "fr",
     timeZone: () => "Europe/Paris",
     log: { info: (event) => events.push(event), warn: (event) => events.push(event) },
+    vocabulary: new VocabularyWork({
+      db: temp.db,
+      log: { info: (event) => events.push(event), warn: (event) => events.push(event) },
+      now: () => boot.wallMs(600),
+    }),
   });
   const created = new AnalysisScheduler({
     db: temp.db,
@@ -307,7 +314,11 @@ describe("who writes the journal", () => {
     await waitUntil(() => published() === 1, { label: "journal published" });
     await running.stop(200);
     scheduler = null;
-    const unit = { episodeId: Number(scalar(temp.db, "SELECT id FROM episodes")), requested: true };
+    const unit = {
+      kind: "journal" as const,
+      episodeId: Number(scalar(temp.db, "SELECT id FROM episodes")),
+      requested: true,
+    };
     // Claude was chosen, then « Ce Mac » again before the pass began.
     writer = "device";
     expect(await work.run(claude, unit, new AbortController().signal)).toBe("discarded");
@@ -330,8 +341,79 @@ describe("who writes the journal", () => {
     expect(work.next()).toBeNull();
     work.request(day, true);
     expect(work.next()).toEqual({
-      episodeId: Number(scalar(temp.db, "SELECT id FROM episodes")),
-      requested: true,
+      unit: {
+        kind: "journal",
+        episodeId: Number(scalar(temp.db, "SELECT id FROM episodes")),
+        requested: true,
+      },
+      engine: claude,
     });
+  });
+});
+
+// The Vocabulary's reading of names (ADR 046): the journal's model on this
+// Mac, under the same admission, before the journal reads the episode.
+describe("the Vocabulary in the analysis scheduler", () => {
+  const segmentText = () => String(scalar(temp.db, "SELECT group_concat(text, '|') FROM segments"));
+
+  it("asks the model about a word that looks like one of the list, and spells it so before the journal", async () => {
+    addVocabularyWord(temp.db, { word: "Sandine", note: "une app", nowMs: boot.wallMs(0) });
+    const text = fakeTextEngine();
+    const { scheduler: running } = scheduled(fakeEngine(), text);
+    await running.recover();
+    running.start();
+    await waitUntil(() => published() === 1, { label: "journal published" });
+    expect(text.requests[0]?.id).toMatch(/^vocabulary-/u);
+    expect(text.requests[1]?.user).toContain("Sandine");
+    expect(segmentText()).toContain("Bonjour Sandine");
+    expect(scalar(temp.db, "SELECT original_text FROM segments")).toBe("Bonjour Sondine");
+    expect(scalar(temp.db, "SELECT status FROM vocabulary_passes")).toBe("done");
+    expect(scalar(temp.db, "SELECT corrected FROM vocabulary_passes")).toBe(1);
+    // Asked once: the journal is current and nothing more goes to the model.
+    await running.stop(200);
+    scheduler = null;
+    expect(text.requests).toHaveLength(2);
+  });
+
+  it("keeps the word as written when the model says so, and asks nothing for an episode without one", async () => {
+    addVocabularyWord(temp.db, { word: "Sandine", note: null, nowMs: boot.wallMs(0) });
+    const text = fakeTextEngine({ vocabulary: "as_written" });
+    const { scheduler: running } = scheduled(fakeEngine(), text);
+    await running.recover();
+    running.start();
+    await waitUntil(() => published() === 1, { label: "journal published" });
+    expect(segmentText()).not.toContain("Sandine");
+    expect(scalar(temp.db, "SELECT verdict FROM vocabulary_checks")).toBe("as_written");
+  });
+
+  it("never sends a word to the user's Claude: the model on this Mac only", async () => {
+    addVocabularyWord(temp.db, { word: "Sandine", note: null, nowMs: boot.wallMs(0) });
+    const claude = fakeTextEngine({ provider: true });
+    const device = fakeTextEngine();
+    const { scheduler: running } = scheduled(fakeEngine(), device, fakeSignals(), {
+      writer: () => "claude",
+      claude,
+    });
+    await running.recover();
+    running.start();
+    await waitUntil(() => published() === 1, { label: "journal published" });
+    expect(device.requests.map((request) => request.id)).toEqual([
+      expect.stringMatching(/^vocabulary-/u),
+    ]);
+    expect(claude.requests.some((request) => request.id.startsWith("vocabulary-"))).toBe(false);
+  });
+
+  it("without the model, spells the recent transcripts by sound when a name joins the list", async () => {
+    const { scheduler: running } = scheduled(fakeEngine(), fakeTextEngine(), fakeSignals(), {
+      device: () => null,
+      enabled: () => false,
+    });
+    await running.recover();
+    running.start();
+    await waitUntil(() => events.includes("analysis.published"), { label: "transcribed" });
+    expect(segmentText()).toContain("Bonjour Sondine");
+    addVocabularyWord(temp.db, { word: "Sondinne", note: null, nowMs: boot.wallMs(0) });
+    await waitUntil(() => segmentText().includes("Bonjour Sondinne"), { label: "spelled" });
+    expect(scalar(temp.db, "SELECT original_text FROM segments")).toBe("Bonjour Sondine");
   });
 });

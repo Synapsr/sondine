@@ -160,6 +160,56 @@ function restore(db: Database, segment: EditedSegment, input: SegmentEditInput):
   return "ok";
 }
 
+/**
+ * A segment of a current transcript spelled as the user's names ask, by
+ * Sondine rather than by the user (ADR 046): the engine's text stays as the
+ * original, so « Rétablir l'original » still works, and no correction is
+ * recorded. False when the segment was corrected by the user, changed since
+ * `expected` was read, or is gone.
+ */
+export function respellSegment(
+  db: Database,
+  input: {
+    readonly segmentId: number;
+    readonly expected: string;
+    readonly text: string;
+    readonly nowMs: number;
+  },
+): boolean {
+  const row = db
+    .statement(
+      `SELECT id, episode_id, run_id, track_run_id, sample_start, sample_end, text, search_text,
+         original_text, edit_id, lang FROM segments WHERE id = ?`,
+    )
+    .get(input.segmentId);
+  if (row === undefined || intOrNull(row, "edit_id") !== null) return false;
+  if (str(row, "text") !== input.expected || input.text === input.expected) return false;
+  const episodeId = int(row, "episode_id");
+  const runId = int(row, "run_id");
+  if (currentRunId(db, episodeId, "asr") !== runId) return false;
+  rewrite(
+    db,
+    {
+      id: int(row, "id"),
+      trackRunId: int(row, "track_run_id"),
+      sampleStart: int(row, "sample_start"),
+      sampleEnd: int(row, "sample_end"),
+      text: str(row, "text"),
+      searchText: str(row, "search_text"),
+      originalText: strOrNull(row, "original_text"),
+      editId: null,
+      lang: strOrNull(row, "lang"),
+    },
+    {
+      text: input.text,
+      originalText: strOrNull(row, "original_text") ?? input.expected,
+      editId: null,
+    },
+    { episodeId, runId, segmentId: input.segmentId, nowMs: input.nowMs },
+  );
+  return true;
+}
+
 /** Puts the engine's text back and forgets the correction. */
 export function restoreSegment(db: Database, input: SegmentEditInput): EditOutcome {
   return transaction(db, () => {

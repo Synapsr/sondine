@@ -238,6 +238,9 @@ describe("migrations", () => {
     // The build before: a Mac conversation with its transcript, and an imported file.
     const { episodeId, trackRunId } = seedEpisode(temp.db, [[10, 40]]);
     const runId = startRun(temp.db, episodeId, "asr");
+    // Today's publish reads the Vocabulary (ADR 046), which that build had
+    // not: an empty list for the publish, gone before the snapshot.
+    temp.db.client.exec("CREATE TABLE vocabulary_words (id integer, word text, note text)");
     publishAnalysis(temp.db, {
       episodeId,
       stage: "asr",
@@ -246,6 +249,7 @@ describe("migrations", () => {
       segments: [segment(trackRunId, 10, 18, "On décale la réunion à jeudi.")],
       turns: [],
     });
+    temp.db.client.exec("DROP TABLE vocabulary_words");
     importRecording(temp.db, {
       uid: "import-1",
       fileName: "notes.m4a",

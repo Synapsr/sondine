@@ -8,6 +8,7 @@ import { journalUsage } from "./journal/usage.ts";
 import { sameMomentUsage } from "./same-moment/usage.ts";
 import { selfEchoUsage } from "./self-echo/usage.ts";
 import { voicesUsage } from "./voices/usage.ts";
+import { vocabularyUsage } from "./vocabulary/usage.ts";
 import { parseDuration } from "./duration.ts";
 import { allowExtensionlessTs } from "./ts-resolve.ts";
 import { defaultResultsDirectory, findMeter, userPath } from "./paths.ts";
@@ -48,7 +49,9 @@ ${sameMomentUsage}
 
 ${selfEchoUsage}
 
-${voicesUsage}`;
+${voicesUsage}
+
+${vocabularyUsage}`;
 
 class UsageError extends Error {}
 
@@ -103,6 +106,11 @@ async function main(argv: readonly string[]): Promise<number> {
     allowExtensionlessTs();
     const { selfEchoMain } = await import("./self-echo/cli.ts");
     return selfEchoMain(command, rest, (message) => new UsageError(message));
+  }
+  if (group === "vocabulary") {
+    allowExtensionlessTs();
+    const { vocabularyMain } = await import("./vocabulary/cli.ts");
+    return vocabularyMain(command, rest, (message) => new UsageError(message));
   }
   if (group === "voices") {
     allowExtensionlessTs();

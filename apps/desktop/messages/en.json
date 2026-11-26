@@ -1642,5 +1642,21 @@
   "update_not_started_body": "Sondine is not listening. Download this version from its page and put it back in Applications: your data has not moved.",
   "update_not_started_close": "Close",
   "update_not_started_open": "Open the page",
-  "tray_update_install": "Restart and update to {version}"
+  "tray_update_install": "Restart and update to {version}",
+  "settings_vocabulary_title": "Vocabulary",
+  "vocabulary_intro": "Sondine spells these words your way when a transcript hears a word that looks like one of them. A note helps the journal’s model recognize it.",
+  "vocabulary_word_label": "Word",
+  "vocabulary_note_label": "Note",
+  "vocabulary_note_placeholder": "Optional: “my app’s name”",
+  "vocabulary_add": "Add",
+  "vocabulary_word_of": "Word “{word}”",
+  "vocabulary_note_of": "Note for “{word}”",
+  "vocabulary_remove": "Remove “{word}”",
+  "vocabulary_people": "Your People’s names are part of it too: {names}.",
+  "vocabulary_no_model": "Without the journal’s model, only words that sound the same are corrected.",
+  "vocabulary_learned": "Sondine will now write {words}",
+  "vocabulary_unheard_title": "Add “{word}” to your Vocabulary?",
+  "vocabulary_unheard_description": "It does not sound like what was heard, so Sondine does not learn it from this correction.",
+  "vocabulary_quoted": "“{word}”",
+  "vocabulary_added": "“{word}” is in your Vocabulary"
 }

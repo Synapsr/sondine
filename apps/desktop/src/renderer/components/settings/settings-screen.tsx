@@ -7,6 +7,7 @@ import {
   ChipIcon,
   ClockIcon,
   MicrophoneIcon,
+  PenIcon,
   PhoneIcon,
   ShieldIcon,
   SlidersIcon,
@@ -43,6 +44,7 @@ import { PhoneSection } from "./phone-section";
 import { PrivacySection } from "./privacy-section";
 import { RecognitionSwitch } from "./recognition-switch";
 import { StatisticsSection } from "./statistics-section";
+import { VocabularySection } from "./vocabulary-section";
 import { UpdatesSection } from "../updates/updates";
 
 // Settings (`/settings`, ADR 037; Téo, 2026-11-19: rows, not tabs): the main
@@ -50,7 +52,8 @@ import { UpdatesSection } from "../updates/updates";
 // something, its current state; a row opens the section's own page
 // (`/settings/$page`), with the way back. « Général »: language,
 // appearance, opening at login, updates. « Transcription »: where it runs
-// (ADR 040) and this Mac's model (as in the first run). « Journal du jour » (ADR 028). « Écoute »: call offers
+// (ADR 040) and this Mac's model (as in the first run). « Vocabulaire »: the
+// words Sondine writes the user's way (ADR 046). « Journal du jour » (ADR 028). « Écoute »: call offers
 // and near-live text. « Confidentialité »: what Sondine keeps (private
 // zones, ADR 029), dictation apps, the sites a browser plays. « Voix »:
 // recognition, the user's voice read (ADR 034), dictations, the notch.
@@ -105,6 +108,12 @@ const PAGES: Record<SettingsPage, Page> = {
         <LocalModel />
       </>
     ),
+  },
+  vocabulary: {
+    id: "vocabulary",
+    icon: <PenIcon />,
+    title: () => m.settings_vocabulary_title(),
+    content: () => <VocabularySection />,
   },
   journal: {
     id: "journal",
@@ -200,7 +209,7 @@ const PAGES: Record<SettingsPage, Page> = {
 };
 
 const GROUPS: readonly (readonly SettingsPage[])[] = [
-  ["general", "transcription", "journal"],
+  ["general", "transcription", "vocabulary", "journal"],
   ["listening", "privacy", "voices"],
   ["phone", "agents"],
   ["statistics", "advanced"],

@@ -163,6 +163,7 @@ import {
   SpeakerUnnameResult,
   Status,
   TranscriptEditInput,
+  TranscriptCorrectResult,
   TranscriptEditResult,
   TranscriptRestoreInput,
   UndoStep,
@@ -178,6 +179,11 @@ import {
   TagRenameInput,
   TagRenameResult,
   TagSetInput,
+  VocabularyAddInput,
+  VocabularyEntry,
+  VocabularyList,
+  VocabularyRemoveInput,
+  VocabularyUpdateInput,
   TagSetResult,
   UsageCrashInput,
   UsageSharingInput,
@@ -888,10 +894,11 @@ export const contract = {
   },
   // Corrections are the user's: agents read the corrected text, never write it.
   transcript: {
+    /** Corrects a segment's text, and says what the Vocabulary learned from it. */
     edit: base
       .meta({ event: "transcript_edited", mcp: null })
       .input(TranscriptEditInput)
-      .output(TranscriptEditResult),
+      .output(TranscriptCorrectResult),
     /** Puts the engine's text back and forgets the correction. */
     restore: base
       .meta({ event: "transcript_restored", mcp: null })
@@ -1053,6 +1060,29 @@ export const contract = {
       .meta({ event: "tag_deleted", mcp: null })
       .input(TagDeleteInput)
       .output(TagDeleteResult),
+  },
+  // The Vocabulary (ADR 046): the user's words, in the window only.
+  vocabulary: {
+    /** The list, and the People's names that are in the vocabulary too. */
+    list: base
+      .meta({ event: "vocabulary_listed", mcp: null })
+      .input(NoInput)
+      .output(VocabularyList),
+    /** Adds a word, with an optional note. */
+    add: base
+      .meta({ event: "vocabulary_word_added", mcp: null })
+      .input(VocabularyAddInput)
+      .output(VocabularyEntry),
+    /** Changes a word or its note. */
+    update: base
+      .meta({ event: "vocabulary_word_changed", mcp: null })
+      .input(VocabularyUpdateInput)
+      .output(VocabularyEntry),
+    /** Takes a word off the list; what Sondine already wrote with it stays. */
+    remove: base
+      .meta({ event: "vocabulary_word_removed", mcp: null })
+      .input(VocabularyRemoveInput)
+      .output(NoOutput),
   },
   statistics: {
     get: base.meta({ event: "statistics_viewed", mcp: null }).input(NoInput).output(Statistics),

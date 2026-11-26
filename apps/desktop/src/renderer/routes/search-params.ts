@@ -92,6 +92,7 @@ export type ChatSearch = z.output<typeof ChatSearch>;
 export const SettingsPage = z.enum([
   "general",
   "transcription",
+  "vocabulary",
   "journal",
   "listening",
   "privacy",
