@@ -2,7 +2,6 @@ import { spawn, type ChildProcess } from "node:child_process";
 import { chmodSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { setTimeout as sleep } from "node:timers/promises";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { EngineError } from "../contract.ts";
 import { NEMOTRON_ARTIFACT } from "../models/catalog.ts";
@@ -11,6 +10,9 @@ import { findWorkerProcesses, stopWorkerProcesses } from "./stale-worker.ts";
 
 // Processes whose `ps` comm reads a fake speech binary's path: Node started
 // with that path as argv[0], the way the system reports the real worker.
+// Each test waits until its strays have said they are ready and `ps` lists
+// them: a loaded machine can take seconds for either, so no test counts on a
+// delay, and each has time for slow `ps` calls.
 
 let dir: string;
 let binary: string;
@@ -28,17 +30,23 @@ afterEach(() => {
 });
 afterAll(() => rmSync(dir, { recursive: true, force: true }));
 
-function stray(
+/** A stray worker, once its handlers are in place and `ps` lists it under `argv0`. */
+async function stray(
   argv0: string,
   options: { readonly ignoreTerm?: boolean; readonly weights?: string } = {},
-): ChildProcess {
-  const script = `${options.ignoreTerm === true ? "process.on('SIGTERM', () => {});" : ""} setInterval(() => {}, 1000)`;
+): Promise<ChildProcess> {
+  const script = `${options.ignoreTerm === true ? "process.on('SIGTERM', () => {});" : ""} process.stdout.write("ready"); setInterval(() => {}, 1000)`;
   const args = ["-e", script, "worker", options.weights ?? "model.gguf", "--device", "gpu"];
   const child = spawn(process.execPath, args, {
     argv0,
-    stdio: "ignore",
+    stdio: ["ignore", "pipe", "ignore"],
   });
   children.push(child);
+  await new Promise<void>((resolve, reject) => {
+    child.stdout?.once("data", () => resolve());
+    child.once("exit", () => reject(new Error("the stray worker exited before it was ready")));
+  });
+  await expect.poll(() => findWorkerProcesses(argv0), { timeout: 20_000 }).toContain(child.pid);
   return child;
 }
 
@@ -48,11 +56,10 @@ const exited = (child: ChildProcess) =>
     else child.once("exit", (_code, signal) => resolve(signal));
   });
 
-describe("speech worker processes", () => {
+describe("speech worker processes", { timeout: 60_000 }, () => {
   it("finds processes by their exact executable path, never by name", async () => {
-    const ours = stray(binary);
-    const other = stray(join(dir, "elsewhere", "speech"));
-    await sleep(200);
+    const ours = await stray(binary);
+    const other = await stray(join(dir, "elsewhere", "speech"));
     const found = await findWorkerProcesses(binary);
     expect(found).toContain(ours.pid);
     expect(found).not.toContain(other.pid);
@@ -60,10 +67,10 @@ describe("speech worker processes", () => {
   });
 
   it("stops every one with SIGTERM, then SIGKILL after the deadline", async () => {
-    const polite = stray(binary);
-    const stubborn = stray(binary, { ignoreTerm: true });
-    await sleep(300);
-    const report = await stopWorkerProcesses(binary, { termMs: 300, killMs: 2_000 });
+    const polite = await stray(binary);
+    const stubborn = await stray(binary, { ignoreTerm: true });
+    // Deadlines, not measures: the stubborn one waits them out whatever the machine.
+    const report = await stopWorkerProcesses(binary, { termMs: 2_000, killMs: 10_000 });
     expect(report.survivors).toEqual([]);
     expect([...report.stopped].toSorted()).toEqual([polite.pid, stubborn.pid].toSorted());
     expect(await exited(polite)).toBe("SIGTERM");
@@ -72,9 +79,8 @@ describe("speech worker processes", () => {
   });
 
   it("tells workers apart by the model they load", async () => {
-    const nemotron = stray(binary, { weights: join(dir, "nemotron dir", "model.gguf") });
-    const parakeet = stray(binary, { weights: join(dir, "parakeet dir", "model.gguf") });
-    await sleep(200);
+    const nemotron = await stray(binary, { weights: join(dir, "nemotron dir", "model.gguf") });
+    const parakeet = await stray(binary, { weights: join(dir, "parakeet dir", "model.gguf") });
     expect(await findWorkerProcesses(binary, join(dir, "nemotron dir", "model.gguf"))).toEqual([
       nemotron.pid,
     ]);
@@ -91,8 +97,7 @@ describe("speech worker processes", () => {
   it("starts no second Nemotron worker while another process runs the speech binary on its model", async () => {
     const weights = join(dir, "model.gguf");
     writeFileSync(weights, "GGUF");
-    const other = stray(binary, { weights });
-    await sleep(200);
+    const other = await stray(binary, { weights });
     const engine = createNemotronEngine({
       speechBinary: binary,
       artifact: {

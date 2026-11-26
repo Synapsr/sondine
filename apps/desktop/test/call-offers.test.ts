@@ -180,10 +180,10 @@ describe("call offers", () => {
     // A pause younger than a minute was meant for this call.
     offsetMs += 30_000;
     fake.emit(seen(DISCORD, "active"));
+    // Its switch is there all the same: only the notice waits for an older pause.
+    await until(runtime, "call seen", (l) => l.call?.callId === DISCORD);
     await sleep(200);
     expect((await listening(runtime)).callOffer).toBeNull();
-    // Its switch is there all the same: only the notice waits for an older pause.
-    expect((await listening(runtime)).call).toMatchObject({ callId: DISCORD });
     fake.emit(seen(DISCORD, "ended"));
     await until(runtime, "over", (l) => l.call === null);
 

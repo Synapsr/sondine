@@ -346,8 +346,10 @@ const speaking = (): ReadTrackAudio => (range) => ({
   missing: [],
 });
 
+/** Up to five seconds: a loaded machine takes its time. */
 async function waitFor(condition: () => boolean): Promise<void> {
-  for (let tries = 0; tries < 200 && !condition(); tries++) {
+  const deadline = Date.now() + 5_000;
+  while (!condition() && Date.now() < deadline) {
     await new Promise((resolve) => setTimeout(resolve, 5));
   }
   expect(condition()).toBe(true);

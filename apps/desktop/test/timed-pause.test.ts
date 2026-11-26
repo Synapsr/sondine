@@ -60,7 +60,7 @@ const resumes = (fake: FakeHelper) => fake.received.filter((m) => m.type === "re
 
 /** Core's state changes first; its `resume` reaches the helper over the socket just after. */
 const resumesReach = (fake: FakeHelper, count: number) =>
-  waitUntil(() => resumes(fake) >= count, { label: `${count} resume(s) sent`, timeoutMs: 1_000 });
+  waitUntil(() => resumes(fake) >= count, { label: `${count} resume(s) sent` });
 
 const connected = (runtime: CoreRuntime, fake: FakeHelper) =>
   waitUntil(
@@ -116,6 +116,7 @@ describe("timed pause", () => {
     await api.listening.resume({ scope: "all" });
     const later = Date.now() + 10_000;
     await api.listening.pause({ scope: "all", untilMs: later });
+    await resumesReach(fake, 2);
     await sleep(400);
     expect((await status(runtime)).listening).toMatchObject({
       desired: "paused",

@@ -183,7 +183,29 @@ let chat: ChatKeysService;
 let agents: ReturnType<typeof makeAgentServices>;
 let socketPath: string;
 /** Holds `episodes.get` until released, to delete something meanwhile. */
-let hold: { readonly release: () => void; readonly reached: Promise<void> } | null;
+let hold: { readonly enter: () => void; readonly reached: Promise<void> } | null;
+
+/** The next `episodes.get` says when it has begun, then waits for `release`. */
+function holdGet(): { readonly entered: Promise<void>; readonly release: () => void } {
+  let release = () => {};
+  let enter = () => {};
+  const reached = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const entered = new Promise<void>((resolve) => {
+    enter = resolve;
+  });
+  hold = { enter, reached };
+  return { entered, release };
+}
+
+/** Until the host listens, or stops listening: a loaded machine takes its time. */
+async function listeningIs(expected: boolean): Promise<void> {
+  const deadline = Date.now() + 5_000;
+  while (access.listening() !== expected && Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+}
 
 beforeEach(() => {
   data = tempDataDir();
@@ -223,7 +245,10 @@ beforeEach(() => {
     },
     episodes: {
       get: async () => {
-        if (hold !== null) await hold.reached;
+        if (hold !== null) {
+          hold.enter();
+          await hold.reached;
+        }
         return detail;
       },
     },
@@ -257,9 +282,7 @@ afterEach(async () => {
 });
 
 async function listening() {
-  for (let attempt = 0; attempt < 100 && !access.listening(); attempt++) {
-    await new Promise((resolve) => setTimeout(resolve, 10));
-  }
+  await listeningIs(true);
   expect(access.listening()).toBe(true);
 }
 
@@ -335,13 +358,9 @@ describe("agent host", () => {
     if (agent === null) throw new Error("no session");
     await agent.initialize();
 
-    let release = () => {};
-    const reached = new Promise<void>((resolve) => {
-      release = resolve;
-    });
-    hold = { release, reached };
+    const { entered, release } = holdGet();
     const pending = agent.call("get_episode", { episodeId: 7 });
-    await new Promise((resolve) => setTimeout(resolve, 20));
+    await entered;
     access.contentChanged();
     release();
     const withheld = await pending;
@@ -360,9 +379,7 @@ describe("agent host", () => {
     expect(agents.status().agents[0]).toMatchObject({ connected: false });
 
     agents.setEnabled(false);
-    for (let attempt = 0; attempt < 100 && access.listening(); attempt++) {
-      await new Promise((resolve) => setTimeout(resolve, 10));
-    }
+    await listeningIs(false);
     await expect(RawAgent.hello(socketPath, "{}")).rejects.toThrow();
   });
 });
@@ -409,9 +426,7 @@ describe("agent host and Sondine's discussions", () => {
     // Revoking the key ends its session, and the host stops listening.
     key.revoke();
     await agent.closed;
-    for (let attempt = 0; attempt < 100 && access.listening(); attempt++) {
-      await new Promise((resolve) => setTimeout(resolve, 10));
-    }
+    await listeningIs(false);
     await expect(RawAgent.hello(socketPath, "{}")).rejects.toThrow();
     const gone = await RawAgent.hello(socketPath, JSON.stringify({ v: 1, token: key.token })).catch(
       () => null,
@@ -513,13 +528,9 @@ describe("agent host requests", () => {
     if (agent === null) throw new Error("no session");
     await agent.initialize();
 
-    let release = () => {};
-    const reached = new Promise<void>((done) => {
-      release = done;
-    });
-    hold = { release, reached };
+    const { entered, release } = holdGet();
     agent.send(100, "tools/call", { name: "get_episode", arguments: { episodeId: 7 } });
-    await new Promise((wait) => setTimeout(wait, 20));
+    await entered;
     agent.send(100, "ping", {});
     const reused = await agent.next((message) => message["id"] === 100 && "error" in message);
     expect(reused["error"]).toMatchObject({ code: -32600 });

@@ -269,7 +269,8 @@ describe("speech.cpp worker client", () => {
   it("reports a worker that dies while idle", async () => {
     const { engine, exits } = makeEngine("crash-idle");
     await engine.load();
-    await sleep(300);
+    // The worker exits shortly after it is ready: wait for the exit itself.
+    await expect.poll(() => exits.length, { timeout: 10_000 }).toBe(1);
     expect(engine.state()).toBe("absent");
     expect(exits).toEqual([expect.objectContaining({ code: 4, during: "ready", expected: false })]);
   });
