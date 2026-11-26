@@ -1,7 +1,7 @@
 import { OnboardingStep, type Permissions, type PermissionState } from "@sondine/api";
 
 // The first run's six steps (architecture §11, ADR 037): what the user wants
-// to find again, the question about anonymous statistics (ADR 042), the two permissions, the transcription model (optional), the
+// to find again, the question about anonymous statistics (ADR 042), the two permissions, where to transcribe and the model (optional), the
 // voice read (optional, ADR 034), and starting to listen. Nothing is recorded for memory before
 // the last step; the voice read records only the text the user reads. The step on screen is saved, so
 // a relaunch after a permission prompt reopens it.
@@ -63,4 +63,17 @@ export function startNotes(permissions: Permissions | null, modelReady: boolean)
 /** The model step's button: plain once a model is installed or on its way. */
 export function modelStepContinues(ready: boolean, busy: boolean): "continue" | "without-model" {
   return ready || busy ? "continue" : "without-model";
+}
+
+/**
+ * What the model step shows (ADR 037, ADR 040): where to transcribe, with
+ * the model to download only while « Ce Mac » is chosen; on a Mac too small
+ * for the model, the cloud card, which holds the same choice, until a
+ * server is chosen.
+ */
+export type ModelStepView = "cloud-card" | "destination" | "destination-and-model";
+
+export function modelStepView(remote: boolean, tooBig: boolean): ModelStepView {
+  if (remote) return "destination";
+  return tooBig ? "cloud-card" : "destination-and-model";
 }

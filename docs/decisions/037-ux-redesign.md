@@ -215,7 +215,8 @@ Sondine's own text outside the exemptions:
 1. What the user wants to find again (three goals), under the promise in one line.
 2. Permissions, with a live meter and a line about the other people
    recorded.
-3. The transcription model.
+3. Where to transcribe (ADR 040: this Mac, the user's machine, the beta),
+   then the transcription model, offered only for this Mac.
 4. A first memory.
 5. The voice read (optional, ADR 034 unchanged).
 6. What will record and be kept, then « Commencer l'écoute ».

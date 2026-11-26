@@ -2,6 +2,7 @@ import type { PermissionState } from "@sondine/api";
 import { describe, expect, it } from "vitest";
 import {
   modelStepContinues,
+  modelStepView,
   nextStep,
   permissionOffer,
   previousStep,
@@ -56,5 +57,13 @@ describe("first run", () => {
     expect(modelStepContinues(false, false)).toBe("without-model");
     expect(modelStepContinues(false, true)).toBe("continue");
     expect(modelStepContinues(true, false)).toBe("continue");
+  });
+
+  it("offers where to transcribe on every Mac, and the model only for this Mac (ADR 040)", () => {
+    expect(modelStepView(false, false)).toBe("destination-and-model");
+    expect(modelStepView(true, false)).toBe("destination");
+    expect(modelStepView(true, true)).toBe("destination");
+    // Too small a Mac keeps its card, with its sign-up link and the same choice.
+    expect(modelStepView(false, true)).toBe("cloud-card");
   });
 });

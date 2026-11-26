@@ -93,7 +93,7 @@ Un moteur distant ne charge aucun poids localement (0 Go vs 19 Go), mais il n'a 
 4. **Raccordement explicite de l'annulation (suppression, changement de réglage, iPhone)** :
    - Ajout de `cancelEpisode(episodeId)` et `cancelAllRemote()` sur `AnalysisQueueService`, appelés par :
      - le coordinateur de suppression (`episodes.delete`, `episodes.forget`, expiration rétention, suppression initiée par l'iPhone) ;
-     - tout changement de destination ou retrait de consentement dans _Réglages ▸ Calcul_.
+     - tout changement de destination ou retrait de consentement dans _Réglages ▸ Transcription_.
    - L'adaptateur distant revérifie une fonction `canStillSend()` (épisode non supprimé, génération inchangée, consentement toujours actif) **avant chaque `AUDIO_CHUNK`**, en plus de la vérification atomique dans la transaction SQLite de publication.
 
 ### 1.4 Journal : hors de la v1

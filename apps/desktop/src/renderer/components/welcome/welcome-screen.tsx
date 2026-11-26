@@ -41,6 +41,7 @@ import { ComputeSection, useCompute } from "../settings/compute-section";
 import { modelsBusy, modelsReady, modelsTooBig } from "../models/model-view";
 import {
   modelStepContinues,
+  modelStepView,
   nextStep,
   permissionOffer,
   previousStep,
@@ -51,8 +52,8 @@ import {
 
 // The first run (`/welcome`, ADR 037), shown until it is completed: what the
 // user wants to find again, whether to share anonymous statistics (ADR 042),
-// the permissions, the model (with the cloud card
-// on a Mac too small for it), the voice read, then starting. Nothing is
+// the permissions, where to transcribe and the model for this Mac (the cloud
+// card instead on a Mac too small for it), the voice read, then starting. Nothing is
 // recorded before « Commencer l'écoute »: a fresh install keeps listening
 // paused until then. Each step is saved as it shows, so a relaunch after a
 // permission prompt comes back to it. The voice read and the model are
@@ -438,7 +439,7 @@ function ModelStep({ onBack, onNext }: { onBack: () => void; onNext: () => void 
   const ready = remote || (models.data !== undefined && modelsReady(models.data));
   const busy = models.data !== undefined && modelsBusy(models.data);
   const continues = modelStepContinues(ready, busy);
-  const tooBig = models.data !== undefined && modelsTooBig(models.data);
+  const view = modelStepView(remote, models.data !== undefined && modelsTooBig(models.data));
   return (
     <Step
       title={m.welcome_model_title()}
@@ -449,16 +450,20 @@ function ModelStep({ onBack, onNext }: { onBack: () => void; onNext: () => void 
         </Button>
       }
     >
-      {/* Too small a Mac: no download to offer, only what comes next (Téo, 2026-11-19). */}
-      {remote ? (
-        <ComputeSection />
-      ) : tooBig ? (
+      {/* Too small a Mac: no download to offer, only what comes next (Téo, 2026-11-19).
+          Otherwise where to transcribe first; the download is only for this Mac. */}
+      {view === "cloud-card" ? (
         <CloudCard />
       ) : (
         <>
-          <p className="text-cte-text-muted">{m.welcome_model_intro()}</p>
-          <ModelPanel />
-          {busy ? <p className="text-cte-text-muted">{m.welcome_model_continues()}</p> : null}
+          <ComputeSection />
+          {view === "destination-and-model" ? (
+            <>
+              <p className="text-cte-text-muted">{m.welcome_model_intro()}</p>
+              <ModelPanel />
+              {busy ? <p className="text-cte-text-muted">{m.welcome_model_continues()}</p> : null}
+            </>
+          ) : null}
         </>
       )}
       {import.meta.env.DEV ? <SmallMacSwitch /> : null}
