@@ -1,0 +1,35 @@
+# sondine-compute in Docker, on Linux with an NVIDIA card and the NVIDIA Container Toolkit (README › Docker).
+# Settings go in .env beside this file: SONDINE_COMPUTE_LISTEN, SONDINE_UID and SONDINE_GID at least.
+services:
+  compute:
+    build: .
+    image: sondine-compute
+    restart: unless-stopped
+    # The state folder belongs to whoever runs it: the server writes its key and the Macs there.
+    user: "${SONDINE_UID:-1000}:${SONDINE_GID:-1000}"
+    # It listens where SONDINE_COMPUTE_LISTEN says: a Tailscale address, or 127.0.0.1 behind a local proxy.
+    network_mode: host
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      # The driver's graphics libraries too: speech.cpp computes through Vulkan, not CUDA.
+      NVIDIA_DRIVER_CAPABILITIES: all
+    volumes:
+      - ./model:/models:ro
+      - ./state:/state
+    stop_grace_period: 30s
+    # Out of swap and without crash dumps, as MemorySwapMax=0 and LimitCORE=1 in the service.
+    mem_limit: 16g
+    memswap_limit: 16g
+    ulimits:
+      core: 1
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

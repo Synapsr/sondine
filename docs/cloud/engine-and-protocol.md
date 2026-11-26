@@ -10,7 +10,8 @@ Statut : associé à [ADR 040](../decisions/040-remote-compute.md). La section 0
 - **Serveur** (`apps/compute`) : réutilise l'adaptateur `speech.cpp` de l'app. Une demande à la fois, à tour de rôle ; audio en mémoire seulement ; 10 minutes d'inactivité, 10 minutes pour un résultat, 6 h en tout au plus, quoi que demande le client ; un Mac retiré perd ses sessions ; places de bêta et heures du mois.
 - **File** (`scheduler.ts`) : un serveur n'attend ni le secteur, ni l'inactivité, ni la mémoire (sauf chaleur ou pression critiques). Injoignable, occupé, refusé ou quota épuisé : pause sans échec compté, dictées et journal continuent. Deux boucles : une demande à la fois chez le serveur, et à côté ce que le Mac calcule (dictées, journal) ; ni l'une ni l'autre n'attend (2026-11-25). Chaque seconde et avant chaque morceau : épisode inchangé, hors zone sans texte, destination inchangée, sinon l'envoi s'arrête ; vérifié encore avant de publier. Près d'une zone sans texte, aucune marge autour de la parole ne part. Sans changement pendant 30 minutes, la demande est abandonnée et reprise plus tard. Les traces suivent un autre travail, dans les 90 s, ou partent ensemble dès que 30 attendent. À côté, les dictées n'attendent ni secteur ni inactivité.
 - **Réglages** (`packages/db/src/compute-settings.ts`) : le jeton est dans la base locale, à côté des transcriptions. Illisible vaut « Ce Mac ».
-- **Pas construit** : TLS propre, Bonjour, appairage à six chiffres, image Docker, « Partager ce Mac », FLAC.
+- **Docker** (`apps/compute/Dockerfile`, `compose.yaml`) : image construite sur place, speech.cpp Vulkan vérifié par sa somme, modèle en lecture seule, état dans `state/`. L'image publiée de la section 3.2 reste à faire.
+- **Pas construit** : TLS propre, Bonjour, appairage à six chiffres, image Docker publiée, « Partager ce Mac », FLAC.
 
 ---
 

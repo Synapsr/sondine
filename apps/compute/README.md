@@ -92,6 +92,29 @@ Past `MemoryHigh` the kernel takes the service's own cache back first. Past
 starts it again. `SONDINE_COMPUTE_IDLE_UNLOAD_SEC=60` gives the memory back
 sooner after the last request, and the next one loads the model again.
 
+## In Docker
+
+On Linux with the NVIDIA driver and the NVIDIA Container Toolkit, in an empty folder:
+
+```bash
+cp <repository>/apps/compute/Dockerfile <repository>/apps/compute/compose.yaml .
+cp <repository>/apps/compute/dist/sondine-compute.js .
+mkdir -p model state # the model in model/model.gguf, fetched as above
+cat > .env <<EOF
+SONDINE_COMPUTE_LISTEN=100.x.y.z:8443
+SONDINE_UID=$(id -u)
+SONDINE_GID=$(id -g)
+EOF
+docker compose up -d --build
+docker compose run --rm compute add "Marie's Mac" --endpoint http://100.x.y.z:8443
+```
+
+The image fetches speech.cpp 0.9.3 and checks it. The model is mounted read-only, and
+`state/` holds what the server keeps; its other settings go in `.env` too. The container
+listens on the machine's network, out of swap and without crash dumps. speech.cpp reaches
+the card through Vulkan: `NVIDIA_DRIVER_CAPABILITIES=all` and the image's EGL and X11
+libraries let the driver start; without them it finds only the CPU.
+
 ## The beta
 
 `SONDINE_COMPUTE_BETA_PLACES=10` lets anyone take a place in one click, until
