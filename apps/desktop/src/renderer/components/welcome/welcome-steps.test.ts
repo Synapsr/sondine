@@ -1,11 +1,12 @@
 import type { PermissionState } from "@sondine/api";
 import { describe, expect, it } from "vitest";
 import {
+  firstPick,
   modelStepContinues,
-  modelStepView,
   nextStep,
   permissionOffer,
   previousStep,
+  serverAction,
   startNotes,
   stepIndex,
   WELCOME_STEPS,
@@ -59,11 +60,19 @@ describe("first run", () => {
     expect(modelStepContinues(true, false)).toBe("continue");
   });
 
-  it("offers where to transcribe on every Mac, and the model only for this Mac (ADR 040)", () => {
-    expect(modelStepView(false, false)).toBe("destination-and-model");
-    expect(modelStepView(true, false)).toBe("destination");
-    expect(modelStepView(true, true)).toBe("destination");
-    // Too small a Mac keeps its card, with its sign-up link and the same choice.
-    expect(modelStepView(false, true)).toBe("cloud-card");
+  it("picks first the place in force, never a Mac too small for the model (ADR 040)", () => {
+    expect(firstPick("device", false)).toBe("device");
+    expect(firstPick("device", true)).toBeNull();
+    expect(firstPick("beta", true)).toBe("beta");
+    expect(firstPick("own", false)).toBe("own");
+  });
+
+  it("asks a server's consent on its own screen, and goes on once it is in force", () => {
+    expect(serverAction("beta", "device", false)).toBe("join");
+    expect(serverAction("beta", "own", true)).toBe("join");
+    expect(serverAction("beta", "beta", false)).toBe("continue");
+    expect(serverAction("own", "device", false)).toBe("connect");
+    expect(serverAction("own", "beta", true)).toBe("use");
+    expect(serverAction("own", "own", true)).toBe("continue");
   });
 });

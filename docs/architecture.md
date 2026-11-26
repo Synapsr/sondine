@@ -1016,8 +1016,10 @@ See [ADR 012](decisions/012-third-parties-and-biometrics.md).
     startup, with its listening intent untouched.
   - The model step is optional ("Continue without transcription"): capture
     and playback work without a model, and analysis waits with `no-model`.
-    It asks first where to transcribe (ADR 040, `compute.*`); the model
-    download shows only for this Mac, and a server continues without it.
+    It asks first where to transcribe (ADR 040, `compute.*`), then shows
+    what the chosen place asks for: the model download for this Mac, or a
+    server's terms and its button. That second screen is not saved: a
+    relaunch reopens the choice, with the place in force picked.
   - The step on screen is saved with `advance`. macOS may relaunch the app
     after a permission prompt (the microphone's does); the first run reopens
     at that step, still paused. A user who resumes from the menu bar before

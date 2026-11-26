@@ -215,8 +215,13 @@ Sondine's own text outside the exemptions:
 1. What the user wants to find again (three goals), under the promise in one line.
 2. Permissions, with a live meter and a line about the other people
    recorded.
-3. Where to transcribe (ADR 040: this Mac, the user's machine, the beta),
-   then the transcription model, offered only for this Mac.
+3. Transcription, in two screens (ADR 040, Téo, 2026-11-26): first only
+   « Où transcrire ? », one line each for this Mac, the user's machine and
+   the beta; then what the chosen place asks for. This Mac shows the
+   model's needs and its download; a server shows, in the page, what
+   Settings' dialog says (what leaves, who could read it), and nothing
+   leaves before its button. « Retour » goes back to the choice, and a
+   relaunch reopens it with the place in force.
 4. A first memory.
 5. The voice read (optional, ADR 034 unchanged).
 6. What will record and be kept, then « Commencer l'écoute ».
@@ -240,7 +245,9 @@ Sondine's own text outside the exemptions:
   - tests cover every path, and its cost on the helper is reported.
 - **A Mac that cannot run a local model** gets:
   - a lighter local model when one passes ADR 018's bar;
-  - otherwise « Continuer sans transcription », as today;
+  - otherwise « Ce Mac » shown unavailable, with why, among the places
+    to transcribe, and « Continuer sans transcription » while no server is
+    chosen;
   - and a card: « Prévu : une transcription dans le cloud, conçue pour ne
     rien garder. » with « Me prévenir ».
 

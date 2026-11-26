@@ -1,7 +1,12 @@
-import { OnboardingStep, type Permissions, type PermissionState } from "@sondine/api";
+import {
+  OnboardingStep,
+  type ComputeDestination,
+  type Permissions,
+  type PermissionState,
+} from "@sondine/api";
 
 // The first run's six steps (architecture §11, ADR 037): what the user wants
-// to find again, the question about anonymous statistics (ADR 042), the two permissions, where to transcribe and the model (optional), the
+// to find again, the question about anonymous statistics (ADR 042), the two permissions, where to transcribe (with the model for this Mac, optional), the
 // voice read (optional, ADR 034), and starting to listen. Nothing is recorded for memory before
 // the last step; the voice read records only the text the user reads. The step on screen is saved, so
 // a relaunch after a permission prompt reopens it.
@@ -66,14 +71,29 @@ export function modelStepContinues(ready: boolean, busy: boolean): "continue" | 
 }
 
 /**
- * What the model step shows (ADR 037, ADR 040): where to transcribe, with
- * the model to download only while « Ce Mac » is chosen; on a Mac too small
- * for the model, the cloud card, which holds the same choice, until a
- * server is chosen.
+ * The transcription step's screens (ADR 037, ADR 040): where to transcribe,
+ * then what the chosen place asks for. Nothing chosen on the first screen is
+ * kept before the second one's button, so a relaunch reopens the choice.
  */
-export type ModelStepView = "cloud-card" | "destination" | "destination-and-model";
+export type TranscriptionScreen = "choice" | ComputeDestination;
 
-export function modelStepView(remote: boolean, tooBig: boolean): ModelStepView {
-  if (remote) return "destination";
-  return tooBig ? "cloud-card" : "destination-and-model";
+/** The choice's first pick: the place in force, unless this Mac cannot run the model. */
+export function firstPick(
+  destination: ComputeDestination,
+  tooBig: boolean,
+): ComputeDestination | null {
+  return destination === "device" && tooBig ? null : destination;
+}
+
+/** A server's button: on once it is in force, otherwise what puts it there. */
+export type ServerAction = "continue" | "use" | "connect" | "join";
+
+export function serverAction(
+  server: Exclude<ComputeDestination, "device">,
+  destination: ComputeDestination,
+  ownConnected: boolean,
+): ServerAction {
+  if (destination === server) return "continue";
+  if (server === "beta") return "join";
+  return ownConnected ? "use" : "connect";
 }

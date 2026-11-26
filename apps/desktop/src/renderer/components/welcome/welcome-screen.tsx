@@ -8,17 +8,8 @@ import type {
 import { cn } from "@sondine/ui";
 import { Button } from "@sondine/ui/components/button";
 import {
-  Popover,
-  PopoverDescription,
-  PopoverPopup,
-  PopoverTitle,
-  PopoverTrigger,
-} from "@sondine/ui/components/popover";
-import {
   CheckIcon,
   ClockIcon,
-  ExternalLinkIcon,
-  InfoIcon,
   MicrophoneIcon,
   PhoneIcon,
   VolumeIcon,
@@ -30,18 +21,16 @@ import { useState, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 import { errorMessage, orpc } from "../../core/orpc";
 import { m } from "../../paraglide/messages.js";
-import { CLOUD_WAITLIST_URL } from "../../../shared/cloud";
-import { ModelPanel, useModels } from "../models/model-panel";
-import { setSmallMac, useSmallMac } from "../models/small-mac";
+import { useModels } from "../models/model-panel";
 import { asksForUpdates } from "../updates/update-view";
 import { UpdateAnswers, useUpdates } from "../updates/updates";
 import { SentReports, UsageAnswers } from "../usage/usage";
 import { VoiceReadPanel } from "../voice-read/voice-read-panel";
-import { ComputeSection, useCompute } from "../settings/compute-section";
-import { modelsBusy, modelsReady, modelsTooBig } from "../models/model-view";
+import { useCompute } from "../settings/compute-section";
+import { modelsReady } from "../models/model-view";
+import { Step } from "./step";
+import { TranscriptionStep } from "./transcription-step";
 import {
-  modelStepContinues,
-  modelStepView,
   nextStep,
   permissionOffer,
   previousStep,
@@ -52,8 +41,8 @@ import {
 
 // The first run (`/welcome`, ADR 037), shown until it is completed: what the
 // user wants to find again, whether to share anonymous statistics (ADR 042),
-// the permissions, where to transcribe and the model for this Mac (the cloud
-// card instead on a Mac too small for it), the voice read, then starting. Nothing is
+// the permissions, where to transcribe (transcription-step.tsx: the choice,
+// then what the chosen place asks for), the voice read, then starting. Nothing is
 // recorded before « Commencer l'écoute »: a fresh install keeps listening
 // paused until then. Each step is saved as it shows, so a relaunch after a
 // permission prompt comes back to it. The voice read and the model are
@@ -150,41 +139,14 @@ export function WelcomeScreen() {
           <VoiceStep onBack={() => go(previousStep(shown))} onNext={() => go(nextStep(shown))} />
         ) : null}
         {shown === "model" ? (
-          <ModelStep onBack={() => go(previousStep(shown))} onNext={() => go(nextStep(shown))} />
+          <TranscriptionStep
+            onBack={() => go(previousStep(shown))}
+            onNext={() => go(nextStep(shown))}
+          />
         ) : null}
         {shown === "start" ? <StartStep onBack={() => go(previousStep(shown))} /> : null}
       </div>
     </div>
-  );
-}
-
-function Step({
-  title,
-  children,
-  onBack,
-  next,
-}: {
-  title: string;
-  children: ReactNode;
-  onBack?: () => void;
-  next: ReactNode;
-}) {
-  return (
-    <section aria-labelledby="welcome-title" className="sondine-stagger flex flex-col gap-l">
-      <h1 id="welcome-title" className="font-display font-heavy text-display-m">
-        {title}
-      </h1>
-      {children}
-      {/* Back on the left, the way forward on the right. */}
-      <div className="flex items-center gap-xs pt-m">
-        {onBack === undefined ? null : (
-          <Button variant="ghost" className="-ms-s" onClick={onBack}>
-            {m.welcome_back()}
-          </Button>
-        )}
-        <span className="ms-auto flex items-center gap-xs">{next}</span>
-      </div>
-    </section>
   );
 }
 
@@ -429,114 +391,6 @@ function VoiceStep({ onBack, onNext }: { onBack: () => void; onNext: () => void 
         }
       />
     </section>
-  );
-}
-
-function ModelStep({ onBack, onNext }: { onBack: () => void; onNext: () => void }) {
-  const models = useModels();
-  const compute = useCompute();
-  const remote = compute.data !== undefined && compute.data.destination !== "device";
-  const ready = remote || (models.data !== undefined && modelsReady(models.data));
-  const busy = models.data !== undefined && modelsBusy(models.data);
-  const continues = modelStepContinues(ready, busy);
-  const view = modelStepView(remote, models.data !== undefined && modelsTooBig(models.data));
-  return (
-    <Step
-      title={m.welcome_model_title()}
-      onBack={onBack}
-      next={
-        <Button variant={continues === "continue" ? "primary" : "secondary"} onClick={onNext}>
-          {continues === "continue" ? m.welcome_continue() : m.welcome_without_model()}
-        </Button>
-      }
-    >
-      {/* Too small a Mac: no download to offer, only what comes next (Téo, 2026-11-19).
-          Otherwise where to transcribe first; the download is only for this Mac. */}
-      {view === "cloud-card" ? (
-        <CloudCard />
-      ) : (
-        <>
-          <ComputeSection />
-          {view === "destination-and-model" ? (
-            <>
-              <p className="text-cte-text-muted">{m.welcome_model_intro()}</p>
-              <ModelPanel />
-              {busy ? <p className="text-cte-text-muted">{m.welcome_model_continues()}</p> : null}
-            </>
-          ) : null}
-        </>
-      )}
-      {import.meta.env.DEV ? <SmallMacSwitch /> : null}
-    </Step>
-  );
-}
-
-/** Development only: see this step as a Mac too small for the model would (small-mac.ts). */
-function SmallMacSwitch() {
-  const on = useSmallMac();
-  return (
-    <Button
-      variant="ghost"
-      className="-ms-s self-start text-body-xs text-cte-text-muted"
-      onClick={() => setSmallMac(!on)}
-    >
-      {on ? "Dev : revenir à ce Mac" : "Dev : simuler un Mac de 16 Go"}
-    </Button>
-  );
-}
-
-/**
- * A Mac too small for the local model (ADR 037): an intention, not a
- * service, so it says what is planned, never that it is there. « Me
- * prévenir » opens the sign-up page in the browser, where the user leaves
- * an e-mail (Téo, 2026-11-19), and stores a flag on this Mac. The « ⓘ »
- * says how the cloud is designed. Below, the servers that exist (ADR 040): a
- * machine of the user's, and the beta in a build that knows one.
- */
-function CloudCard() {
-  const queryClient = useQueryClient();
-  const onboarding = useQuery(orpc.onboarding.get.queryOptions());
-  const advance = useMutation(
-    orpc.onboarding.advance.mutationOptions({
-      onSuccess: (status) => queryClient.setQueryData(orpc.onboarding.get.queryKey(), status),
-    }),
-  );
-  const asked = onboarding.data?.cloudNotify === true;
-  return (
-    <div className="flex flex-col gap-m">
-      <p className="text-body-m">
-        {m.welcome_cloud_title()}{" "}
-        <Popover>
-          <PopoverTrigger
-            variant="ghost"
-            size="icon-s"
-            aria-label={m.welcome_cloud_how()}
-            className="align-middle text-cte-text-muted"
-          >
-            <InfoIcon />
-          </PopoverTrigger>
-          <PopoverPopup className="w-[20rem] gap-xs">
-            <PopoverTitle>{m.welcome_cloud_how()}</PopoverTitle>
-            <PopoverDescription>{m.welcome_cloud_how_detail()}</PopoverDescription>
-          </PopoverPopup>
-        </Popover>
-      </p>
-      {/* The page asks for an e-mail; Sondine sends nothing itself (shared/cloud.ts). */}
-      <Button
-        variant="secondary"
-        className="self-start"
-        nativeButton={false}
-        render={<a href={CLOUD_WAITLIST_URL} target="_blank" rel="noreferrer" />}
-        onClick={() => {
-          if (!asked) advance.mutate({ step: onboarding.data?.step ?? "model", cloudNotify: true });
-        }}
-      >
-        {m.welcome_cloud_notify()}
-        <ExternalLinkIcon />
-      </Button>
-      {/* Each server says what leaves before anything does. */}
-      <ComputeSection />
-    </div>
   );
 }
 
