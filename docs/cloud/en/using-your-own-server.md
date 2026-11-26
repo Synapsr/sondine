@@ -55,4 +55,4 @@ The same program, with the macOS archive of `speech.cpp` 0.9.3. **Not tried yet.
 - **Several Macs:** one request at a time, each in turn.
 - **Deletion:** what is leaving stops within about a second. What already left cannot be called back; the server forgets it on cancellation, or ten minutes after it last heard from your Mac or finished transcribing.
 - **Network:** audio leaves uncompressed, about 115 MB per hour (1 min 30 s at 10 Mbps).
-- **Card:** the model frees it after three minutes without work.
+- **Card:** the model frees it after three minutes without work (`SONDINE_COMPUTE_IDLE_UNLOAD_SEC` on the server).

@@ -36,7 +36,8 @@ SONDINE_COMPUTE_LISTEN=100.x.y.z:8443 node sondine-compute.js serve
 
 `node sondine-compute.js` lists the settings. The card needs 3.7 GB free, and
 each of the 23 layers of experts it keeps takes 0.72 GB more; the others run on
-the CPU. The model leaves the card after three minutes without work.
+the CPU. The model leaves the card after three minutes without work;
+`SONDINE_COMPUTE_IDLE_UNLOAD_SEC` sets how long, and `0` keeps it loaded.
 
 ## Add a Mac
 
@@ -74,6 +75,22 @@ WantedBy=default.target
 apport still writes the dump to `/var/crash`. `MemorySwapMax=0` keeps the service's memory, and the model's process, out of
 swap, where it would outlive the request. Without that line, turn the
 machine's swap off, or encrypt it with a key made at each start.
+
+On a machine that runs other work too, bound the service in the same file. Its
+worker keeps in RAM the layers of experts the card does not hold, 0.72 GB each
+(about 6 GB beside a 16 GB card), and the kernel caches pages of the model file
+on top:
+
+```ini
+[Service]
+MemoryHigh=10G
+MemoryMax=12G
+```
+
+Past `MemoryHigh` the kernel takes the service's own cache back first. Past
+`MemoryMax` it stops the worker: the request it was on fails, and the next one
+starts it again. `SONDINE_COMPUTE_IDLE_UNLOAD_SEC=60` gives the memory back
+sooner after the last request, and the next one loads the model again.
 
 ## The beta
 

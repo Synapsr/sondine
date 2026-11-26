@@ -34,6 +34,7 @@ Environment:
   SONDINE_COMPUTE_NAME     the name Sondine shows (default this machine's)
   SONDINE_COMPUTE_THREADS  the CPU's threads (default 8)
   SONDINE_COMPUTE_DEVICE   gpu, cpu or auto (default gpu)
+  SONDINE_COMPUTE_IDLE_UNLOAD_SEC  seconds without work before the model leaves the card (default 180; 0: never)
   SONDINE_COMPUTE_BETA_PLACES   places anyone may take in one click (default 0: none)
   SONDINE_COMPUTE_BETA_HOURS    hours of audio per place and month (default 40)
   SONDINE_COMPUTE_ADDRESS_HEADER  where a trusted tunnel puts the caller's address
@@ -83,8 +84,10 @@ async function serve(clients: ClientStore): Promise<void> {
       if (!expected) log("worker-exited", { code: code ?? -1, signal: signal ?? "" });
     },
   });
+  const idleUnloadSec = positive("IDLE_UNLOAD_SEC", "180");
   const sessions = new Sessions({
     engine,
+    limits: { unloadMs: idleUnloadSec === 0 ? Number.POSITIVE_INFINITY : idleUnloadSec * 1000 },
     log,
     known: (id) => clients.has(id),
     onTranscribed: (id, seconds) => clients.charge(id, seconds),

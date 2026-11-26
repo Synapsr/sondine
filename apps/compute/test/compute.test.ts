@@ -319,6 +319,27 @@ describe("a transcription", () => {
   });
 });
 
+describe("the model on the card", () => {
+  it("leaves the card a while after its last request", async () => {
+    // Long enough that a slow runner has the result before the model leaves.
+    const { link, engine } = await serve(async (asked) => heard(asked), {
+      limits: { unloadMs: 1_500 },
+    });
+    await remote(link()).transcribe(request(audio(RATE)));
+    expect(engine.unloads).toBe(0);
+    await expect.poll(() => engine.unloads, { timeout: 5_000 }).toBe(1);
+  });
+
+  it("stays on the card when told to", async () => {
+    const { link, engine } = await serve(async (asked) => heard(asked), {
+      limits: { unloadMs: Number.POSITIVE_INFINITY },
+    });
+    await remote(link()).transcribe(request(audio(RATE)));
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    expect(engine.unloads).toBe(0);
+  });
+});
+
 describe("what is between a Mac and its server", () => {
   /** Opens a session as a Mac does, then leaves it to the test. */
   async function opened() {
