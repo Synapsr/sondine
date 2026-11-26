@@ -5,6 +5,11 @@ packages:
 allowBuilds:
   electron-winstaller: false
 
+# electron-builder 26.18.0 still asks for minimatch 9 and 10, open to a
+# denial of service (GHSA-g3hv-75wg-m249). Drop this once it asks for 11.
+overrides:
+  "minimatch@>=7.0.0 <11.0.1": ^11.0.1
+
 catalog:
   # Tooling
   oxfmt: 0.75.0
