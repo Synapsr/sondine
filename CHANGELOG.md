@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.9.0 — 2026-11-26
+
+Sondine learns your words, the first run lets you pick the cloud, and your own transcription server runs in Docker.
+
+### New
+
+#### Teach Sondine your words
+
+Add your words in Réglages ▸ Vocabulaire, with a short note if you like (« le nom de mon app »); your People's names are in it already. Sondine writes them your way when a transcript hears a name that sounds the same, and with the journal's model it also catches one that only looks close, like « Sandrine » for « Sondine ». After « Corriger ce passage », it says what it learned, or offers to add a name it could not learn. « Rétablir l'original » always brings back what was heard.
+
+#### Your own server in Docker
+
+On a Linux machine with an NVIDIA card, the server now comes with a Dockerfile and a compose file: speech.cpp and the card in one container, the model read-only, out of swap. Its README gives the commands.
+
+### Improved
+
+#### Choose the cloud from the first run
+
+The first run now asks where to transcribe on every Mac: this Mac, your machine, or Cloud (beta). Then it shows what that choice needs: the model download for this Mac, or what leaves and who could read it for a server, with nothing sent before you agree.
+
+### Fixed
+
+#### Fewer failed recordings on very short noises
+
+A noise of less than a second no longer leaves a recording marked as failed: Sondine now treats it as having no speech. A short recording whose words the model could not place gets a second try, and its transcript comes back with a single voice.
+
+#### Your own server keeps the model as long as you say
+
+`SONDINE_COMPUTE_IDLE_UNLOAD_SEC` now sets how long your transcription server keeps the model after its last request, and `0` keeps it loaded, so a conversation starts at once. The server used to let go of it after three minutes, whatever the setting said. Its README also shows how to bound its memory on a machine that does other work.
+
 ## 0.8.0 — 2026-11-25
 
 Sondine's source code is public; it keeps itself up to date when you say yes, and its icon is in the Dock.
