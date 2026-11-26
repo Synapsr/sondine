@@ -39,6 +39,8 @@ const connectText: Record<
 };
 
 const joinText: Record<Exclude<ComputeJoinOutcome, "joined" | "cancelled">, () => string> = {
+  "bad-link": () => m.compute_connect_bad_link(),
+  refused: () => m.compute_connect_refused(),
   full: () => m.compute_beta_full(),
   closed: () => m.compute_beta_closed(),
   busy: () => m.compute_beta_busy(),
@@ -167,7 +169,12 @@ export function ComputeSection() {
         onChoose={() => choose.mutate({ destination: "own" })}
         onClose={() => setAsking(null)}
       />
-      <BetaDialog open={asking === "beta"} current={destination} onClose={() => setAsking(null)} />
+      <BetaDialog
+        open={asking === "beta"}
+        current={destination}
+        joined={beta.joined}
+        onClose={() => setAsking(null)}
+      />
     </div>
   );
 }
@@ -337,15 +344,13 @@ export function useJoinBeta(current: ComputeDestination) {
   return {
     pending: join.isPending,
     problem,
-    take(onJoined: () => void) {
-      join.mutate(
-        {},
-        {
-          onSuccess: (answer) => {
-            if (answer.outcome === "joined") onJoined();
-          },
+    take(onJoined: () => void, invite?: string) {
+      const trimmed = invite?.trim() ?? "";
+      join.mutate(trimmed === "" ? {} : { link: trimmed }, {
+        onSuccess: (answer) => {
+          if (answer.outcome === "joined") onJoined();
         },
-      );
+      });
     },
     /** After the answer. */
     finish() {
@@ -384,14 +389,18 @@ export function BetaTerms({ Lead = "p" }: { Lead?: ElementType }) {
 export function BetaDialog({
   open,
   current,
+  joined = false,
   onClose,
 }: {
   open: boolean;
   current: ComputeDestination;
+  joined?: boolean;
   onClose: () => void;
 }) {
   const join = useJoinBeta(current);
+  const [invite, setInvite] = useState("");
   const close = () => {
+    setInvite("");
     join.finish();
     onClose();
   };
@@ -400,6 +409,7 @@ export function BetaDialog({
       open={open}
       onOpenChange={(next) => {
         if (next) return;
+        setInvite("");
         join.leave();
         onClose();
       }}
@@ -407,6 +417,18 @@ export function BetaDialog({
       <AlertDialogPopup>
         <AlertDialogTitle>{m.compute_beta_title()}</AlertDialogTitle>
         <BetaTerms Lead={AlertDialogDescription} />
+        {joined ? null : (
+          <Field className="items-stretch">
+            <FieldLabel>{m.compute_beta_invite_label()}</FieldLabel>
+            <Input
+              value={invite}
+              autoComplete="off"
+              spellCheck={false}
+              placeholder="sondine-compute://connect?…"
+              onChange={(event) => setInvite(event.target.value)}
+            />
+          </Field>
+        )}
         {join.problem === null ? null : (
           <p role="alert" className="text-body-s text-error">
             {join.problem}
@@ -414,7 +436,7 @@ export function BetaDialog({
         )}
         <AlertDialogFooter>
           <AlertDialogClose>{m.compute_beta_later()}</AlertDialogClose>
-          <Button isPending={join.pending} onClick={() => join.take(close)}>
+          <Button isPending={join.pending} onClick={() => join.take(close, invite)}>
             {m.compute_beta_use()}
           </Button>
         </AlertDialogFooter>

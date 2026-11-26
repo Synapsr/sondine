@@ -48,11 +48,30 @@ export const AsrJob = z.strictObject({
 });
 export type AsrJob = z.output<typeof AsrJob>;
 
+/** Billing / quota tier of a compute client (ADR 040). */
+export const QuotaPlan = z.enum(["own", "beta", "trial", "founder", "pro"]);
+export type QuotaPlan = z.output<typeof QuotaPlan>;
+
+/** Whether a client's included seconds reset each month, never reset, or are unlimited. */
+export const QuotaPeriod = z.enum(["total", "month", "unlimited"]);
+export type QuotaPeriod = z.output<typeof QuotaPeriod>;
+
+export const QuotaSnapshot = z.strictObject({
+  plan: QuotaPlan,
+  period: QuotaPeriod,
+  usedSeconds: z.number().nonnegative(),
+  limitSeconds: z.number().nonnegative().nullable(),
+  extraSeconds: z.number().nonnegative(),
+});
+export type QuotaSnapshot = z.output<typeof QuotaSnapshot>;
+
 export const Open = z.discriminatedUnion("kind", [
   /** One of the beta's places, without an account. */
   z.strictObject({ v: z.literal(1), at: z.int(), kind: z.literal("claim") }),
   /** Is this server mine, and what does it run? */
   z.strictObject({ v: z.literal(1), at: z.int(), kind: z.literal("hello"), token: Token }),
+  /** How much of this client's plan has been used. */
+  z.strictObject({ v: z.literal(1), at: z.int(), kind: z.literal("quota"), token: Token }),
   z.strictObject({ v: z.literal(1), at: z.int(), kind: z.literal("leave"), token: Token }),
   z.strictObject({
     v: z.literal(1),
@@ -92,6 +111,14 @@ export const OpenReply = z.discriminatedUnion("kind", [
     modelSha256: z.string(),
     engineVersion: z.string(),
     name: z.string().max(64),
+  }),
+  z.strictObject({
+    kind: z.literal("quota"),
+    plan: QuotaPlan,
+    period: QuotaPeriod,
+    usedSeconds: z.number().nonnegative(),
+    limitSeconds: z.number().nonnegative().nullable(),
+    extraSeconds: z.number().nonnegative(),
   }),
   z.strictObject({ kind: z.literal("session"), id: z.string().regex(/^[0-9a-f]{32}$/) }),
 ]);

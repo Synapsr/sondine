@@ -21,11 +21,18 @@ import {
   hello,
   leavePlace,
   parseServerLink,
+  readQuota,
   type Fetch,
   type ServerLink,
 } from "@sondine/engines/remote";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { ClientStore, PLACE_IDLE_MS } from "../src/clients.ts";
+import {
+  ClientStore,
+  PLAN_MONTHLY_SECONDS,
+  PLACE_IDLE_MS,
+  TOPUP_SECONDS,
+  TRIAL_SECONDS,
+} from "../src/clients.ts";
 import {
   CLAIMS_PER_DAY,
   createComputeServer,
@@ -124,7 +131,8 @@ async function serve(
     engine,
     ...(options.log === undefined ? {} : { log: options.log }),
     known: (id) => clients.has(id),
-    onTranscribed: (id, seconds) => clients.charge(id, seconds),
+    onTranscribed: (id, seconds) =>
+      clients.charge(id, seconds, options.beta?.secondsPerMonth ?? null),
     ...(options.limits === undefined ? {} : { limits: options.limits }),
   });
   const server = createComputeServer({
@@ -627,6 +635,124 @@ describe("the beta's places", () => {
     });
     at += 40 * 24 * 3_600_000;
     expect(clients.usage(clients.find(link.token)!.id).seconds).toBe(0);
+  });
+});
+
+describe("plans, trial and top-ups (Wave 1)", () => {
+  it("runs a cumulative trial even when open beta is closed, and never resets it next month", async () => {
+    let at = Date.now();
+    const { endpoint, serverKey, clients } = await serve(undefined, { now: () => at });
+    const { id, token } = clients.add("beta", "wave1-trial", { plan: "trial", limitSeconds: 3 });
+    const link: ServerLink = { endpoint, serverKey, token };
+    const engine = remote(link);
+
+    expect(await readQuota(link, { now: () => at })).toEqual({
+      plan: "trial",
+      period: "total",
+      usedSeconds: 0,
+      limitSeconds: 3,
+      extraSeconds: 0,
+    });
+    await engine.transcribe(request(audio(RATE * 2)));
+    expect(await readQuota(link, { now: () => at })).toEqual({
+      plan: "trial",
+      period: "total",
+      usedSeconds: 2,
+      limitSeconds: 3,
+      extraSeconds: 0,
+    });
+    // Asking for 2 more seconds exceeds the 1 second remaining in the trial.
+    await expect(engine.transcribe(request(audio(RATE * 2)))).rejects.toMatchObject({
+      code: "quota_exhausted",
+    });
+    // Next month: trial usage stays cumulative and does not reset.
+    at += 40 * 24 * 3_600_000;
+    expect(await readQuota(link, { now: () => at })).toEqual({
+      plan: "trial",
+      period: "total",
+      usedSeconds: 2,
+      limitSeconds: 3,
+      extraSeconds: 0,
+    });
+    expect(clients.quota(id)).toMatchObject({ plan: "trial", usedSeconds: 2, limitSeconds: 3 });
+  });
+
+  it("upgrades a trial token to founder in place, and spends top-ups only past the monthly limit", async () => {
+    let at = Date.now();
+    const { endpoint, serverKey, clients } = await serve(undefined, { now: () => at });
+    const { id, token } = clients.add("beta", "wave1-user", { plan: "trial", limitSeconds: 2 });
+    const link: ServerLink = { endpoint, serverKey, token };
+    const engine = remote(link);
+
+    await engine.transcribe(request(audio(RATE * 2)));
+    await expect(engine.transcribe(request(audio(RATE)))).rejects.toMatchObject({
+      code: "quota_exhausted",
+    });
+
+    // Upgrade keeps the same token and starts a fresh monthly allowance.
+    expect(clients.setPlan(id, "founder", { limitSeconds: 3 })).toBe(true);
+    expect(clients.topUp(id, 4)).toBe(true);
+    expect(await readQuota(link, { now: () => at })).toEqual({
+      plan: "founder",
+      period: "month",
+      usedSeconds: 0,
+      limitSeconds: 3,
+      extraSeconds: 4,
+    });
+
+    // 2 s uses monthly allowance; next 3 s finishes monthly (1 s) and takes 2 s from top-ups.
+    await engine.transcribe(request(audio(RATE * 2)));
+    await engine.transcribe(request(audio(RATE * 3)));
+    expect(await readQuota(link, { now: () => at })).toEqual({
+      plan: "founder",
+      period: "month",
+      usedSeconds: 3,
+      limitSeconds: 3,
+      extraSeconds: 2,
+    });
+
+    // Asking for 3 s exceeds the 2 s of top-up left.
+    await expect(engine.transcribe(request(audio(RATE * 3)))).rejects.toMatchObject({
+      code: "quota_exhausted",
+    });
+
+    // Next month: monthly allowance resets to 0 while remaining 2 s of top-up persist.
+    at += 40 * 24 * 3_600_000;
+    expect(await readQuota(link, { now: () => at })).toEqual({
+      plan: "founder",
+      period: "month",
+      usedSeconds: 0,
+      limitSeconds: 3,
+      extraSeconds: 2,
+    });
+  });
+
+  it("uses 60 min trial, 40 h monthly founder/pro and 10 h top-up defaults, and protects invited clients from beta eviction", () => {
+    let at = Date.UTC(2026, 10, 26);
+    const clients = new ClientStore(state, () => at);
+    const trial = clients.add("beta", "t", { plan: "trial" });
+    const founder = clients.add("beta", "f", { plan: "founder" });
+    const pro = clients.add("beta", "p", { plan: "pro" });
+    expect(clients.quota(trial.id)).toMatchObject({ limitSeconds: TRIAL_SECONDS, period: "total" });
+    expect(clients.quota(founder.id)).toMatchObject({
+      limitSeconds: PLAN_MONTHLY_SECONDS,
+      period: "month",
+    });
+    expect(clients.quota(pro.id)).toMatchObject({
+      limitSeconds: PLAN_MONTHLY_SECONDS,
+      period: "month",
+    });
+    expect(TOPUP_SECONDS).toBe(10 * 3_600);
+
+    // Open-beta claims neither count nor evict invited clients, even when idle past PLACE_IDLE_MS.
+    const openPlace = clients.claim(1);
+    expect(openPlace).not.toBeNull();
+    at += PLACE_IDLE_MS + 1;
+    expect(clients.claim(1)).not.toBeNull();
+    expect(clients.has(trial.id)).toBe(true);
+    expect(clients.has(founder.id)).toBe(true);
+    expect(clients.has(pro.id)).toBe(true);
+    expect(clients.find(openPlace!)).toBeNull();
   });
 });
 

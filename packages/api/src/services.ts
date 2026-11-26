@@ -38,7 +38,9 @@ import type {
   ComputeChooseInput,
   ComputeConnectInput,
   ComputeConnectResult,
+  ComputeJoinInput,
   ComputeJoinResult,
+  ComputeQuota,
   ComputeStatus,
   ContextAddInput,
   ContextAddResult,
@@ -338,8 +340,9 @@ export interface ApiServices {
     choose(input: z.output<typeof ComputeChooseInput>): Promise<ComputeStatus>;
     connect(input: z.output<typeof ComputeConnectInput>): Promise<ComputeConnectResult>;
     disconnect(): Promise<ComputeStatus>;
-    joinBeta(): Promise<ComputeJoinResult>;
+    joinBeta(input: z.output<typeof ComputeJoinInput>): Promise<ComputeJoinResult>;
     leaveBeta(): Promise<ComputeStatus>;
+    quota(): Promise<ComputeQuota | null>;
   };
   readonly live: {
     setEnabled(input: z.output<typeof LiveEnabledInput>): Promise<LiveStatus>;

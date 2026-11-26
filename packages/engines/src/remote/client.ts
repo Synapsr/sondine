@@ -8,6 +8,7 @@ import {
   PROLOGUE,
   PROTOCOL_VERSION,
   type AsrJob,
+  type QuotaSnapshot,
   type RefusalCode,
   type ServerLink,
 } from "./wire.ts";
@@ -80,6 +81,7 @@ export async function exchange(
 export type OpenRequest =
   | { readonly kind: "claim" }
   | { readonly kind: "hello"; readonly token: string }
+  | { readonly kind: "quota"; readonly token: string }
   | { readonly kind: "leave"; readonly token: string }
   | { readonly kind: "asr"; readonly token: string; readonly job: AsrJob };
 
@@ -149,6 +151,17 @@ export async function hello(
     throw new EngineError("server_mismatch", "the server runs another model or version");
   }
   return reply;
+}
+
+/** Reads this client's plan and remaining quota from its server. */
+export async function readQuota(
+  link: ServerLink,
+  options: Parameters<typeof open>[2] = {},
+): Promise<QuotaSnapshot> {
+  const { reply } = await open(link, { kind: "quota", token: link.token }, options);
+  if (reply.kind !== "quota") throw new EngineError("server_mismatch", "not a quota");
+  const { plan, period, usedSeconds, limitSeconds, extraSeconds } = reply;
+  return { plan, period, usedSeconds, limitSeconds, extraSeconds };
 }
 
 /** Takes one of the beta's places; `RefusedError("full")` when none is left. */

@@ -617,6 +617,7 @@ function fakeServices(overrides: Partial<ApiServices> = {}) {
       disconnect: async () => computeStatus,
       joinBeta: async () => ({ outcome: "joined", status: computeStatus }),
       leaveBeta: async () => computeStatus,
+      quota: async () => null,
     },
     live: {
       setEnabled: async (input) => {
@@ -975,6 +976,7 @@ describe("contract metadata", () => {
       "compute.get",
       "compute.joinBeta",
       "compute.leaveBeta",
+      "compute.quota",
       "context.add",
       "context.edit",
       "context.get",

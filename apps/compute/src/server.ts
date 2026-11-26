@@ -17,7 +17,7 @@ import {
   type RefusalCode,
   type Responded,
 } from "@sondine/engines/remote";
-import type { ClientStore } from "./clients.ts";
+import { planOf, type ClientStore } from "./clients.ts";
 import type { ServerLog, Sessions } from "./sessions.ts";
 
 // The HTTP face (packages/engines/src/remote/wire.ts). Plain HTTP: every
@@ -140,8 +140,8 @@ export function createComputeServer(options: ComputeServerOptions): Server {
     const known = clients.find(message.token);
     if (known === null) return refuse("unauthorized");
     if (!first()) return refuse("bad_request");
-    // The beta is closed: its places stay, nothing runs for them, and one may still be given back.
-    if (known.client.kind === "beta" && beta === null && message.kind !== "leave") {
+    // The open beta is closed: self-claimed beta places wait, while invited plans keep running.
+    if (planOf(known.client) === "beta" && beta === null && message.kind !== "leave") {
       return refuse("closed");
     }
     switch (message.kind) {
@@ -154,6 +154,11 @@ export function createComputeServer(options: ComputeServerOptions): Server {
             name: options.name,
           },
         };
+      case "quota": {
+        const snapshot = clients.quota(known.id, beta?.secondsPerMonth ?? null);
+        if (snapshot === null) return refuse("unauthorized");
+        return { reply: { kind: "quota", ...snapshot } };
+      }
       case "leave":
         sessions.dropClient(known.id);
         clients.remove(known.id);
@@ -170,10 +175,11 @@ export function createComputeServer(options: ComputeServerOptions): Server {
         if (seconds > NEMOTRON_CAPABILITIES.maxRequestSeconds) {
           return refuse("bad_request");
         }
-        if (known.client.kind === "beta" && beta !== null) {
-          const asked =
-            clients.usage(known.id).seconds + sessions.pendingSeconds(known.id) + seconds;
-          if (asked > beta.secondsPerMonth) return refuse("quota");
+        const snapshot = clients.quota(known.id, beta?.secondsPerMonth ?? null);
+        if (snapshot !== null && snapshot.limitSeconds !== null) {
+          const remaining =
+            Math.max(0, snapshot.limitSeconds - snapshot.usedSeconds) + snapshot.extraSeconds;
+          if (sessions.pendingSeconds(known.id) + seconds > remaining) return refuse("quota");
         }
         if (!sessions.hasRoom(known.id, job.samples * 2)) {
           return refuse("busy");

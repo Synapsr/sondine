@@ -2349,11 +2349,11 @@ export const apiLayer = Layer.effect(
               return compute.status();
             }),
           ),
-        joinBeta: () =>
+        joinBeta: (input) =>
           call(
             "compute.joinBeta",
             Effect.promise(async () => ({
-              outcome: await compute.joinBeta(),
+              outcome: await compute.joinBeta(input.link),
               status: compute.status(),
             })),
           ),
@@ -2364,6 +2364,11 @@ export const apiLayer = Layer.effect(
               await compute.leaveBeta();
               return compute.status();
             }),
+          ),
+        quota: () =>
+          call(
+            "compute.quota",
+            Effect.promise(() => compute.quota()),
           ),
       },
       live: {
