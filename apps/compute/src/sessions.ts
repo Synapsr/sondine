@@ -29,7 +29,7 @@ export interface SessionLimits {
   readonly keepResultMs: number;
   /** The longest any session lives, whatever its client does. */
   readonly maxAgeMs: number;
-  /** The engine lets go of the GPU after this long without work. */
+  /** The engine lets go of the GPU after this long without work; `Infinity` keeps it. */
   readonly unloadMs: number;
 }
 
@@ -306,10 +306,13 @@ export class Sessions {
       this.current = null;
       this.countAhead();
       const { engine } = this.options;
-      this.unloadTimer = setTimeout(() => {
-        if (this.current === null) void engine.unload().catch(() => undefined);
-      }, this.limits.unloadMs);
-      this.unloadTimer.unref();
+      // Node fires a timer of Infinity at once: a model kept loaded has none.
+      if (Number.isFinite(this.limits.unloadMs)) {
+        this.unloadTimer = setTimeout(() => {
+          if (this.current === null) void engine.unload().catch(() => undefined);
+        }, this.limits.unloadMs);
+        this.unloadTimer.unref();
+      }
       void this.next();
     }
   }

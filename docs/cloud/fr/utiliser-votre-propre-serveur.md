@@ -55,4 +55,4 @@ Le même programme, avec l'archive macOS de `speech.cpp` 0.9.3. **Pas encore ess
 - **Plusieurs Mac :** une demande à la fois, chacun son tour.
 - **Suppression :** ce qui part s'arrête en une seconde environ. Ce qui est déjà parti ne se rappelle pas ; le serveur l'oublie à l'annulation, ou dix minutes après avoir entendu votre Mac ou fini de transcrire.
 - **Réseau :** l'audio part sans compression, environ 115 Mo par heure (1 min 30 à 10 Mbit/s).
-- **Carte :** le modèle la libère après trois minutes sans demande.
+- **Carte :** le modèle la libère après trois minutes sans demande (`SONDINE_COMPUTE_IDLE_UNLOAD_SEC` sur le serveur).
