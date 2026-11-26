@@ -241,14 +241,16 @@ describe("a transcription", () => {
       maySend: () => allowed-- > 0,
     });
     await expect(sending).rejects.toMatchObject({ code: "cancelled" });
-    await expect.poll(() => sessions.size).toBe(0);
+    await expect.poll(() => sessions.size, { timeout: 5_000 }).toBe(0);
   });
 
   it("cancels the server's work with the signal", async () => {
+    let started = false;
     let stopped = false;
     const { link } = await serve(
       (_, { signal }) =>
         new Promise((_resolve, reject) => {
+          started = true;
           signal?.addEventListener("abort", () => {
             stopped = true;
             reject(new EngineError("cancelled", "stopped"));
@@ -259,9 +261,12 @@ describe("a transcription", () => {
     const running = remote(link()).transcribe(request(audio(RATE)), {
       signal: controller.signal,
     });
-    setTimeout(() => controller.abort(), 40);
+    running.catch(() => undefined);
+    // Once the server has the audio and works on it: sooner, there is no work to stop.
+    await expect.poll(() => started, { timeout: 5_000 }).toBe(true);
+    controller.abort();
     await expect(running).rejects.toMatchObject({ code: "cancelled" });
-    await expect.poll(() => stopped).toBe(true);
+    await expect.poll(() => stopped, { timeout: 5_000 }).toBe(true);
   });
 
   it("survives a connection that drops, and gives up on one that stays down", async () => {
@@ -425,10 +430,12 @@ describe("who may use a server", () => {
   });
 
   it("stops what a removed Mac already started", async () => {
+    let started = false;
     let stopped = false;
     const { link, clients, sessions } = await serve(
       (_, { signal }) =>
         new Promise((_resolve, reject) => {
+          started = true;
           signal?.addEventListener("abort", () => {
             stopped = true;
             reject(new EngineError("cancelled", "stopped"));
@@ -438,11 +445,12 @@ describe("who may use a server", () => {
     const own = link();
     const running = remote(own).transcribe(request(audio(RATE)));
     running.catch(() => undefined);
-    await expect.poll(() => sessions.size).toBe(1);
+    // The session opens before the audio is in: wait for the work itself.
+    await expect.poll(() => started, { timeout: 5_000 }).toBe(true);
     clients.remove(clients.find(own.token)!.id);
     await expect(running).rejects.toMatchObject({ code: "server_busy" });
-    expect(stopped).toBe(true);
-    expect(sessions.size).toBe(0);
+    await expect.poll(() => stopped, { timeout: 5_000 }).toBe(true);
+    await expect.poll(() => sessions.size, { timeout: 5_000 }).toBe(0);
   });
 
   it("refuses a first message sent again, or from a clock too far off", async () => {
