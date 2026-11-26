@@ -74,17 +74,27 @@ const heard = (request: AsrRequest, text = "bonjour"): AsrResult => ({
   metrics: { audioMs: 0, computeMs: 12 },
 });
 
-function fakeEngine(transcribe: Transcribe): AsrEngine & { unloads: number } {
+function fakeEngine(transcribe: Transcribe): AsrEngine & {
+  unloads: number;
+  /** When the last transcription ended and the model last left, by `performance.now()`. */
+  doneAt: number;
+  unloadAt: number;
+} {
   let busy = false;
   const engine = {
     unloads: 0,
+    doneAt: 0,
+    unloadAt: 0,
     manifest: NEMOTRON_MANIFEST,
     capabilities: NEMOTRON_CAPABILITIES,
     resources: NEMOTRON_RESOURCES,
     state: () => (busy ? ("busy" as const) : ("ready" as const)),
     pid: () => undefined,
     load: async () => ({ loadMs: 0 }),
-    unload: async () => void (engine.unloads += 1),
+    unload: async () => {
+      engine.unloads += 1;
+      engine.unloadAt = performance.now();
+    },
     transcribe: async (request: AsrRequest, options: TranscribeOptions = {}) => {
       if (busy) throw new EngineError("rejected", "two at once");
       busy = true;
@@ -92,6 +102,7 @@ function fakeEngine(transcribe: Transcribe): AsrEngine & { unloads: number } {
         return await transcribe(request, options);
       } finally {
         busy = false;
+        engine.doneAt = performance.now();
       }
     },
   };
@@ -321,13 +332,14 @@ describe("a transcription", () => {
 
 describe("the model on the card", () => {
   it("leaves the card a while after its last request", async () => {
-    // Long enough that a slow runner has the result before the model leaves.
     const { link, engine } = await serve(async (asked) => heard(asked), {
       limits: { unloadMs: 1_500 },
     });
     await remote(link()).transcribe(request(audio(RATE)));
-    expect(engine.unloads).toBe(0);
     await expect.poll(() => engine.unloads, { timeout: 5_000 }).toBe(1);
+    // Measured on the engine, not against the reply: a slow runner may hand
+    // the result back after the model has already left.
+    expect(engine.unloadAt - engine.doneAt).toBeGreaterThanOrEqual(1_500);
   });
 
   it("stays on the card when told to", async () => {
