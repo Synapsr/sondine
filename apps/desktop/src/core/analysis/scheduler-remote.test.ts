@@ -87,6 +87,7 @@ function start(
     readonly dictationEngine?: AsrEngine;
     readonly journal?: JournalWork;
     readonly idleUnloadMs?: number;
+    readonly admissionIntervalMs?: number;
     readonly now?: () => number;
   } = {},
 ) {
@@ -111,7 +112,7 @@ function start(
     onStatus: (status) => void statuses.push(status),
     log: { info: record, warn: record },
     timing: {
-      admissionIntervalMs: 20,
+      admissionIntervalMs: options.admissionIntervalMs ?? 20,
       idleUnloadMs: options.idleUnloadMs ?? 50,
       rssIntervalMs: 20,
       swapSettleMs: 0,
@@ -213,12 +214,12 @@ describe("a compute server", () => {
   it("stops at once when the user goes back to this Mac, which takes the job", async () => {
     const engine = remoteEngine({ hang: true });
     const local = fakeEngine();
-    const started = start(engine, { idleEngine: local });
+    // The next look is a minute away: whatever stops the request now came at once.
+    const started = start(engine, { idleEngine: local, admissionIntervalMs: 60_000 });
     await waitUntil(() => engine.requests.length === 1, { label: "sent" });
     current = local;
     started.placeChanged();
-    // At once: not at the next look.
-    await waitUntil(() => attempts()[0]?.["error_code"] === "not_sent", { timeoutMs: 400 });
+    await waitUntil(() => attempts()[0]?.["error_code"] === "not_sent", { label: "stopped" });
     await waitUntil(() => jobState() === "succeeded", { label: "published here" });
     expect(attempts()[0]).toMatchObject({ outcome: "cancelled", error_code: "not_sent" });
     expect(local.requests).toHaveLength(1);

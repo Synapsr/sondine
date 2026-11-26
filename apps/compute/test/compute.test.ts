@@ -304,7 +304,9 @@ describe("a transcription", () => {
       }
       return response;
     };
-    const result = await remote(link(), { fetch: flaky }).transcribe(
+    // Patience is counted from the first try: a slow runner's round trip must
+    // not use it up before the second try, which the server answers.
+    const result = await remote(link(), { fetch: flaky, patienceMs: 60_000 }).transcribe(
       request(audio(CHUNK_BYTES * 2)),
     );
     expect(result.text).toBe("bonjour");
@@ -325,13 +327,20 @@ describe("a transcription", () => {
       return heard(asked);
     });
     const [first, second] = [link("a"), link("b")];
+    // A request is queued once the server answered its one chunk.
+    let uploaded = 0;
+    const counting: Fetch = async (url, init) => {
+      const response = await fetch(url, init);
+      if (init.method === "PUT") uploaded += 1;
+      return response;
+    };
     // The first Mac sends two before the second sends one.
-    const all = [remote(first).transcribe(request(audio(RATE + 1)))];
+    const all = [remote(first, { fetch: counting }).transcribe(request(audio(RATE + 1)))];
     await expect.poll(() => order.length).toBe(1);
-    all.push(remote(first).transcribe(request(audio(RATE + 2))));
-    await new Promise((resolve) => setTimeout(resolve, 80));
-    all.push(remote(second).transcribe(request(audio(RATE + 3))));
-    await new Promise((resolve) => setTimeout(resolve, 80));
+    all.push(remote(first, { fetch: counting }).transcribe(request(audio(RATE + 2))));
+    await expect.poll(() => uploaded).toBe(2);
+    all.push(remote(second, { fetch: counting }).transcribe(request(audio(RATE + 3))));
+    await expect.poll(() => uploaded).toBe(3);
     for (let count = 1; count <= 3; count += 1) {
       await expect.poll(() => gates.length).toBe(count);
       gates[count - 1]?.();
@@ -520,13 +529,14 @@ describe("who may use a server", () => {
   });
 
   it("says it is busy rather than hold too much", async () => {
-    const { link } = await serve(() => new Promise(() => undefined), {
+    const { link, sessions } = await serve(() => new Promise(() => undefined), {
       limits: { maxPerClient: 1 },
     });
     const own = link();
     const controller = new AbortController();
     const first = remote(own).transcribe(request(audio(RATE)), { signal: controller.signal });
-    await new Promise((resolve) => setTimeout(resolve, 60));
+    first.catch(() => undefined);
+    await expect.poll(() => sessions.size).toBe(1);
     await expect(remote(own).transcribe(request(audio(RATE)))).rejects.toMatchObject({
       code: "server_busy",
     });

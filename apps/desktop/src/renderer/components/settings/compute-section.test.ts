@@ -144,8 +144,22 @@ vi.mock("@sondine/ui/components/radio-group", () => {
 });
 
 vi.mock("@sondine/ui/components/button", () => ({
-  Button: (props: { onClick?: () => void; type?: "submit"; children: ReactNode }) =>
-    createElement("button", { type: props.type, onClick: props.onClick }, props.children),
+  Button: (props: {
+    onClick?: () => void;
+    type?: "submit";
+    isPending?: boolean;
+    children: ReactNode;
+  }) =>
+    createElement(
+      "button",
+      {
+        type: props.type,
+        onClick: props.onClick,
+        // As the real button: the page shows that it waits.
+        "aria-busy": props.isPending === true ? true : undefined,
+      },
+      props.children,
+    ),
 }));
 
 vi.mock("@sondine/ui/components/field", () => {
@@ -184,6 +198,11 @@ afterEach(async () => {
 
 const shown = () => document.querySelector("#choice")?.getAttribute("data-value");
 const dialog = () => document.querySelector("[role=alertdialog]");
+/** The dialog's button shows it waits: the page knows the answer is due. */
+const waiting = () =>
+  vi.waitFor(() =>
+    expect(document.querySelector("[role=alertdialog] [aria-busy=true]")).not.toBeNull(),
+  );
 
 function click(selector: string): void {
   const element = document.querySelector<HTMLElement>(selector);
@@ -253,8 +272,7 @@ describe("choosing where transcription runs", () => {
       const answer = held();
       await ask(destination);
       await vi.waitFor(() => expect(core.choices).toBe(1));
-      // The button shows it waits: the page knows the answer is due.
-      await new Promise((resolve) => setTimeout(resolve, 20));
+      await waiting();
       click("#dismiss");
       await vi.waitFor(() => expect(core.chosen).toEqual(["device"]));
       answer();
@@ -267,12 +285,12 @@ describe("choosing where transcription runs", () => {
   it("shows what core keeps when the answer came before the closing", async () => {
     const answer = held();
     await ask("beta");
-    await new Promise((resolve) => setTimeout(resolve, 20));
+    await waiting();
     answer();
     click("#dismiss");
     await vi.waitFor(() => expect(dialog()).toBeNull());
-    await new Promise((resolve) => setTimeout(resolve, 20));
-    expect(shown()).toBe(core.state.destination);
+    await vi.waitFor(() => expect(client.isMutating()).toBe(0));
+    await vi.waitFor(() => expect(shown()).toBe(core.state.destination));
   });
 
   it("stays open on a refusal, and closing it then chooses nothing", async () => {

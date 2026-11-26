@@ -668,7 +668,7 @@ describe("transcription pipeline in the core runtime", () => {
   it("recovers a job whose core died during inference: one published run, no duplicates", async () => {
     const data = setup();
     const fake = await helper(data);
-    const stray = straySpeechWorker(data.dir);
+    const stray = await straySpeechWorker(data.dir);
     cleanups.push(() => void stray.child.kill("SIGKILL"));
     const hung = fakeEngine({ hang: true, pid: () => stray.child.pid });
     const first = startCore(
@@ -697,7 +697,7 @@ describe("transcription pipeline in the core runtime", () => {
     left.close();
 
     // A worker spawned during a cold load, killed with its core before its pid was recorded.
-    const unrecorded = straySpeechWorker(data.dir);
+    const unrecorded = await straySpeechWorker(data.dir);
     cleanups.push(() => void unrecorded.child.kill("SIGKILL"));
     const engine = fakeEngine();
     const second = startCore(

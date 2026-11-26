@@ -3,6 +3,7 @@ import { join } from "node:path";
 import type { Database } from "@sondine/db";
 import {
   EngineError,
+  findWorkerProcesses,
   type AsrEngine,
   type AsrRequest,
   type AsrResult,
@@ -21,6 +22,7 @@ import type { MemoryUse } from "../src/core/analysis/memory-use";
 import type { MemoryState } from "../src/core/analysis/system-signals";
 import type { ReadTrackAudio } from "../src/core/audio/track-audio";
 import { Database as CoreDatabase } from "../src/core/database";
+import { waitUntil } from "./support";
 
 // Test doubles for the analysis pipeline: an engine that "hears" non-zero
 // stretches of the audio it is sent, an audio reader that synthesizes speech
@@ -277,17 +279,27 @@ export const regionAudioLayer = Layer.effect(
  * A process whose command line reads `<dir>/bin/speech … worker …`, standing
  * for a worker a killed core left behind (core matches the speech binary's
  * exact path, which `ps` reports from argv[0], and for a recorded pid the
- * `worker` subcommand).
+ * `worker` subcommand). Resolves once `ps` lists it that way: a loaded
+ * machine can take seconds to, and a core started sooner would not see it.
  */
-export function straySpeechWorker(dir: string): {
+export async function straySpeechWorker(dir: string): Promise<{
   readonly child: ChildProcess;
   readonly binary: string;
-} {
+}> {
   const binary = join(dir, "bin", "speech");
   const child = spawn(
     process.execPath,
     ["-e", "setInterval(() => {}, 1000)", "worker", "weights.gguf"],
     { argv0: binary, stdio: "ignore" },
   );
+  try {
+    await waitUntil(async () => (await findWorkerProcesses(binary)).includes(child.pid ?? -1), {
+      label: "stray worker listed",
+      timeoutMs: 20_000,
+    });
+  } catch (error) {
+    child.kill("SIGKILL");
+    throw error;
+  }
   return { child, binary };
 }

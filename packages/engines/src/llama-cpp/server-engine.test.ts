@@ -131,15 +131,17 @@ describe("llama-server engine", () => {
     const pending = text.generate(request, { signal: controller.signal });
     setTimeout(() => controller.abort(), 300);
     await expect(pending).rejects.toMatchObject({ code: "cancelled" });
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    expect(logged().some((entry) => entry.event === "client-gone")).toBe(true);
+    // The server logs the closed connection once it notices it.
+    await expect
+      .poll(() => logged().some((entry) => entry.event === "client-gone"), { timeout: 10_000 })
+      .toBe(true);
   });
 
   it("fails a request when the server dies under it", async () => {
     const text = serverEngine("crash-in-request");
     await expect(text.generate(request)).rejects.toMatchObject({ code: "crashed" });
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    expect(text.state()).toBe("absent");
+    // The request fails on the reset socket; the child's exit comes after.
+    await expect.poll(() => text.state(), { timeout: 10_000 }).toBe("absent");
   });
 
   it("fails a load that never becomes healthy, and one whose server exits", async () => {
