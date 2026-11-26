@@ -837,9 +837,66 @@ describe("analysis scheduler", () => {
     checkSearchIndex(temp.db);
   });
 
-  it("fails the attempt when a request stays untimed at the smallest split", async () => {
-    start(fakeEngine({ untimed: () => true }));
+  it("publishes no speech when the model cannot time a noise under a second", async () => {
+    // Seen on 2026-11-25: traces of 0.3 s of speech failed untimed, again and again.
+    boot.chunks(mic, 120, 300);
+    boot.region(mic, 200, 200.4);
+    runEpisodePass(temp.db, { nowMs: boot.wallMs(300), fullScan: true });
+    const short = Number(scalar(temp.db, "SELECT max(id) FROM episodes"));
+    const engine = fakeEngine({ untimed: (request) => request.samples.length < 5 * 16_000 });
+    start(engine);
+    await waitUntil(() => succeededJobs() === 2, { label: "both published" });
+    expect(scalar(temp.db, "SELECT count(*) FROM job_attempts WHERE outcome = 'failed'")).toBe(0);
+    expect(scalar(temp.db, "SELECT analysis_state FROM episodes WHERE id = ?", short)).toBe(
+      "complete",
+    );
+    expect(scalar(temp.db, "SELECT count(*) FROM segments WHERE episode_id = ?", short)).toBe(0);
+    expect(
+      Number(
+        scalar(
+          temp.db,
+          "SELECT json_extract(metrics, '$.untimedSilent') FROM analysis_runs WHERE episode_id = ? AND status = 'published'",
+          short,
+        ),
+      ),
+    ).toBe(1);
+    // Sent once: no voiceless retry for a noise.
+    expect(engine.requests.filter((request) => request.samples.length < 5 * 16_000)).toHaveLength(
+      1,
+    );
+    expect(logged("analysis.untimed").map((entry) => entry.fields)).toEqual([
+      expect.objectContaining({ outcome: "silent", speechMs: 400 }),
+    ]);
+    checkSearchIndex(temp.db);
+  });
+
+  it("sends a request it cannot halve again without voices, and publishes it as one voice", async () => {
+    const engine = fakeEngine({ untimed: (request) => request.speakers });
+    start(engine);
+    await waitUntil(() => jobState() === "succeeded", { label: "published" });
+    expect(engine.requests.map((request) => request.speakers)).toEqual([true, false]);
+    expect(rows(temp.db, "SELECT DISTINCT speaker_label FROM segments")).toEqual([
+      { speaker_label: "input:BuiltInMicrophoneDevice/1/1" },
+    ]);
+    expect(
+      Number(
+        scalar(
+          temp.db,
+          "SELECT json_extract(metrics, '$.untimedRetries') FROM analysis_runs WHERE status = 'published'",
+        ),
+      ),
+    ).toBe(1);
+    expect(logged("analysis.untimed").map((entry) => entry.fields["outcome"])).toEqual([
+      "retry-one-voice",
+    ]);
+    checkSearchIndex(temp.db);
+  });
+
+  it("fails the attempt when a request stays untimed at the smallest split, voices or not", async () => {
+    const engine = fakeEngine({ untimed: () => true });
+    start(engine);
     await waitUntil(() => jobState() === "failed", { label: "failed" });
+    expect(engine.requests.map((request) => request.speakers)).toEqual([true, false]);
     expect(
       rows(temp.db, "SELECT outcome, error_code FROM job_attempts ORDER BY attempt").at(-1),
     ).toEqual({ outcome: "failed", error_code: "invalid_output" });

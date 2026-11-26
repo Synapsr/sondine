@@ -32,7 +32,7 @@ import {
   OPENS_PER_SECOND,
   type BetaOptions,
 } from "../src/server.ts";
-import { Sessions, type SessionLimits } from "../src/sessions.ts";
+import { Sessions, type ServerLog, type SessionLimits } from "../src/sessions.ts";
 
 const RATE = 16_000;
 let state: string;
@@ -115,12 +115,14 @@ async function serve(
     readonly beta?: BetaOptions;
     readonly limits?: Partial<SessionLimits>;
     readonly now?: () => number;
+    readonly log?: ServerLog;
   } = {},
 ) {
   const clients = new ClientStore(state, options.now);
   const engine = fakeEngine(transcribe);
   const sessions = new Sessions({
     engine,
+    ...(options.log === undefined ? {} : { log: options.log }),
     known: (id) => clients.has(id),
     onTranscribed: (id, seconds) => clients.charge(id, seconds),
     ...(options.limits === undefined ? {} : { limits: options.limits }),
@@ -222,9 +224,13 @@ describe("a transcription", () => {
       new EngineError("invalid_output", "no times", { reason: "untimed" }),
       new EngineError("deadline", "too long"),
     ];
-    const { link } = await serve(async () => {
-      throw errors.shift() ?? new Error("none left");
-    });
+    const logged: Readonly<Record<string, string | number>>[] = [];
+    const { link } = await serve(
+      async () => {
+        throw errors.shift() ?? new Error("none left");
+      },
+      { log: (event, fields) => logged.push({ event, ...fields }) },
+    );
     const engine = remote(link());
     await expect(engine.transcribe(request(audio(RATE)))).rejects.toMatchObject({
       code: "invalid_output",
@@ -233,6 +239,11 @@ describe("a transcription", () => {
     await expect(engine.transcribe(request(audio(RATE)))).rejects.toMatchObject({
       code: "crashed",
     });
+    // The reason is a fixed code: it says why without the model's words.
+    expect(logged.filter((entry) => entry["event"] === "failed")).toEqual([
+      { event: "failed", code: "invalid_output", reason: "untimed" },
+      { event: "failed", code: "deadline" },
+    ]);
   });
 
   it("refuses times outside the audio it sent", async () => {
@@ -418,13 +429,18 @@ describe("what is between a Mac and its server", () => {
   });
 
   it("never lets a server's words into an error", async () => {
-    const { link } = await serve(async () => {
-      throw new EngineError("invalid_output", "no", { reason: "a sentence someone said" });
-    });
+    const logged: string[] = [];
+    const { link } = await serve(
+      async () => {
+        throw new EngineError("invalid_output", "no", { reason: "a sentence someone said" });
+      },
+      { log: (event, fields) => logged.push(JSON.stringify({ event, ...fields })) },
+    );
     const failure = await remote(link())
       .transcribe(request(audio(RATE)))
       .catch((error: unknown) => error);
     expect(failure).toMatchObject({ code: "invalid_output", reason: undefined });
+    expect(logged.join("\n")).not.toContain("someone said");
   });
 
   it("cannot fill the server's memory with strangers' first messages", async () => {

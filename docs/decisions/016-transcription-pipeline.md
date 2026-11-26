@@ -243,7 +243,8 @@ identity, and publish and worker gaps; this version answers them.
   it. Cancelled attempts (admission, shutdown, a new generation) and
   abandoned ones stay in `job_attempts` and never count: they say nothing
   about the job. A failure the same input would give again (`model_limit`
-  or `untimed` at the smallest split, audio gone) fails the job at once. A
+  or `untimed` at the smallest split and without speakers, audio gone)
+  fails the job at once. A
   user request on a failed job starts a new job, counted from zero. Before,
   each claim counted, so a request cancelled five times by admission read
   « 5 of 3 » while still queued; startup recovery recounts queued jobs.
@@ -319,9 +320,20 @@ identity, and publish and worker gaps; this version answers them.
 - **Untimed.** A request whose text the model cannot time (speech.cpp's
   `untimed`: its CTC alignment, bound by speaker, finds no path through a
   long request) is halved the same way, and its halves sent; text without
-  times is never published. Still untimed at the smallest split, the job
-  fails as `invalid_output` without retry. One episode lost
-  three attempts of 20 min on one 55 min request (2026-11-18).
+  times is never published. One episode lost
+  three attempts of 20 min on one 55 min request (2026-11-18). A request
+  the split cannot halve (2026-11-26):
+  - with less than 1 s of speech (its region slices, without roll) is
+    published as no speech: no segment, the episode `complete`. The text is
+    dropped, and only a code and durations are logged. From 2026-11-08 to
+    2026-11-26 one Mac had 101 episodes fail untimed: 86 held less than 1 s
+    of speech, all traces, where the model writes text the request's few
+    frames cannot hold;
+  - otherwise it is sent once more without speakers, so the alignment has
+    the whole request instead of one voice's frames, and its text becomes
+    one voice of that request (`<trackKey>/<request>/1`). Still untimed, or
+    a dictation (sent without speakers already), the job fails as
+    `invalid_output` without retry.
 - **Outcome.** One pass covers every track and publishes one `asr` run:
   segments with their `track_run_id`, and turns derived from the segments'
   speakers, which become the episode's speakers. Coverage below 0.5 still
@@ -334,7 +346,9 @@ identity, and publish and worker gaps; this version answers them.
   (architecture §3 "Echo and duplicates").
 - `analysis_runs.metrics` records audio ms, coverage, cold load ms, compute
   ms, real-time factor, and the worker's peak RSS, so admission can use the
-  measured peak per audio duration.
+  measured peak per audio duration; and the requests split, published as no
+  speech or sent again without speakers (`modelLimitSplits`,
+  `untimedSplits`, `untimedSilent`, `untimedRetries`).
 
 ### Models
 
