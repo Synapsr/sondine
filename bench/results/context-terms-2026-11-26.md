@@ -48,8 +48,9 @@ differences above are the prompt's, not noise.
 ## Reading
 
 - The combined prompt spells the terms and keeps the speakers and the word times,
-  for 2 to 4 % more time. Its risk is the model's with any context: names that sound
-  like a term become the term (here 2 of 3 deliberately chosen near names).
+  for 2 to 4 % more time. Its risk: names that sound like a term become the term (2 of 3
+  deliberately chosen near names; the terms pass without speakers changed none
+  into the term), so on this sample it pulls harder than the card's prompt.
 - Without speakers, the CTC alignment takes the transcript as one voice and
   its times drift on conversations, so the other routes are worse: the terms
   pass's words merged with `speech diarize` (`nemotron-3-diarization`, 16 s
