@@ -1715,9 +1715,19 @@ export class AnalysisScheduler {
         sent: number;
         splits: number;
         untimedSplits: number;
+        untimedSilent: number;
+        untimedRetries: number;
         computeMs: number;
         provenance: EngineProvenance | null;
-      } = { sent: 0, splits: 0, untimedSplits: 0, computeMs: 0, provenance: null };
+      } = {
+        sent: 0,
+        splits: 0,
+        untimedSplits: 0,
+        untimedSilent: 0,
+        untimedRetries: 0,
+        computeMs: 0,
+        provenance: null,
+      };
       const segments: SegmentInput[] = [];
       const transcribed: RequestPlan[] = [];
       /** Transcribes a request, halving it while the model stops at its limit. */
@@ -1736,14 +1746,13 @@ export class AnalysisScheduler {
           await transcribe(first, samples.subarray(0, split.at), offset, depth + 1);
           await transcribe(second, samples.subarray(split.at), offset + split.at, depth + 1);
         };
-        let result: AsrResult;
-        try {
-          result = await engine.transcribe(
+        const send = (speakers: boolean) =>
+          engine.transcribe(
             {
               id: `attempt-${claim.attemptId}-${pass.sent}`,
               samples,
               sampleRate: 16_000,
-              speakers: !oneVoice,
+              speakers,
               timestamps: true,
             },
             {
@@ -1755,16 +1764,37 @@ export class AnalysisScheduler {
               },
             },
           );
+        let result: AsrResult;
+        try {
+          result = await send(!oneVoice);
         } catch (error) {
+          if (!isUntimed(error) || controller.signal.aborted) throw error;
           // The model wrote text it could not time: its alignment found no
           // path through a long request (2026-11-18: three
           // attempts of 20 min lost on one 55 min request). Shorter halves
           // align; text without times is never published.
-          if (!isUntimed(error) || split === null || controller.signal.aborted) throw error;
-          pass.untimedSplits += 1;
-          log.info("analysis.split", { jobId: claim.jobId, reason: "untimed", depth });
-          await halves();
-          return;
+          if (split !== null) {
+            pass.untimedSplits += 1;
+            log.info("analysis.split", { jobId: claim.jobId, reason: "untimed", depth });
+            await halves();
+            return;
+          }
+          const speechMs = speechMsOf(plan);
+          const fields = { jobId: claim.jobId, speechMs, audioMs: msIn(plan, plan.samples) };
+          if (speechMs < UNTIMED_SILENT_SPEECH_MS) {
+            // A noise too short for the text the model wrote: no speech, not a failure.
+            pass.untimedSilent += 1;
+            log.info("analysis.untimed", { ...fields, outcome: "silent" });
+            transcribed.push(plan);
+            return;
+          }
+          // The alignment is searched per voice; without voices it has the whole request.
+          if (oneVoice) throw error;
+          pass.untimedRetries += 1;
+          pass.sent += 1;
+          log.info("analysis.untimed", { ...fields, outcome: "retry-one-voice" });
+          // Still untimed: it fails as `invalid_output`, without retry.
+          result = oneSpeaker(await send(false));
         }
         pass.computeMs += result.metrics.computeMs;
         pass.provenance = result.provenance;
@@ -1893,6 +1923,8 @@ export class AnalysisScheduler {
             skippedRequests: skipped,
             modelLimitSplits: pass.splits,
             untimedSplits: pass.untimedSplits,
+            untimedSilent: pass.untimedSilent,
+            untimedRetries: pass.untimedRetries,
             segments: echo.segments.length,
             echoWords: echo.echoWords,
           },
@@ -2176,6 +2208,30 @@ function isUntimed(error: unknown): boolean {
   return (
     error instanceof EngineError && error.code === "invalid_output" && error.reason === "untimed"
   );
+}
+
+/**
+ * Speech under this, in a request the model cannot time and the split cannot
+ * halve, is published as no speech. From 2026-11-08 to 2026-11-26 one Mac had
+ * 101 episodes fail untimed; 86 of them held less than 1 s of speech (65 less
+ * than 0.5 s), all traces: a noise the model wrote text over, likely more
+ * than the frames of its one voice can hold. The live transcripts of the
+ * seven that failed on the compute server found one 80 ms piece in all.
+ */
+export const UNTIMED_SILENT_SPEECH_MS = 1_000;
+
+const msIn = (plan: RequestPlan, samples: number) => Math.round((samples * 1000) / plan.sampleRate);
+
+/** The speech inside a request, without its roll. */
+const speechMsOf = (plan: RequestPlan) =>
+  msIn(
+    plan,
+    plan.speech.reduce((sum, span) => sum + span.sampleEnd - span.sampleStart, 0),
+  );
+
+/** A request sent again without voices: its text is one voice of the request. */
+function oneSpeaker(result: AsrResult): AsrResult {
+  return { ...result, segments: result.segments.map((segment) => ({ ...segment, speaker: 0 })) };
 }
 
 /** Loaded or loading: the engine holds its memory, or is taking it. */

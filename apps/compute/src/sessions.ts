@@ -360,12 +360,10 @@ export class Sessions {
       if (!this.sessions.has(session.id)) return;
       const code = error instanceof EngineError ? error.code : "internal";
       const own = code === "invalid_output" || code === "rejected";
-      this.setState(session, {
-        state: "failed",
-        code: own ? code : "failed",
-        reason: reasonOf(error),
-      });
-      this.log("failed", { code });
+      const reason = reasonOf(error);
+      this.setState(session, { state: "failed", code: own ? code : "failed", reason });
+      // A fixed code (`untimed`…), never the engine's message, which may quote its text.
+      this.log("failed", reason === null ? { code } : { code, reason });
     } finally {
       samples.fill(0);
       session.touchedAt = this.now();
