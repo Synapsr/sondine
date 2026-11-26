@@ -12,12 +12,21 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 /** Core's side: the last choice wins over a server's late answer. */
 const core = vi.hoisted(() => {
-  const initial = { destination: "device", own: false, joined: false };
+  const initial = { destination: "device", own: false, joined: false, invited: false };
   return {
     state: { ...initial },
     choices: 0,
     /** Every `compute.choose` received. */
     chosen: [] as string[],
+    /** Last invite link passed to `joinBeta`. */
+    lastInvite: undefined as string | undefined,
+    quotaData: null as {
+      plan: "own" | "beta" | "trial" | "cloud";
+      period: "total" | "month" | "unlimited";
+      usedSeconds: number;
+      limitSeconds: number | null;
+      extraSeconds: number;
+    } | null,
     givenBack: 0,
     outcome: "joined",
     /** Resolves when the server answers. */
@@ -26,16 +35,18 @@ const core = vi.hoisted(() => {
       this.state = { ...initial };
       this.choices = 0;
       this.chosen = [];
+      this.lastInvite = undefined;
+      this.quotaData = null;
       this.givenBack = 0;
       this.outcome = "joined";
       this.answer = Promise.resolve();
     },
     status() {
-      const { destination, own, joined } = this.state;
+      const { destination, own, joined, invited } = this.state;
       return {
         destination,
         own: own ? { name: "atelier", host: "10.0.0.1:8443" } : null,
-        beta: { available: true, joined },
+        beta: { available: true, joined, invited },
       };
     },
     choose(destination: string) {
@@ -44,9 +55,10 @@ const core = vi.hoisted(() => {
       this.state.destination = destination;
       return this.status();
     },
-    async joinBeta() {
+    async joinBeta(input: { link?: string } = {}) {
+      this.lastInvite = input.link;
       const asked = ++this.choices;
-      if (!this.state.joined) {
+      if (!this.state.joined || input.link !== undefined) {
         await this.answer;
         if (this.choices !== asked) {
           this.givenBack += 1;
@@ -54,7 +66,12 @@ const core = vi.hoisted(() => {
         }
         if (this.outcome !== "joined") return { outcome: this.outcome, status: this.status() };
       }
-      this.state = { ...this.state, destination: "beta", joined: true };
+      this.state = {
+        ...this.state,
+        destination: "beta",
+        joined: true,
+        invited: input.link !== undefined || this.state.invited,
+      };
       return { outcome: "joined", status: this.status() };
     },
     async connect() {
@@ -92,9 +109,16 @@ vi.mock("../../core/orpc", () => {
         },
         choose: mutation(({ destination }) => core.choose(destination)),
         connect: mutation(() => core.connect()),
-        joinBeta: mutation(() => core.joinBeta()),
+        joinBeta: mutation((input) => core.joinBeta(input as { link?: string })),
         disconnect: mutation(() => core.status()),
         leaveBeta: mutation(() => core.status()),
+        quota: {
+          queryKey: () => ["compute", "quota"],
+          queryOptions: () => ({
+            queryKey: ["compute", "quota"],
+            queryFn: () => Promise.resolve(core.quotaData),
+          }),
+        },
       },
     },
   };
@@ -153,8 +177,16 @@ vi.mock("@sondine/ui/components/field", () => {
   return { Field: plain, FieldLabel: plain };
 });
 
-vi.mock("@sondine/ui/components/input", () => ({ Input: () => null }));
+vi.mock("@sondine/ui/components/input", () => ({
+  Input: (props: { value?: string; onChange?: (event: { target: { value: string } }) => void }) =>
+    createElement("input", {
+      value: props.value ?? "",
+      onInput: (event: Event) =>
+        props.onChange?.({ target: { value: (event.target as HTMLInputElement).value } }),
+    }),
+}));
 
+const { m } = await import("../../paraglide/messages.js");
 const { ComputeSection } = await import("./compute-section");
 
 let root: Root;
@@ -284,5 +316,28 @@ describe("choosing where transcription runs", () => {
     await vi.waitFor(() => expect(dialog()).toBeNull());
     expect(core.chosen).toEqual([]);
     expect(await reread()).toBe("device");
+  });
+
+  it("sends the invite code typed in Settings, shows quota, and offers Disconnect instead of Leave", async () => {
+    core.quotaData = {
+      plan: "cloud",
+      period: "month",
+      usedSeconds: 36_000,
+      limitSeconds: 144_000,
+      extraSeconds: 36_000,
+    };
+    click("#radio-beta");
+    await vi.waitFor(() => expect(dialog()).not.toBeNull());
+    const input = document.querySelector<HTMLInputElement>("[role=alertdialog] input");
+    expect(input).not.toBeNull();
+    input!.value = "invite-token-123";
+    input!.dispatchEvent(new document.defaultView!.Event("input", { bubbles: true }));
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    click("[role=alertdialog] button:not(#dismiss)");
+    await vi.waitFor(() => expect(dialog()).toBeNull());
+    expect(core.lastInvite).toBe("invite-token-123");
+    await vi.waitFor(() => expect(document.body.textContent).toContain("10.0 / 40.0 h"));
+    expect(document.body.textContent).toContain("+10.0 h");
+    expect(document.body.textContent).toContain(m.compute_cloud_disconnect());
   });
 });

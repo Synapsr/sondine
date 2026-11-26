@@ -14,6 +14,8 @@ export interface ComputeServer {
   readonly serverKey: string;
   readonly token: string;
   readonly name: string;
+  /** True when joined via a Wave 1 invite link/code (never sends `leave` on disconnect). */
+  readonly invited?: boolean;
 }
 
 export interface ComputeSettings {
@@ -27,13 +29,18 @@ const ON_DEVICE: ComputeSettings = { destination: "device", own: null, beta: nul
 
 function server(value: unknown): ComputeServer | null {
   if (typeof value !== "object" || value === null) return null;
-  const { endpoint, serverKey, token, name } = value as Record<string, unknown>;
-  return typeof endpoint === "string" &&
-    typeof serverKey === "string" &&
-    typeof token === "string" &&
-    typeof name === "string"
-    ? { endpoint, serverKey, token, name }
-    : null;
+  const { endpoint, serverKey, token, name, invited } = value as Record<string, unknown>;
+  if (
+    typeof endpoint !== "string" ||
+    typeof serverKey !== "string" ||
+    typeof token !== "string" ||
+    typeof name !== "string"
+  ) {
+    return null;
+  }
+  return invited === true
+    ? { endpoint, serverKey, token, name, invited: true }
+    : { endpoint, serverKey, token, name };
 }
 
 export function computeSettings(db: Database): ComputeSettings {

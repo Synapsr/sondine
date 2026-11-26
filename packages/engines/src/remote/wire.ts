@@ -48,8 +48,8 @@ export const AsrJob = z.strictObject({
 });
 export type AsrJob = z.output<typeof AsrJob>;
 
-/** Billing / quota tier of a compute client (ADR 040). */
-export const QuotaPlan = z.enum(["own", "beta", "trial", "founder", "pro"]);
+/** Quota tier of a compute client (ADR 040); pricing lives outside the compute server. */
+export const QuotaPlan = z.enum(["own", "beta", "trial", "cloud"]);
 export type QuotaPlan = z.output<typeof QuotaPlan>;
 
 /** Whether a client's included seconds reset each month, never reset, or are unlimited. */

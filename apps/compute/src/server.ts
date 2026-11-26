@@ -17,7 +17,7 @@ import {
   type RefusalCode,
   type Responded,
 } from "@sondine/engines/remote";
-import { planOf, type ClientStore } from "./clients.ts";
+import { isInvitedPlan, planOf, type ClientStore } from "./clients.ts";
 import type { ServerLog, Sessions } from "./sessions.ts";
 
 // The HTTP face (packages/engines/src/remote/wire.ts). Plain HTTP: every
@@ -160,6 +160,8 @@ export function createComputeServer(options: ComputeServerOptions): Server {
         return { reply: { kind: "quota", ...snapshot } };
       }
       case "leave":
+        // Invited plans (`trial`, `cloud`) cannot be deleted by a client click; only the operator removes them.
+        if (isInvitedPlan(planOf(known.client))) return refuse("bad_request");
         sessions.dropClient(known.id);
         clients.remove(known.id);
         return { reply: { kind: "left" } };

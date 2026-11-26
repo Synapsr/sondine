@@ -55,7 +55,7 @@ describe("where transcription runs", () => {
     expect(service.status()).toEqual({
       destination: "device",
       own: null,
-      beta: { available: true, joined: false },
+      beta: { available: true, joined: false, invited: false },
     });
     expect(service.engine()).toBeNull();
     expect(service.choose("own")).toBe(false);
@@ -160,7 +160,7 @@ describe("where transcription runs", () => {
     expect(await none.joinBeta()).toBe("closed");
   });
 
-  it("joins the cloud with an invite link or raw token, and reads quota only when remote", async () => {
+  it("joins the cloud with an invite link or raw token, disconnects without server leave, releases prior open beta, and reads quota only when remote", async () => {
     const server = answering(hello);
     const service = await compute({ beta: { endpoint, serverKey }, fetch: server.fetch });
     expect(await service.quota()).toBeNull();
@@ -174,9 +174,52 @@ describe("where transcription runs", () => {
     });
     expect(await service.joinBeta(otherServer)).toBe("mismatch");
 
-    expect(await service.joinBeta(token)).toBe("joined");
-    expect(service.status()).toMatchObject({ destination: "beta", beta: { joined: true } });
+    // Propagates server refusals (`closed`, `busy`, `quota`, `unauthorized`) on invite join.
+    for (const [code, expected] of [
+      ["closed", "closed"],
+      ["busy", "busy"],
+      ["quota", "quota"],
+      ["unauthorized", "refused"],
+    ] as const) {
+      const refused = await compute({
+        beta: { endpoint, serverKey },
+        fetch: answering({ kind: "refused", code }).fetch,
+      });
+      expect(await refused.joinBeta(token)).toBe(expected);
+    }
 
+    // Holding an open-beta place, then joining with an invite releases the old open-beta place.
+    const oldToken = Buffer.alloc(32, 3).toString("base64url");
+    setComputeSettings(
+      temp.db,
+      {
+        destination: "beta",
+        own: null,
+        beta: { endpoint, serverKey, token: oldToken, name: "Sondine" },
+      },
+      1,
+    );
+    expect(await service.joinBeta(token)).toBe("joined");
+    expect(service.status()).toMatchObject({
+      destination: "beta",
+      beta: { joined: true, invited: true },
+    });
+    expect(server.asked).toMatchObject([
+      { kind: "hello", token },
+      { kind: "leave", token: oldToken },
+    ]);
+
+    // Disconnecting an invited plan stays local and never sends `leave` to the server.
+    const beforeLeave = server.asked.length;
+    await service.leaveBeta();
+    expect(service.status()).toMatchObject({
+      destination: "device",
+      beta: { joined: false, invited: false },
+    });
+    expect(server.asked).toHaveLength(beforeLeave);
+
+    // Quota is read on demand when remote.
+    expect(await service.joinBeta(token)).toBe("joined");
     const quotaReply: OpenReply = {
       kind: "quota",
       plan: "trial",

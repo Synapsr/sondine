@@ -1,4 +1,5 @@
-import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -26,6 +27,7 @@ import {
   type ServerLink,
 } from "@sondine/engines/remote";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { runCli } from "../src/cli.ts";
 import {
   ClientStore,
   PLAN_MONTHLY_SECONDS,
@@ -629,7 +631,7 @@ describe("the beta's places", () => {
 });
 
 describe("plans, trial and top-ups (Wave 1)", () => {
-  it("runs a cumulative trial even when open beta is closed, and never resets it next month", async () => {
+  it("runs a cumulative trial even when open beta is closed, never resets next month, and refuses leave and top-up", async () => {
     let at = Date.now();
     const { endpoint, serverKey, clients } = await serve(undefined, { now: () => at });
     const { id, token } = clients.add("beta", "wave1-trial", { plan: "trial", limitSeconds: 3 });
@@ -643,6 +645,7 @@ describe("plans, trial and top-ups (Wave 1)", () => {
       limitSeconds: 3,
       extraSeconds: 0,
     });
+    expect(clients.topUp(id, 3_600)).toEqual({ ok: false, reason: "unsupported-plan" });
     await engine.transcribe(request(audio(RATE * 2)));
     expect(await readQuota(link, { now: () => at })).toEqual({
       plan: "trial",
@@ -655,6 +658,11 @@ describe("plans, trial and top-ups (Wave 1)", () => {
     await expect(engine.transcribe(request(audio(RATE * 2)))).rejects.toMatchObject({
       code: "quota_exhausted",
     });
+    // Invited plans refuse `leave` so a client cannot delete its plan on the server.
+    await expect(leavePlace(link, { now: () => at })).rejects.toMatchObject({
+      refusal: "bad_request",
+    });
+    expect(clients.has(id)).toBe(true);
     // Next month: trial usage stays cumulative and does not reset.
     at += 40 * 24 * 3_600_000;
     expect(await readQuota(link, { now: () => at })).toEqual({
@@ -667,10 +675,10 @@ describe("plans, trial and top-ups (Wave 1)", () => {
     expect(clients.quota(id)).toMatchObject({ plan: "trial", usedSeconds: 2, limitSeconds: 3 });
   });
 
-  it("upgrades a trial token to founder in place, and spends top-ups only past the monthly limit", async () => {
+  it("upgrades a trial token to cloud in place, keeps clients/ CLI-only when spending top-ups, and persists top-ups across months", async () => {
     let at = Date.now();
     const { endpoint, serverKey, clients } = await serve(undefined, { now: () => at });
-    const { id, token } = clients.add("beta", "wave1-user", { plan: "trial", limitSeconds: 2 });
+    const { id, token } = clients.add("beta", "wave1-001", { plan: "trial", limitSeconds: 2 });
     const link: ServerLink = { endpoint, serverKey, token };
     const engine = remote(link);
 
@@ -680,10 +688,15 @@ describe("plans, trial and top-ups (Wave 1)", () => {
     });
 
     // Upgrade keeps the same token and starts a fresh monthly allowance.
-    expect(clients.setPlan(id, "founder", { limitSeconds: 3 })).toBe(true);
-    expect(clients.topUp(id, 4)).toBe(true);
+    expect(clients.setPlan(id, "cloud", { limitSeconds: 3 })).toEqual({ ok: true });
+    // Downgrading back to trial is refused.
+    expect(clients.setPlan(id, "trial")).toEqual({ ok: false, reason: "downgrade" });
+    expect(clients.topUp(id, 4)).toEqual({ ok: true, remainingSeconds: 4 });
+    const clientFilePath = join(state, "clients", `${id}.json`);
+    const clientBeforeCharge = readFileSync(clientFilePath, "utf8");
+
     expect(await readQuota(link, { now: () => at })).toEqual({
-      plan: "founder",
+      plan: "cloud",
       period: "month",
       usedSeconds: 0,
       limitSeconds: 3,
@@ -693,42 +706,101 @@ describe("plans, trial and top-ups (Wave 1)", () => {
     // 2 s uses monthly allowance; next 3 s finishes monthly (1 s) and takes 2 s from top-ups.
     await engine.transcribe(request(audio(RATE * 2)));
     await engine.transcribe(request(audio(RATE * 3)));
+    // `charge` never rewrites `clients/<id>.json` (extraSpent lives in `usage/`).
+    expect(readFileSync(clientFilePath, "utf8")).toBe(clientBeforeCharge);
     expect(await readQuota(link, { now: () => at })).toEqual({
-      plan: "founder",
+      plan: "cloud",
       period: "month",
       usedSeconds: 3,
       limitSeconds: 3,
       extraSeconds: 2,
     });
 
-    // Asking for 3 s exceeds the 2 s of top-up left.
-    await expect(engine.transcribe(request(audio(RATE * 3)))).rejects.toMatchObject({
+    // Exhaust the remaining 2 s of top-up, then verify quota refusal once top-ups run out.
+    await engine.transcribe(request(audio(RATE * 2)));
+    await expect(engine.transcribe(request(audio(RATE)))).rejects.toMatchObject({
       code: "quota_exhausted",
     });
 
-    // Next month: monthly allowance resets to 0 while remaining 2 s of top-up persist.
+    // Add another top-up, then roll over to next month: monthly resets to 0, top-up stays intact.
+    expect(clients.topUp(id, 5)).toEqual({ ok: true, remainingSeconds: 5 });
     at += 40 * 24 * 3_600_000;
     expect(await readQuota(link, { now: () => at })).toEqual({
-      plan: "founder",
+      plan: "cloud",
       period: "month",
       usedSeconds: 0,
       limitSeconds: 3,
-      extraSeconds: 2,
+      extraSeconds: 5,
+    });
+    // `leave` is also refused on paid monthly plans so top-ups can never be deleted by a click.
+    await expect(leavePlace(link, { now: () => at })).rejects.toMatchObject({
+      refusal: "bad_request",
+    });
+    expect(clients.has(id)).toBe(true);
+  });
+
+  it("reads 0.9.0 client and usage files and keeps own/beta usage files minimal", () => {
+    const at = Date.UTC(2026, 10, 26);
+    const clients = new ClientStore(state, () => at);
+    const ownToken = Buffer.alloc(32, 4).toString("base64url");
+    const ownId = createHash("sha256").update(ownToken).digest("hex");
+    const betaToken = Buffer.alloc(32, 5).toString("base64url");
+    const betaId = createHash("sha256").update(betaToken).digest("hex");
+    writeFileSync(
+      join(state, "clients", `${ownId}.json`),
+      JSON.stringify({ kind: "own", name: "mac", createdAt: at }),
+    );
+    writeFileSync(
+      join(state, "usage", `${ownId}.json`),
+      JSON.stringify({ lastUsedAt: at, month: "2026-11", seconds: 12 }),
+    );
+    writeFileSync(
+      join(state, "clients", `${betaId}.json`),
+      JSON.stringify({ kind: "beta", name: "beta", createdAt: at }),
+    );
+    writeFileSync(
+      join(state, "usage", `${betaId}.json`),
+      JSON.stringify({ lastUsedAt: at, month: "2026-11", seconds: 30 }),
+    );
+
+    expect(clients.find(ownToken)?.client).toEqual({ kind: "own", name: "mac", createdAt: at });
+    expect(clients.quota(ownId)).toEqual({
+      plan: "own",
+      period: "unlimited",
+      usedSeconds: 12,
+      limitSeconds: null,
+      extraSeconds: 0,
+    });
+    expect(clients.quota(betaId, 1_000)).toEqual({
+      plan: "beta",
+      period: "month",
+      usedSeconds: 30,
+      limitSeconds: 1_000,
+      extraSeconds: 0,
+    });
+
+    clients.charge(ownId, 5);
+    clients.charge(betaId, 10, 1_000);
+    // Neither `own` nor plain `beta` gains `totalSeconds` or `extraSpent`.
+    expect(JSON.parse(readFileSync(join(state, "usage", `${ownId}.json`), "utf8"))).toEqual({
+      lastUsedAt: at,
+      month: "2026-11",
+      seconds: 17,
+    });
+    expect(JSON.parse(readFileSync(join(state, "usage", `${betaId}.json`), "utf8"))).toEqual({
+      lastUsedAt: at,
+      month: "2026-11",
+      seconds: 40,
     });
   });
 
-  it("uses 60 min trial, 40 h monthly founder/pro and 10 h top-up defaults, and protects invited clients from beta eviction", () => {
+  it("uses 60 min trial, 40 h monthly cloud and 10 h top-up defaults, and protects invited clients from beta eviction", () => {
     let at = Date.UTC(2026, 10, 26);
     const clients = new ClientStore(state, () => at);
     const trial = clients.add("beta", "t", { plan: "trial" });
-    const founder = clients.add("beta", "f", { plan: "founder" });
-    const pro = clients.add("beta", "p", { plan: "pro" });
+    const cloud = clients.add("beta", "c", { plan: "cloud" });
     expect(clients.quota(trial.id)).toMatchObject({ limitSeconds: TRIAL_SECONDS, period: "total" });
-    expect(clients.quota(founder.id)).toMatchObject({
-      limitSeconds: PLAN_MONTHLY_SECONDS,
-      period: "month",
-    });
-    expect(clients.quota(pro.id)).toMatchObject({
+    expect(clients.quota(cloud.id)).toMatchObject({
       limitSeconds: PLAN_MONTHLY_SECONDS,
       period: "month",
     });
@@ -740,9 +812,72 @@ describe("plans, trial and top-ups (Wave 1)", () => {
     at += PLACE_IDLE_MS + 1;
     expect(clients.claim(1)).not.toBeNull();
     expect(clients.has(trial.id)).toBe(true);
-    expect(clients.has(founder.id)).toBe(true);
-    expect(clients.has(pro.id)).toBe(true);
+    expect(clients.has(cloud.id)).toBe(true);
     expect(clients.find(openPlace!)).toBeNull();
+  });
+
+  it("runs CLI commands for add, list, set-plan, topup, and rejects invalid options", async () => {
+    const cli = async (args: string[]) => {
+      const stdout: string[] = [];
+      const stderr: string[] = [];
+      const code = await runCli(args, {
+        env: { SONDINE_COMPUTE_STATE: state },
+        out: (line) => stdout.push(line),
+        err: (line) => stderr.push(line),
+      });
+      return { code, stdout: stdout.join("\n"), stderr: stderr.join("\n") };
+    };
+
+    const added = await cli([
+      "add",
+      "wave1-001",
+      "--endpoint",
+      "https://cloud.sondine.app",
+      "--plan",
+      "trial",
+    ]);
+    expect(added.code).toBe(0);
+    expect(parseServerLink(added.stdout)).not.toBeNull();
+
+    const listed = await cli(["list"]);
+    expect(listed.code).toBe(0);
+    expect(listed.stdout).toContain("trial");
+    expect(listed.stdout).toContain("0.00/1.0 h");
+    const id = listed.stdout.split(/\s+/u)[0]!;
+
+    // Top-up on trial is refused.
+    expect((await cli(["topup", id, "--hours", "10"])).code).toBe(1);
+    // --hours on unlimited own plan is refused.
+    expect(
+      (
+        await cli([
+          "add",
+          "my-mac",
+          "--endpoint",
+          "http://127.0.0.1:8443",
+          "--plan",
+          "own",
+          "--hours",
+          "5",
+        ])
+      ).code,
+    ).toBe(1);
+
+    const upgraded = await cli(["set-plan", id, "cloud"]);
+    expect(upgraded.code).toBe(0);
+    expect(upgraded.stdout).toContain("cloud  40.0 h");
+    // Downgrade to trial is refused.
+    expect((await cli(["set-plan", id, "trial"])).code).toBe(1);
+
+    const top1 = await cli(["topup", id, "--hours", "10"]);
+    expect(top1.code).toBe(0);
+    expect(top1.stdout).toContain("+10.0 h top-up (10.0 h left)");
+    const top2 = await cli(["topup", id, "--minutes", "30"]);
+    expect(top2.code).toBe(0);
+    expect(top2.stdout).toContain("+0.5 h top-up (10.5 h left)");
+    expect((await cli(["list"])).stdout).toContain("0.00/40.0 h (+10.5 h)");
+    expect((await cli(["remove", id])).code).toBe(0);
+    expect((await cli(["list"])).stdout).toBe("");
   });
 });
 

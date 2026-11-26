@@ -91,7 +91,11 @@ export const computeLayer = (options: ComputeOptions = {}) =>
           return {
             destination,
             own: own === null ? null : { name: own.name, host: new URL(own.endpoint).host },
-            beta: { available: beta !== null, joined: place !== null },
+            beta: {
+              available: beta !== null,
+              joined: place !== null,
+              invited: place?.invited === true,
+            },
           };
         },
         engine: () => {
@@ -151,15 +155,22 @@ export const computeLayer = (options: ComputeOptions = {}) =>
               if (rawToken.success) link = { ...beta, token: rawToken.data };
             }
             if (link === null) return "bad-link";
+            const previous = computeSettings(db).beta;
             const asked = ++choice;
             try {
               const { name } = await hello(link, network);
               if (choice !== asked) return "cancelled";
-              save({ destination: "beta", beta: { ...link, name } });
+              save({ destination: "beta", beta: { ...link, name, invited: true } });
+              // Release any previously claimed open-beta place when moving to an invited plan.
+              if (previous !== null && previous.invited !== true && previous.token !== link.token) {
+                await leavePlace(previous, network).catch(() => undefined);
+              }
               return "joined";
             } catch (error) {
+              const refusal = error instanceof RefusedError ? error.refusal : null;
               const code = failed(error);
               log.warn("compute.join-failed", { code });
+              if (refusal === "closed" || refusal === "busy" || refusal === "quota") return refusal;
               if (code === "network_unavailable") return "offline";
               return code === "unauthorized" ? "refused" : "mismatch";
             }
@@ -189,7 +200,10 @@ export const computeLayer = (options: ComputeOptions = {}) =>
         leaveBeta: async () => {
           const { destination, beta: place } = computeSettings(db);
           save({ beta: null, destination: destination === "beta" ? "device" : destination });
-          if (place !== null) await leavePlace(place, network).catch(() => undefined);
+          // Only self-claimed open-beta places are given back; invited plans stay intact on the server.
+          if (place !== null && place.invited !== true) {
+            await leavePlace(place, network).catch(() => undefined);
+          }
         },
         quota: async () => {
           const settings = computeSettings(db);

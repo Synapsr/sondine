@@ -1,7 +1,7 @@
 ---
-type: added
+type: new
 ---
 
-## Invite links and plans for Sondine Cloud
+## Join Sondine Cloud with an invite link, and see your remaining hours
 
-The compute server now supports invited Wave 1 plans (`trial` with 60 cumulative minutes, `founder` and `pro` with 40 hours per month) alongside persistent top-up packs (`topup`) and in-place upgrades (`set-plan`), even when one-click open beta places are closed. You can paste a Cloud invite link or code directly in Settings ▸ Transcription ▸ Cloud, and Sondine can read your remaining plan allowance on demand.
+If you have a Sondine Cloud invite link or code, you can paste it during the first run or in Settings ▸ Transcription ▸ Cloud to activate your trial or monthly plan even while open beta spots are closed. Settings shows how much of your trial or monthly allowance (and any top-up hours) remains, and disconnecting a Mac from an invited plan leaves your plan and top-ups intact on the server.

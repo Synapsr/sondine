@@ -14,16 +14,18 @@ const core = vi.hoisted(() => ({
   tooBig: false,
   /** Every call that could send something, or change the place in force. */
   calls: [] as string[],
+  lastInvite: undefined as string | undefined,
   reset() {
     this.destination = "device";
     this.tooBig = false;
     this.calls = [];
+    this.lastInvite = undefined;
   },
   status() {
     return {
       destination: this.destination,
       own: null,
-      beta: { available: true, joined: this.destination === "beta" },
+      beta: { available: true, joined: this.destination === "beta", invited: false },
     };
   },
 }));
@@ -52,12 +54,14 @@ vi.mock("../../core/orpc", () => {
           return core.status();
         }),
         connect: mutation("connect", () => ({ outcome: "connected", status: core.status() })),
-        joinBeta: mutation("joinBeta", () => {
+        joinBeta: mutation("joinBeta", (input) => {
+          core.lastInvite = (input as { link?: string }).link;
           core.destination = "beta";
           return { outcome: "joined", status: core.status() };
         }),
         disconnect: mutation("disconnect", () => core.status()),
         leaveBeta: mutation("leaveBeta", () => core.status()),
+        quota: query("compute-quota", () => null),
       },
       onboarding: {
         get: query("onboarding", () => ({ step: "model", cloudNotify: false })),
@@ -139,7 +143,14 @@ vi.mock("@sondine/ui/components/alert-dialog", () => ({
 }));
 
 vi.mock("@sondine/ui/components/field", () => ({ Field: plain, FieldLabel: plain }));
-vi.mock("@sondine/ui/components/input", () => ({ Input: () => null }));
+vi.mock("@sondine/ui/components/input", () => ({
+  Input: (props: { value?: string; onChange?: (event: { target: { value: string } }) => void }) =>
+    createElement("input", {
+      value: props.value ?? "",
+      onInput: (event: Event) =>
+        props.onChange?.({ target: { value: (event.target as HTMLInputElement).value } }),
+    }),
+}));
 
 const { m } = await import("../../paraglide/messages.js");
 const { TranscriptionStep } = await import("./transcription-step");
@@ -264,5 +275,20 @@ describe("the first run's transcription step", () => {
     expect(document.body.textContent).toContain(m.welcome_cloud_notify());
     press(m.welcome_without_model());
     expect(steps).toEqual(["next"]);
+  });
+
+  it("lets a user join with a Cloud invite link or code during the first run", async () => {
+    await render();
+    await open("beta");
+    await vi.waitFor(() => expect(title()).toBe(m.compute_beta_title()));
+    const input = document.querySelector<HTMLInputElement>("input");
+    expect(input).not.toBeNull();
+    input!.value = "wave1-invite-token";
+    input!.dispatchEvent(new document.defaultView!.Event("input", { bubbles: true }));
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    press(m.compute_beta_use());
+    await vi.waitFor(() => expect(steps).toEqual(["next"]));
+    expect(core.calls).toEqual(["joinBeta"]);
+    expect(core.lastInvite).toBe("wave1-invite-token");
   });
 });

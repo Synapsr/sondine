@@ -18,6 +18,7 @@ import { ModelPanel, useModels } from "../models/model-panel";
 import { modelsBusy, modelsReady, modelsTooBig } from "../models/model-view";
 import { setSmallMac, useSmallMac } from "../models/small-mac";
 import {
+  BetaInviteField,
   BetaTerms,
   destinationOption,
   OwnLinkForm,
@@ -229,7 +230,7 @@ function OwnScreen({
   );
 }
 
-/** The beta's terms in the page; « Utiliser le cloud » takes the place. */
+/** The Cloud terms in the page; « Utiliser le cloud » takes a place or connects an invite. */
 function BetaScreen({
   status,
   onBack,
@@ -240,11 +241,13 @@ function BetaScreen({
   onNext: () => void;
 }) {
   const join = useJoinBeta(status.destination);
+  const [invite, setInvite] = useState("");
   const action = serverAction("beta", status.destination, status.own !== null);
   return (
     <Step
       title={m.compute_beta_title()}
       onBack={() => {
+        setInvite("");
         join.leave();
         onBack();
       }}
@@ -256,9 +259,10 @@ function BetaScreen({
             isPending={join.pending}
             onClick={() =>
               join.take(() => {
+                setInvite("");
                 join.finish();
                 onNext();
-              })
+              }, invite)
             }
           >
             {m.compute_beta_use()}
@@ -267,6 +271,7 @@ function BetaScreen({
       }
     >
       <BetaTerms />
+      {status.beta.joined ? null : <BetaInviteField value={invite} onChange={setInvite} />}
       {join.problem === null ? null : (
         <p role="alert" className="text-body-s text-error">
           {join.problem}
