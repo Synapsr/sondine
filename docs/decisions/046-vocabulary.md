@@ -2,7 +2,9 @@
 
 Status: Accepted — 2026-11-26 (Téo: « ok » to a list in Settings and to
 learning more from corrections, after a call where Sondine wrote « Théo t'as
-passé Sandrine » for « Téo » and « Sondine »). Amends ADR 018's spelling
+passé Sandrine » for « Téo » and « Sondine »; « ok » again, 2026-11-26, to
+the model running with the journal off, the 7 days read again, and the
+People's names by sound only). Amends ADR 018's spelling
 row (`vocabulary/2` → `vocabulary/3`). Builds on ADR 006, ADR 016, ADR 028.
 
 ## Context
@@ -41,7 +43,10 @@ sentence's start when the same transcript writes it with a capital
 mid-sentence) that sounds like exactly one of the user's names (same
 `phonetic-fr/2` key) is spelled their way: « Théo » → « Téo ». Two of the
 user's names with one key: neither. Lower-case words are never touched
-(« en théorie », a host named « théo »). As for `vocabulary/2`, the
+(« en théorie », a host named « théo »). A name followed by another word
+with a capital (« Théo Martin ») is someone else of that first name and is
+left, unless those two words are one of the user's names (« Téo Martin » in
+the list or the People); the model is not asked about it either. As for `vocabulary/2`, the
 engine's text stays as `original_text`, so « Rétablir l'original » works,
 and then records a correction keeping what was heard.
 
@@ -117,8 +122,10 @@ On a copy of the database (`sqlite3 .backup`, private, deleted after),
 `bench/results/vocabulary-2026-11-26.md`.
 
 - 178 episodes, 6,383 sentences. The rule without a model spells 84 words:
-  52 « Théo » → « Téo » (by their sentences about 46 are Téo, 2 another Théo
-  named with his surname, 4 cannot tell), 2 « Theo »/« Teo », 2 « Sondin »,
+  52 « Théo » → « Téo » (by their sentences about 46 are Téo, 2 another Théo,
+  4 cannot tell). With the surname rule, 83 words and 51 « Théo »: the one left is the other Théo
+  followed by his surname; no « Téo » is lost, and the other mention of him
+  (without his surname) is still rewritten. The rest: 2 « Theo »/« Teo », 2 « Sondin »,
   and 28 People's names written another way (three people: 12, 11 and 5). Cost: the whole week in 0.8 s, the copy's
   migration included; at publish, 2 ms to read the vocabulary and 9 ms for the
   week's longest episode (2,056 sentences).

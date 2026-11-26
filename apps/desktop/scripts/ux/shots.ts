@@ -127,6 +127,9 @@ const shots: readonly Shot[] = [
   },
   { name: "settings-advanced", route: "/settings?tab=advanced" },
   { name: "settings-privacy", route: "/settings/privacy" },
+  { name: "settings-vocabulary", route: "/settings/vocabulary" },
+  // What a correction taught, and a name it could not learn (ADR 046).
+  { name: "vocabulary-toasts", route: "/episode/1", prepare: correctSentence },
   {
     name: "usage-report",
     route: "/settings/privacy",
@@ -159,6 +162,53 @@ const shots: readonly Shot[] = [
 async function openAgent(page: Page): Promise<void> {
   const open = await page.eval<boolean>("document.querySelector('aside[aria-label]') !== null");
   if (!open) await page.click("button[aria-pressed]");
+}
+
+/**
+ * « Corriger ce passage » on the first sentence: a word written as a name
+ * that sounds the same (« chiffre » → « Chiffres »: learned), and another
+ * as a name that does not (« Kalia »).
+ */
+async function correctSentence(page: Page): Promise<void> {
+  await closePlayer(page);
+  // The focus arms the sentence's actions, as the pointer does.
+  await page.eval(`document.querySelector("[data-segment-id]").focus()`);
+  await sleep(300);
+  await page.click(`button[aria-label="Actions de la phrase"]`);
+  await sleep(1000);
+  // The menu's items, found in shadow roots too.
+  const item = await page.eval<{ x: number; y: number } | null>(`(() => {
+    const walk = (root) => {
+      for (const element of root.querySelectorAll("*")) {
+        if (element.getAttribute("role") === "menuitem" && element.textContent.includes("Corriger")) {
+          const box = element.getBoundingClientRect();
+          return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+        }
+        const inner = element.shadowRoot && walk(element.shadowRoot);
+        if (inner) return inner;
+      }
+      return null;
+    };
+    return walk(document);
+  })()`);
+  if (item === null) throw new Error("no « Corriger ce passage »");
+  await page.clickAt(item.x, item.y);
+  await sleep(400);
+  await page.eval(`(() => {
+    const field = document.querySelector("textarea");
+    const words = [...field.value.matchAll(/(?<=\\s)\\p{Ll}{5,}/gu)].map((match) => match[0]);
+    const sounding = words.find((word) => word.endsWith("e")) ?? words[0];
+    const other = words.find((word) => word !== sounding);
+    const next = field.value
+      .replace(sounding, sounding[0].toUpperCase() + sounding.slice(1) + "s")
+      .replace(other, "Kalia");
+    const set = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, "value").set;
+    set.call(field, next);
+    field.dispatchEvent(new Event("input", { bubbles: true }));
+  })()`);
+  // Leaving the field saves it.
+  await page.click("h1");
+  await sleep(1500);
 }
 
 async function closePlayer(page: Page): Promise<void> {

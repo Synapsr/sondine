@@ -88,6 +88,19 @@ describe("the user's names (vocabulary/3)", () => {
     );
   });
 
+  it("leaves a name followed by a surname, unless the full name is the user's", () => {
+    expect(spell("il y avait Théo Martin hier", named(["Téo"]))).toBe(
+      "il y avait Théo Martin hier",
+    );
+    expect(spell("mais Théo GG.", named(["Téo"]))).toBe("mais Théo GG.");
+    // Not a surname: a comma, or a word without a capital.
+    expect(spell("merci Théo, Martin arrive", named(["Téo"]))).toBe("merci Téo, Martin arrive");
+    expect(spell("vas-y Théo tu valides", named(["Téo"]))).toBe("vas-y Téo tu valides");
+    // The user's own full name.
+    expect(spell("avec Théo Martin hier", named(["Téo Martin"]))).toBe("avec Téo Martin hier");
+    expect(vocabularyCandidates("allez Sandrine Dupont", named(["Sondine"]))).toEqual([]);
+  });
+
   it("leaves a name two of the user's sound like", () => {
     const vocabulary = named(["Téo", "Théo"]);
     expect(spell("salut Teo", vocabulary)).toBe("salut Teo");

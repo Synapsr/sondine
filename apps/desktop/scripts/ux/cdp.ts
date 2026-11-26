@@ -140,6 +140,7 @@ export async function connect(port: number, timeoutMs: number): Promise<Page> {
           modifiers,
           ...(key === "Tab" ? { windowsVirtualKeyCode: 9 } : {}),
           ...(key === "Escape" ? { windowsVirtualKeyCode: 27 } : {}),
+          ...(key === "Enter" ? { windowsVirtualKeyCode: 13 } : {}),
         });
     },
     async move(x, y) {

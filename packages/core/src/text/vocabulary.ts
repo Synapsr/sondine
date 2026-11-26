@@ -22,6 +22,8 @@ export interface Vocabulary {
   readonly corrections: ReadonlyMap<string, string>;
   /** The user's names, word by word, by phonetic key: the spellings that share it. */
   readonly names: ReadonlyMap<string, readonly string[]>;
+  /** Two words of one of the user's names in a row (« Marie-Anne Dupont »), as their two keys. */
+  readonly fullNames: ReadonlySet<string>;
 }
 
 export interface VocabularyWord {
@@ -171,7 +173,17 @@ export function buildVocabulary(input: {
     if (!spellings.includes(word)) spellings.push(word);
     names.set(key, spellings);
   }
-  return { corrections, names };
+  const fullNames = new Set<string>();
+  for (const name of input.names ?? []) {
+    const keys = wordsOf(name.normalize("NFC")).map(keyOf);
+    for (let index = 1; index < keys.length; index += 1) {
+      const [before, after] = [keys[index - 1], keys[index]];
+      if (before !== null && before !== undefined && after !== null && after !== undefined) {
+        fullNames.add(`${before} ${after}`);
+      }
+    }
+  }
+  return { corrections, names, fullNames };
 }
 
 /**
@@ -230,6 +242,17 @@ function asName(text: string, word: string, index: number, written: ReadonlySet<
   return !startsSentence(text.slice(0, index)) || written.has(fold(word));
 }
 
+/**
+ * A name followed by a surname (« Théo Martin »): someone else of that first
+ * name, unless the two words are one of the user's names.
+ */
+function surnamed(text: string, word: string, index: number, vocabulary: Vocabulary): boolean {
+  const following = /^\s+(\p{Lu}[\p{L}\p{M}'’-]*)/u.exec(text.slice(index + word.length));
+  const surname = following?.[1];
+  if (surname === undefined) return false;
+  return !vocabulary.fullNames.has(`${keyOf(word)} ${keyOf(surname)}`);
+}
+
 /** The one spelling of the user's names that sounds like `word`; null for none, or for two. */
 function soundsLike(word: string, vocabulary: Vocabulary): string | null {
   const key = keyOf(word);
@@ -259,7 +282,10 @@ export function applyVocabulary<
     const word = match[0];
     const next =
       vocabulary.corrections.get(fold(word)) ??
-      (asName(segment.text, word, match.index, written) ? soundsLike(word, vocabulary) : null);
+      (asName(segment.text, word, match.index, written) &&
+      !surnamed(segment.text, word, match.index, vocabulary)
+        ? soundsLike(word, vocabulary)
+        : null);
     if (next === undefined || next === null || next === word) continue;
     edits.push({ start: match.index, end: match.index + word.length, text: next });
   }
@@ -361,6 +387,7 @@ export function vocabularyCandidates(
   for (const match of text.matchAll(WORD)) {
     const word = match[0];
     if (!asName(text, word, match.index, written) || listed.has(fold(word))) continue;
+    if (surnamed(text, word, match.index, vocabulary)) continue;
     if (vocabulary.corrections.has(fold(word))) continue;
     const key = keyOf(word);
     if (key === null || vocabulary.names.has(key)) continue;

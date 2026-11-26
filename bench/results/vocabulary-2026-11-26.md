@@ -27,8 +27,13 @@ transcript, 6,383 sentences.
 | total                              |    84 |
 
 - Of the 52 « Théo », read in their sentences: about 46 are Téo (addressed,
-  or talked about as the one doing his work), 2 are another Théo named with
-  his surname, 4 cannot be told.
+  or talked about as the one doing his work), 2 are another Théo, 4 cannot
+  be told.
+- With the surname rule (a name followed by a capitalized word is left,
+  same day, a new copy, same method): 83 words, 51 « Théo ». The one left is
+  the other Théo followed by his surname; no « Téo » is lost. The other
+  mention of him has no surname after it and is still rewritten. The
+  model's 9 candidates do not change.
 - The 28 People's names are three people's (12, 11, 5), each written
   another way that sounds the same.
 - Cost: the whole week settled in 0.8 s (node, the copy's migration

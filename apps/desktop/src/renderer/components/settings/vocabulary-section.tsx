@@ -29,20 +29,21 @@ export function VocabularySection() {
   if (data === undefined) return null;
   return (
     <div className="flex flex-col gap-m">
-      <p className="text-cte-text-muted">{m.vocabulary_intro()}</p>
-      {data.words.length === 0 ? null : (
-        <ul className="flex flex-col gap-xs">
-          {data.words.map((entry) => (
-            <WordRow
-              key={`${entry.id}:${entry.word}:${entry.note ?? ""}`}
-              entry={entry}
-              onChange={(word, note) => update.mutate({ id: entry.id, word, note })}
-              onRemove={() => remove.mutate({ id: entry.id })}
-            />
-          ))}
-        </ul>
-      )}
-      <AddForm onAdded={refresh} />
+      <p className="max-w-[40rem] text-cte-text-muted">{m.vocabulary_intro()}</p>
+      {/* One grid for the words and the new one: their fields line up. */}
+      <ul className="grid grid-cols-[12rem_minmax(0,1fr)_auto] items-center gap-xs">
+        {data.words.map((entry) => (
+          <WordRow
+            key={`${entry.id}:${entry.word}:${entry.note ?? ""}`}
+            entry={entry}
+            onChange={(word, note) => update.mutate({ id: entry.id, word, note })}
+            onRemove={() => remove.mutate({ id: entry.id })}
+          />
+        ))}
+        <li className="col-span-full grid grid-cols-subgrid">
+          <AddForm onAdded={refresh} />
+        </li>
+      </ul>
       {data.people.length === 0 ? null : (
         <p className="text-body-s text-cte-text-muted">
           {m.vocabulary_people({ names: data.people.join(", ") })}
@@ -72,12 +73,11 @@ function WordRow({
     onChange(nextWord, nextNote);
   };
   return (
-    <li className="flex items-center gap-xs">
+    <li className="col-span-full grid grid-cols-subgrid items-center">
       <Input
         aria-label={m.vocabulary_word_of({ word: entry.word })}
         defaultValue={entry.word}
         maxLength={60}
-        className="w-[12rem] shrink-0"
         onBlur={(event) => save(event.currentTarget.value, entry.note ?? "")}
         onKeyDown={(event) => {
           if (event.key === "Enter") event.currentTarget.blur();
@@ -86,10 +86,9 @@ function WordRow({
       />
       <Input
         aria-label={m.vocabulary_note_of({ word: entry.word })}
-        placeholder={m.vocabulary_note_placeholder()}
+        placeholder={m.vocabulary_note_label()}
         defaultValue={entry.note ?? ""}
         maxLength={200}
-        className="min-w-0 flex-1"
         onBlur={(event) => save(entry.word, event.currentTarget.value)}
         onKeyDown={(event) => {
           if (event.key === "Enter") event.currentTarget.blur();
@@ -99,6 +98,7 @@ function WordRow({
       <Button
         variant="ghost"
         size="icon"
+        className="justify-self-start"
         aria-label={m.vocabulary_remove({ word: entry.word })}
         onClick={onRemove}
       >
@@ -128,14 +128,13 @@ function AddForm({ onAdded }: { onAdded: () => void }) {
     add.mutate({ word: word.trim(), note: note.trim() === "" ? null : note.trim() });
   };
   return (
-    <form onSubmit={submit} className="flex items-center gap-xs">
+    <form onSubmit={submit} className="col-span-full grid grid-cols-subgrid items-center">
       <Input
         aria-label={m.vocabulary_word_label()}
         placeholder={m.vocabulary_word_label()}
         maxLength={60}
         value={word}
         onValueChange={(next) => setWord(next)}
-        className="w-[12rem] shrink-0"
       />
       <Input
         aria-label={m.vocabulary_note_label()}
@@ -143,7 +142,6 @@ function AddForm({ onAdded }: { onAdded: () => void }) {
         maxLength={200}
         value={note}
         onValueChange={(next) => setNote(next)}
-        className="min-w-0 flex-1"
       />
       <Button
         type="submit"

@@ -29,7 +29,7 @@ const { openDatabase, upsertTrackRun, openSpeechRegion, closeSpeechRegion, publi
   sondineDb;
 const { nameSpeaker, loadJournalSource, startJournalRun, publishJournalRun, setJournalMark } =
   sondineDb;
-const { setEpisodeTag, setUsageConsent } = sondineDb;
+const { setEpisodeTag, setUsageConsent, addVocabularyWord } = sondineDb;
 const { USAGE_REPORT_VERSION } = await import("@sondine/protocol");
 
 const RATE = 16_000;
@@ -685,6 +685,10 @@ for (const row of db
   const id = Number(row["id"]);
   tagged(id, row["context"] === "dictation" ? "idées" : "carte", now - 10_000 + id);
 }
+
+// The Vocabulary (ADR 046): two words of the list, one with a note.
+addVocabularyWord(db, { word: "Sondine", note: "le nom de mon app", nowMs: now });
+addVocabularyWord(db, { word: "Graphical", nowMs: now });
 
 // The question about anonymous statistics (ADR 042) is answered, so its card
 // is not on every screen (`--ask` leaves it).
