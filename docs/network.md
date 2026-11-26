@@ -62,14 +62,23 @@ has a token per Mac.
     (ten minutes at most), everything at most six hours. The program
     overwrites its audio buffers; the text, and what the engine's process and
     the graphics card free, is released without being erased byte by byte.
-  - _On disk, per Mac or place:_ a hash of its token, whether it is a machine
-    the owner added (with the name they gave), a place in the open beta, or an
-    invited plan (`trial`, `founder`, `pro`) with its included and top-up
-    seconds, when it was made, when it was last charged for a transcription,
-    and the seconds transcribed (monthly and cumulative). The Mac asks for its
-    erasure when the user gives the place back, once, without trying again.
-    Otherwise it stays until the operator removes it or, in a full open beta,
-    a newcomer takes a self-claimed beta place idle for 14 days.
+  - _On disk, per Mac or place:_ in `clients/` (written by the CLI or open-beta
+    `claim` only), a hash of its token, whether it is a machine the owner added,
+    a place in the open beta, or an invited plan (`trial`, `cloud`) with an
+    operator-given label (keep it an opaque id, never a name or e-mail), its
+    included and top-up seconds, and when it was made; in `usage/` (written by
+    the running server), when it was last charged and the seconds transcribed in
+    the current UTC month — plus a cumulative `totalSeconds` for `trial` clients
+    (no monthly reset) and `extraSpent` once purchased top-ups are drawn down
+    (`own` and open-beta places without top-ups keep only the current month's
+    seconds). For an open-beta place, the Mac asks for its erasure once when the
+    user gives the place back; for an invited plan (`trial`, `cloud`), the
+    server refuses `leave` and the Mac disconnects locally without deleting the
+    server record. Otherwise a record stays until the operator removes it or, in
+    a full open beta, a newcomer takes a self-claimed beta place idle for 14 days.
+  - _Quota check:_ when Cloud is the active destination and the user views
+    Settings ▸ Transcription, the Mac may send a sealed `quota` request with its
+    token to read the current plan and remaining seconds.
   - _In its log:_ the time and one word (`beta-claimed`, `transcribed`,
     `failed` with an error code, `expired`), with no Mac, no duration, no
     address. The machine's journal keeps it as long as it is set to.

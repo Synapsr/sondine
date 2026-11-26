@@ -1633,8 +1633,8 @@ export const ComputeStatus = z.strictObject({
   destination: ComputeDestination,
   /** The user's machine, once connected: never its token. */
   own: z.strictObject({ name: z.string(), host: z.string() }).nullable(),
-  /** `available`: this build knows a beta. `joined`: this Mac has one of its places. */
-  beta: z.strictObject({ available: z.boolean(), joined: z.boolean() }),
+  /** `available`: this build knows Cloud. `joined`: this Mac has a token. `invited`: joined by invite link/code. */
+  beta: z.strictObject({ available: z.boolean(), joined: z.boolean(), invited: z.boolean() }),
 });
 export type ComputeStatus = z.output<typeof ComputeStatus>;
 
@@ -1678,6 +1678,7 @@ export const ComputeJoinOutcome = z.enum([
   "full",
   "closed",
   "busy",
+  "quota",
   "offline",
   "mismatch",
 ]);
@@ -1690,7 +1691,7 @@ export const ComputeJoinResult = z.strictObject({
 export type ComputeJoinResult = z.output<typeof ComputeJoinResult>;
 
 export const ComputeQuota = z.strictObject({
-  plan: z.enum(["own", "beta", "trial", "founder", "pro"]),
+  plan: z.enum(["own", "beta", "trial", "cloud"]),
   period: z.enum(["total", "month", "unlimited"]),
   usedSeconds: z.number().nonnegative(),
   limitSeconds: z.number().nonnegative().nullable(),

@@ -221,3 +221,12 @@ Téo : journal sur les petits Mac, et bêta joignable tout de suite pour essayer
 Mesuré par l'adresse publique, même conversation de synthèse de 10 minutes : 89 s, chargement du modèle compris. Par Tailscale, version finale : 69 s.
 
 Téo, le même jour : les dictées ne doivent pas attendre une longue demande. Le planificateur a maintenant deux boucles, une pour le serveur et une pour ce que le Mac calcule (dictées, journal). Codex Astra a relu ce changement : une remarque, corrigée avec un test. Cinq places, pour l'équipe.
+
+## Vague 1 : invitations, essai 60 min, forfait mensuel et recharges (2026-11-26)
+
+Décisions de Téo pour l'ouverture progressive du Cloud Sondine au goutte-à-goutte :
+
+- **Deux plans invités côté serveur de calcul** : `trial` (60 minutes cumulées au total, sans remise à zéro mensuelle, non rechargeable) et `cloud` (40 heures par mois calendaire UTC + recharges persistantes de 10 heures sans expiration, consommées uniquement au-delà des 40 heures). Le serveur de calcul reste agnostique des tarifs (Tarif Fondateur 19 €/mois vs tarif public 29 €/mois gérés côté facturation) ; les rétrogradations vers `trial` sont refusées.
+- **Mode sur invitation** : les clients `trial` et `cloud` fonctionnent même avec `SONDINE_COMPUTE_BETA_PLACES=0`, ne sont jamais repris par le recyclage d'inactivité de la bêta ouverte, et le serveur refuse `leave` sur ces plans (l'app propose « Déconnecter ce Mac » sans supprimer le plan ni les recharges côté serveur).
+- **Séparation disque CLI / serveur** : `clients/` reste écrit uniquement par la CLI (et le `claim` bêta ouverte) avec un identifiant opaque (`name`), jamais de nom ni d'e-mail ; `usage/` (serveur seul) suit les secondes du mois UTC, `totalSeconds` uniquement pour `trial`, et `extraSpent` uniquement lorsque des recharges sont entamées (`own` et la bêta ouverte sans recharge gardent le même format qu'en 0.9.0).
+- **Protocole & app** : ajout du message chiffré `quota` (sans modifier `hello`, rétro-compatible 0.9.0), champ lien/code d'invitation partagé entre le premier lancement et Réglages ▸ Transcription ▸ Cloud, et affichage discret du temps restant dans Réglages quand le Cloud est actif.

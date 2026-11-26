@@ -18,27 +18,28 @@ import {
 import { z } from "zod";
 
 // What the server keeps on disk, all of it: its key, and for each client a
-// token's hash, its kind/plan/quotas and name, when it came, when it was last
-// charged, and the seconds transcribed. Never audio, text, or what a request
-// was. docs/network.md and the privacy policy say the same: change them with
-// this.
+// token's hash, its kind/plan/quotas and opaque label in `clients/` (written
+// only by the CLI and open-beta `claim`), and when it was last charged plus
+// seconds transcribed in `usage/` (written by the running server). Never
+// audio, text, or what a request was. docs/network.md and the privacy policy
+// say the same: change them with this.
 
 /** Default free trial allowance: 60 minutes total (does not reset monthly). */
 export const TRIAL_SECONDS = 60 * 60;
-/** Default monthly allowance for Founder and Pro plans: 40 hours. */
+/** Default monthly allowance for invited Cloud plans: 40 hours (UTC calendar month). */
 export const PLAN_MONTHLY_SECONDS = 40 * 3_600;
-/** Default top-up pack: 10 hours. */
+/** Default top-up pack: 10 hours (persists across months, no expiration). */
 export const TOPUP_SECONDS = 10 * 3_600;
 
 const Client = z.strictObject({
   kind: z.enum(["own", "beta"]),
   name: z.string().max(64),
   createdAt: z.int(),
-  /** Quota tier; omitted in older state files (defaults to `kind`). */
+  /** Quota tier; omitted in older 0.9.0 state files (defaults to `kind`). */
   plan: QuotaPlan.optional(),
-  /** Included seconds (total for `trial`, monthly for `founder`/`pro`/`beta`). */
+  /** Included seconds (total for `trial`, monthly for `cloud`/`beta`). */
   limitSeconds: z.number().nonnegative().optional(),
-  /** Purchased top-up seconds, consumed only past `limitSeconds`, never reset monthly. */
+  /** Purchased top-up seconds added by CLI; spent balance is tracked in `usage/`. */
   extraSeconds: z.number().nonnegative().optional(),
 });
 export type Client = z.output<typeof Client>;
@@ -47,8 +48,10 @@ const Usage = z.strictObject({
   lastUsedAt: z.int(),
   month: z.string(),
   seconds: z.number(),
-  /** Cumulative seconds across months (used by `trial`). */
+  /** Cumulative seconds across months (stored only for `trial` clients). */
   totalSeconds: z.number().nonnegative().optional(),
+  /** Cumulative top-up seconds already spent (stored only once top-ups are spent). */
+  extraSpent: z.number().nonnegative().optional(),
 });
 export type Usage = z.output<typeof Usage>;
 
@@ -61,9 +64,13 @@ export function planOf(client: Client): QuotaPlan {
   return client.plan ?? client.kind;
 }
 
+export function isInvitedPlan(plan: QuotaPlan): boolean {
+  return plan === "trial" || plan === "cloud";
+}
+
 export function defaultLimitSeconds(plan: QuotaPlan): number | undefined {
   if (plan === "trial") return TRIAL_SECONDS;
-  if (plan === "founder" || plan === "pro") return PLAN_MONTHLY_SECONDS;
+  if (plan === "cloud") return PLAN_MONTHLY_SECONDS;
   return undefined;
 }
 
@@ -84,7 +91,11 @@ function writeJson(path: string, value: unknown): void {
   renameSync(temporary, path);
 }
 
-/** One file per client, so the command line and the running server never overwrite each other. */
+/**
+ * One file per client in `clients/` (written by the CLI / `claim` only) and
+ * one file per client in `usage/` (written by `charge`), so the CLI and the
+ * running server never overwrite each other's files.
+ */
 export class ClientStore {
   private readonly directory: string;
   private readonly now: () => number;
@@ -128,14 +139,18 @@ export class ClientStore {
     const token = randomBytes(32).toString("base64url");
     const id = hashOf(token);
     const plan = options.plan;
+    const effectivePlan = plan ?? kind;
     const limitSeconds =
-      options.limitSeconds ?? (plan === undefined ? undefined : defaultLimitSeconds(plan));
-    const extraSeconds = options.extraSeconds;
+      effectivePlan === "own"
+        ? undefined
+        : (options.limitSeconds ?? (plan === undefined ? undefined : defaultLimitSeconds(plan)));
+    const extraSeconds =
+      effectivePlan === "own" || effectivePlan === "trial" ? undefined : options.extraSeconds;
     const record: Client = {
       kind,
       name,
       createdAt: this.now(),
-      ...(plan === undefined ? {} : { plan }),
+      ...(plan === undefined || plan === kind ? {} : { plan }),
       ...(limitSeconds === undefined ? {} : { limitSeconds }),
       ...(extraSeconds === undefined || extraSeconds <= 0 ? {} : { extraSeconds }),
     };
@@ -143,39 +158,61 @@ export class ClientStore {
     return { id, token };
   }
 
-  /** Changes a client's plan while keeping its token and any purchased top-up hours. */
-  setPlan(id: string, plan: QuotaPlan, options: { readonly limitSeconds?: number } = {}): boolean {
+  /**
+   * Changes a client's plan while keeping its token and any purchased top-up
+   * hours. Refuses downgrades from a paid/unlimited plan to `trial`.
+   */
+  setPlan(
+    id: string,
+    plan: QuotaPlan,
+    options: { readonly limitSeconds?: number } = {},
+  ): { readonly ok: true } | { readonly ok: false; readonly reason: "not-found" | "downgrade" } {
     const parsed = Client.safeParse(readJson(this.clientPath(id)));
-    if (!parsed.success) return false;
+    if (!parsed.success) return { ok: false, reason: "not-found" };
     const previous = planOf(parsed.data);
-    const limitSeconds = options.limitSeconds ?? defaultLimitSeconds(plan);
-    const { limitSeconds: _oldLimit, ...rest } = parsed.data;
+    if (plan === "trial" && previous !== "trial") {
+      return { ok: false, reason: "downgrade" };
+    }
+    const limitSeconds =
+      plan === "own" ? undefined : (options.limitSeconds ?? defaultLimitSeconds(plan));
+    const { limitSeconds: _oldLimit, plan: _oldPlan, ...rest } = parsed.data;
+    const kind: Client["kind"] = plan === "own" ? "own" : "beta";
     const next: Client = {
       ...rest,
-      kind: plan === "own" ? "own" : "beta",
-      plan,
+      kind,
+      ...(plan === kind ? {} : { plan }),
       ...(limitSeconds === undefined ? {} : { limitSeconds }),
     };
     writeJson(this.clientPath(id), next);
-    // Moving from a free trial to a monthly plan starts the paid month with a full allowance.
-    if (previous === "trial" && (plan === "founder" || plan === "pro")) {
+    // Moving from a free trial to a monthly Cloud plan starts the first paid month fresh.
+    if (previous === "trial" && plan === "cloud") {
       const usage = this.usage(id);
-      writeJson(this.usagePath(id), { ...usage, seconds: 0 } satisfies Usage);
+      const { totalSeconds: _dropTotal, ...kept } = usage;
+      writeJson(this.usagePath(id), { ...kept, seconds: 0 } satisfies Usage);
     }
-    return true;
+    return { ok: true };
   }
 
-  /** Adds purchased top-up seconds that persist across months. */
-  topUp(id: string, seconds: number): boolean {
-    if (!Number.isFinite(seconds) || seconds <= 0) return false;
+  /** Adds purchased top-up seconds that persist across months. Refused on `own` and `trial`. */
+  topUp(
+    id: string,
+    seconds: number,
+  ):
+    | { readonly ok: true; readonly remainingSeconds: number }
+    | {
+        readonly ok: false;
+        readonly reason: "not-found" | "invalid" | "unsupported-plan";
+      } {
+    if (!Number.isFinite(seconds) || seconds <= 0) return { ok: false, reason: "invalid" };
     const parsed = Client.safeParse(readJson(this.clientPath(id)));
-    if (!parsed.success) return false;
-    const next: Client = {
-      ...parsed.data,
-      extraSeconds: (parsed.data.extraSeconds ?? 0) + seconds,
-    };
+    if (!parsed.success) return { ok: false, reason: "not-found" };
+    const plan = planOf(parsed.data);
+    if (plan === "own" || plan === "trial") return { ok: false, reason: "unsupported-plan" };
+    const nextExtra = (parsed.data.extraSeconds ?? 0) + seconds;
+    const next: Client = { ...parsed.data, extraSeconds: nextExtra };
     writeJson(this.clientPath(id), next);
-    return true;
+    const spent = this.usage(id).extraSpent ?? 0;
+    return { ok: true, remainingSeconds: Math.max(0, nextExtra - spent) };
   }
 
   /** The client a token belongs to; null when it is unknown or was removed. */
@@ -204,15 +241,20 @@ export class ClientStore {
     rmSync(this.usagePath(id), { force: true });
   }
 
-  /** Seconds transcribed this month (and cumulative total across months). */
+  /** Seconds transcribed this UTC calendar month (plus cumulative / top-up fields when present). */
   usage(id: string): Usage {
     const stored = Usage.safeParse(readJson(this.usagePath(id)));
     const month = monthOf(this.now());
-    if (!stored.success) return { lastUsedAt: 0, month, seconds: 0, totalSeconds: 0 };
-    const totalSeconds = stored.data.totalSeconds ?? stored.data.seconds;
-    return stored.data.month === month
-      ? { ...stored.data, totalSeconds }
-      : { ...stored.data, month, seconds: 0, totalSeconds };
+    if (!stored.success) return { lastUsedAt: 0, month, seconds: 0 };
+    if (stored.data.month === month) return stored.data;
+    const { totalSeconds, extraSpent, lastUsedAt } = stored.data;
+    return {
+      lastUsedAt,
+      month,
+      seconds: 0,
+      ...(totalSeconds === undefined ? {} : { totalSeconds }),
+      ...(extraSpent === undefined ? {} : { extraSpent }),
+    };
   }
 
   /** Current plan, usage and limits for one client. */
@@ -222,7 +264,7 @@ export class ClientStore {
     const client = parsed.data;
     const plan = planOf(client);
     const usage = this.usage(id);
-    const extraSeconds = client.extraSeconds ?? 0;
+    const remainingExtra = Math.max(0, (client.extraSeconds ?? 0) - (usage.extraSpent ?? 0));
     if (plan === "own") {
       return {
         plan,
@@ -238,7 +280,7 @@ export class ClientStore {
         period: "total",
         usedSeconds: usage.totalSeconds ?? usage.seconds,
         limitSeconds: client.limitSeconds ?? TRIAL_SECONDS,
-        extraSeconds,
+        extraSeconds: 0,
       };
     }
     const limitSeconds =
@@ -250,47 +292,59 @@ export class ClientStore {
       period: "month",
       usedSeconds: usage.seconds,
       limitSeconds,
-      extraSeconds,
+      extraSeconds: remainingExtra,
     };
   }
 
+  /**
+   * Charges transcribed seconds to `usage/<id>.json` only (never touches
+   * `clients/<id>.json`). Keeps `own` and `beta` usage files minimal when no
+   * top-up is spent.
+   */
   charge(id: string, seconds: number, betaSecondsPerMonth: number | null = null): void {
     const parsed = Client.safeParse(readJson(this.clientPath(id)));
     if (!parsed.success) return;
-    const client = parsed.data;
     const usage = this.usage(id);
     const snapshot = this.quota(id, betaSecondsPerMonth);
+    if (snapshot === null) return;
+
     let fromExtra = 0;
-    if (snapshot !== null && snapshot.limitSeconds !== null && snapshot.extraSeconds > 0) {
+    if (
+      snapshot.period === "month" &&
+      snapshot.limitSeconds !== null &&
+      snapshot.extraSeconds > 0
+    ) {
       const includedLeft = Math.max(0, snapshot.limitSeconds - snapshot.usedSeconds);
       fromExtra = Math.min(snapshot.extraSeconds, Math.max(0, seconds - includedLeft));
-      if (fromExtra > 0) {
-        const remaining = Math.max(0, snapshot.extraSeconds - fromExtra);
-        const { extraSeconds: _oldExtra, ...rest } = client;
-        writeJson(
-          this.clientPath(id),
-          remaining > 0 ? ({ ...rest, extraSeconds: remaining } satisfies Client) : rest,
-        );
-      }
     }
-    const periodCharge = seconds - fromExtra;
-    const priorTotal = usage.totalSeconds ?? usage.seconds;
-    const nextSeconds =
-      snapshot?.period === "month" ? usage.seconds + periodCharge : usage.seconds + seconds;
-    const nextTotal =
-      snapshot?.period === "total" ? priorTotal + periodCharge : priorTotal + seconds;
+    const nextExtraSpent = (usage.extraSpent ?? 0) + fromExtra;
+
+    if (snapshot.period === "total") {
+      const nextTotal = (usage.totalSeconds ?? usage.seconds) + seconds;
+      writeJson(this.usagePath(id), {
+        lastUsedAt: this.now(),
+        month: usage.month,
+        seconds: usage.seconds + seconds,
+        totalSeconds: nextTotal,
+        ...(nextExtraSpent > 0 ? { extraSpent: nextExtraSpent } : {}),
+      } satisfies Usage);
+      return;
+    }
+
+    const nextSeconds = usage.seconds + (seconds - fromExtra);
     writeJson(this.usagePath(id), {
-      ...usage,
-      seconds: nextSeconds,
-      totalSeconds: nextTotal,
       lastUsedAt: this.now(),
+      month: usage.month,
+      seconds: nextSeconds,
+      ...(usage.totalSeconds === undefined ? {} : { totalSeconds: usage.totalSeconds }),
+      ...(nextExtraSpent > 0 ? { extraSpent: nextExtraSpent } : {}),
     } satisfies Usage);
   }
 
-  /** A self-claimed beta place, or null when all `places` are taken by people who use theirs. */
+  /** A self-claimed open-beta place, or null when all `places` are taken by active users. */
   claim(places: number): string | null {
     const now = this.now();
-    // Only open beta places count against `places` or are reclaimed when idle; invited plans stay.
+    // Only open-beta places count against `places` or are reclaimed when idle; invited plans stay.
     const beta = this.list().filter(({ client }) => planOf(client) === "beta");
     const idle = beta
       .map((entry) => ({

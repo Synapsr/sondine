@@ -2,6 +2,7 @@ import type {
   ComputeConnectOutcome,
   ComputeDestination,
   ComputeJoinOutcome,
+  ComputeQuota,
   ComputeStatus,
 } from "@sondine/api";
 import {
@@ -39,14 +40,29 @@ const connectText: Record<
 };
 
 const joinText: Record<Exclude<ComputeJoinOutcome, "joined" | "cancelled">, () => string> = {
-  "bad-link": () => m.compute_connect_bad_link(),
-  refused: () => m.compute_connect_refused(),
+  "bad-link": () => m.compute_beta_bad_link(),
+  refused: () => m.compute_beta_refused(),
   full: () => m.compute_beta_full(),
   closed: () => m.compute_beta_closed(),
   busy: () => m.compute_beta_busy(),
+  quota: () => m.compute_beta_quota(),
   offline: () => m.compute_offline(),
   mismatch: () => m.compute_mismatch(),
 };
+
+function formatQuotaLine(quota: ComputeQuota): string | null {
+  if (quota.limitSeconds === null) return null;
+  if (quota.period === "total") {
+    const leftMin = Math.max(0, Math.ceil((quota.limitSeconds - quota.usedSeconds) / 60));
+    const totalMin = Math.round(quota.limitSeconds / 60);
+    return m.compute_quota_trial({ left: String(leftMin), total: String(totalMin) });
+  }
+  const used = (quota.usedSeconds / 3_600).toFixed(1);
+  const limit = (quota.limitSeconds / 3_600).toFixed(1);
+  const base = m.compute_quota_month({ used, limit });
+  if (quota.extraSeconds <= 0) return base;
+  return `${base} · ${m.compute_quota_extra({ hours: (quota.extraSeconds / 3_600).toFixed(1) })}`;
+}
 
 export function useCompute() {
   return useQuery(orpc.compute.get.queryOptions());
@@ -104,6 +120,11 @@ export function ComputeSection() {
   const disconnect = useMutation(orpc.compute.disconnect.mutationOptions({ onSuccess: store }));
   const leave = useMutation(orpc.compute.leaveBeta.mutationOptions({ onSuccess: store }));
   const status = compute.data;
+  const quota = useQuery({
+    ...orpc.compute.quota.queryOptions(),
+    enabled: status !== undefined && status.destination === "beta" && status.beta.joined,
+    retry: false,
+  });
   if (status === undefined) {
     return (
       <p className={compute.isError ? "text-error" : "text-cte-text-muted"}>
@@ -112,6 +133,7 @@ export function ComputeSection() {
     );
   }
   const { destination, own, beta } = status;
+  const quotaLine = quota.data == null ? null : formatQuotaLine(quota.data);
   const error = choose.error ?? disconnect.error ?? leave.error;
   return (
     <div className="flex max-w-[40rem] flex-col gap-s">
@@ -147,6 +169,7 @@ export function ComputeSection() {
           {m.compute_own_forget()}
         </Button>
       )}
+      {quotaLine === null ? null : <p className="text-body-s text-cte-text-muted">{quotaLine}</p>}
       {beta.joined ? (
         <Button
           variant="ghost"
@@ -154,7 +177,7 @@ export function ComputeSection() {
           isPending={leave.isPending}
           onClick={() => leave.mutate({})}
         >
-          {m.compute_beta_leave()}
+          {beta.invited ? m.compute_cloud_disconnect() : m.compute_beta_leave()}
         </Button>
       ) : null}
       {error === null ? null : (
@@ -385,7 +408,29 @@ export function BetaTerms({ Lead = "p" }: { Lead?: ElementType }) {
   );
 }
 
-/** The beta's terms; one click takes a place. */
+/** Optional invite link or raw token for invite-only Cloud waves (Settings and first run). */
+export function BetaInviteField({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <Field className="items-stretch">
+      <FieldLabel>{m.compute_beta_invite_label()}</FieldLabel>
+      <Input
+        value={value}
+        autoComplete="off"
+        spellCheck={false}
+        placeholder="sondine-compute://connect?…"
+        onChange={(event) => onChange(event.target.value)}
+      />
+    </Field>
+  );
+}
+
+/** The beta's terms; one click takes a place, or connects an invite link/code. */
 export function BetaDialog({
   open,
   current,
@@ -417,18 +462,7 @@ export function BetaDialog({
       <AlertDialogPopup>
         <AlertDialogTitle>{m.compute_beta_title()}</AlertDialogTitle>
         <BetaTerms Lead={AlertDialogDescription} />
-        {joined ? null : (
-          <Field className="items-stretch">
-            <FieldLabel>{m.compute_beta_invite_label()}</FieldLabel>
-            <Input
-              value={invite}
-              autoComplete="off"
-              spellCheck={false}
-              placeholder="sondine-compute://connect?…"
-              onChange={(event) => setInvite(event.target.value)}
-            />
-          </Field>
-        )}
+        {joined ? null : <BetaInviteField value={invite} onChange={setInvite} />}
         {join.problem === null ? null : (
           <p role="alert" className="text-body-s text-error">
             {join.problem}

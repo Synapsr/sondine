@@ -117,27 +117,33 @@ libraries let the driver start; without them it finds only the CPU.
 
 ## The beta and invited waves
 
+> **Upgrading from 0.9.0:** back up `state/` before updating `sondine-compute`.
+> Older 0.9.0 servers use strict schemas that reject the new plan/usage fields,
+> so rolling back without a copy of `state/` will not work.
+
 `SONDINE_COMPUTE_BETA_PLACES=10` lets anyone take a place in one click, until
 all are taken; when all are, a place unused for two weeks goes to the next person.
-`SONDINE_COMPUTE_BETA_HOURS` bounds each open-beta place's month. Behind
-Cloudflare Tunnel, `SONDINE_COMPUTE_ADDRESS_HEADER=cf-connecting-ip` lets the
-server slow down claims by address. The app knows the beta by `CLOUD_BETA`
+`SONDINE_COMPUTE_BETA_HOURS` bounds each open-beta place's month (UTC calendar
+month). Behind Cloudflare Tunnel, `SONDINE_COMPUTE_ADDRESS_HEADER=cf-connecting-ip`
+lets the server slow down claims by address. The app knows the beta by `CLOUD_BETA`
 (`apps/desktop/src/shared/cloud.ts`): the tunnel's URL and the key
 `sondine-compute key` prints.
 
 For invite-only waves, leave `SONDINE_COMPUTE_BETA_PLACES=0` and issue tokens
-per plan:
+per plan using an **opaque label** (never a person's real name or e-mail):
 
 ```bash
-# 60-minute cumulative free trial (does not reset monthly)
+# 60-minute cumulative free trial (does not reset monthly; override with --hours or --minutes)
 node sondine-compute.js add "wave1-001" --endpoint https://cloud.sondine.app --plan trial
 
-# upgrade the same link in place to Founder (40 h/month) or Pro (40 h/month)
-node sondine-compute.js set-plan <id> founder
+# upgrade the same link in place to the monthly Cloud plan (40 h/month, UTC calendar month)
+node sondine-compute.js set-plan <id> cloud
 
-# add a 10-hour top-up pack (spent only past the monthly limit, persists across months)
+# add a 10-hour top-up pack (spent only past the monthly limit, persists across months; also accepts --minutes)
 node sondine-compute.js topup <id> --hours 10
 ```
 
-Invited clients (`trial`, `founder`, `pro`) stay active while open claims are
-closed and are never evicted by idle beta recycling.
+Invited clients (`trial`, `cloud`) stay active while open claims are closed,
+are never evicted by idle beta recycling, and cannot be removed by a client's
+`leave` request (only `sondine-compute remove` deletes them). Downgrading a
+`cloud` or `own` client to `trial`, or adding top-ups to `trial`/`own`, is refused.
