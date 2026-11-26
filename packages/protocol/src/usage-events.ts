@@ -53,6 +53,7 @@ export const USAGE_RULES = {
   compute_chosen: "action",
   compute_connected: "action",
   compute_disconnected: "action",
+  compute_quota_viewed: "never",
   compute_viewed: "never",
   context_added: "action",
   context_edited: "action",

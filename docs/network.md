@@ -63,12 +63,13 @@ has a token per Mac.
     overwrites its audio buffers; the text, and what the engine's process and
     the graphics card free, is released without being erased byte by byte.
   - _On disk, per Mac or place:_ a hash of its token, whether it is a machine
-    the owner added (with the name they gave) or a place in the beta, when it
-    was made, when it was last charged for a transcription, and the seconds
-    transcribed in the last month it was used. The Mac asks for its erasure
-    when the user gives the place back, once, without trying again. Otherwise
-    it stays until the operator removes it or, in a full beta, a newcomer
-    takes a place idle for 14 days.
+    the owner added (with the name they gave), a place in the open beta, or an
+    invited plan (`trial`, `founder`, `pro`) with its included and top-up
+    seconds, when it was made, when it was last charged for a transcription,
+    and the seconds transcribed (monthly and cumulative). The Mac asks for its
+    erasure when the user gives the place back, once, without trying again.
+    Otherwise it stays until the operator removes it or, in a full open beta,
+    a newcomer takes a self-claimed beta place idle for 14 days.
   - _In its log:_ the time and one word (`beta-claimed`, `transcribed`,
     `failed` with an error code, `expired`), with no Mac, no duration, no
     address. The machine's journal keeps it as long as it is set to.

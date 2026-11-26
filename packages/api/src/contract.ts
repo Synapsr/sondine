@@ -40,7 +40,9 @@ import {
   ComputeChooseInput,
   ComputeConnectInput,
   ComputeConnectResult,
+  ComputeJoinInput,
   ComputeJoinResult,
+  ComputeQuota,
   ComputeStatus,
   ContextAddInput,
   ContextAddResult,
@@ -671,12 +673,16 @@ export const contract = {
       .output(ComputeStatus),
     joinBeta: base
       .meta({ event: "compute_beta_joined", mcp: null })
-      .input(NoInput)
+      .input(ComputeJoinInput)
       .output(ComputeJoinResult),
     leaveBeta: base
       .meta({ event: "compute_beta_left", mcp: null })
       .input(NoInput)
       .output(ComputeStatus),
+    quota: base
+      .meta({ event: "compute_quota_viewed", mcp: null })
+      .input(NoInput)
+      .output(ComputeQuota.nullable()),
   },
   // Near-live text: the user's switch; its state comes with the status.
   live: {

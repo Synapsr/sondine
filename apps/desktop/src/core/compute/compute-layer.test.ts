@@ -160,6 +160,42 @@ describe("where transcription runs", () => {
     expect(await none.joinBeta()).toBe("closed");
   });
 
+  it("joins the cloud with an invite link or raw token, and reads quota only when remote", async () => {
+    const server = answering(hello);
+    const service = await compute({ beta: { endpoint, serverKey }, fetch: server.fetch });
+    expect(await service.quota()).toBeNull();
+    expect(server.asked).toEqual([]);
+
+    expect(await service.joinBeta("not-a-token")).toBe("bad-link");
+    const otherServer = formatServerLink({
+      endpoint: "http://10.0.0.2:8443",
+      serverKey,
+      token,
+    });
+    expect(await service.joinBeta(otherServer)).toBe("mismatch");
+
+    expect(await service.joinBeta(token)).toBe("joined");
+    expect(service.status()).toMatchObject({ destination: "beta", beta: { joined: true } });
+
+    const quotaReply: OpenReply = {
+      kind: "quota",
+      plan: "trial",
+      period: "total",
+      usedSeconds: 600,
+      limitSeconds: 3_600,
+      extraSeconds: 0,
+    };
+    const quotaServer = answering(quotaReply);
+    const withQuota = await compute({ beta: { endpoint, serverKey }, fetch: quotaServer.fetch });
+    expect(await withQuota.quota()).toEqual({
+      plan: "trial",
+      period: "total",
+      usedSeconds: 600,
+      limitSeconds: 3_600,
+      extraSeconds: 0,
+    });
+  });
+
   it("reads anything unclear as this Mac", () => {
     const stored = { endpoint, serverKey, token, name: "a" };
     setComputeSettings(temp.db, { destination: "own", own: stored, beta: null }, 1);

@@ -9,29 +9,63 @@ import {
   writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
-import { generateKeyPair, type KeyPair } from "@sondine/engines/remote";
+import {
+  generateKeyPair,
+  QuotaPlan,
+  type KeyPair,
+  type QuotaSnapshot,
+} from "@sondine/engines/remote";
 import { z } from "zod";
 
 // What the server keeps on disk, all of it: its key, and for each client a
-// token's hash, its kind and name, when it came, when it was last charged, and
-// the seconds transcribed in that month. Kept until the client is removed.
-// Never audio, text, or what a request was. docs/network.md and the privacy
-// policy say the same: change them with this.
+// token's hash, its kind/plan/quotas and name, when it came, when it was last
+// charged, and the seconds transcribed. Never audio, text, or what a request
+// was. docs/network.md and the privacy policy say the same: change them with
+// this.
+
+/** Default free trial allowance: 60 minutes total (does not reset monthly). */
+export const TRIAL_SECONDS = 60 * 60;
+/** Default monthly allowance for Founder and Pro plans: 40 hours. */
+export const PLAN_MONTHLY_SECONDS = 40 * 3_600;
+/** Default top-up pack: 10 hours. */
+export const TOPUP_SECONDS = 10 * 3_600;
 
 const Client = z.strictObject({
   kind: z.enum(["own", "beta"]),
   name: z.string().max(64),
   createdAt: z.int(),
+  /** Quota tier; omitted in older state files (defaults to `kind`). */
+  plan: QuotaPlan.optional(),
+  /** Included seconds (total for `trial`, monthly for `founder`/`pro`/`beta`). */
+  limitSeconds: z.number().nonnegative().optional(),
+  /** Purchased top-up seconds, consumed only past `limitSeconds`, never reset monthly. */
+  extraSeconds: z.number().nonnegative().optional(),
 });
 export type Client = z.output<typeof Client>;
 
-const Usage = z.strictObject({ lastUsedAt: z.int(), month: z.string(), seconds: z.number() });
+const Usage = z.strictObject({
+  lastUsedAt: z.int(),
+  month: z.string(),
+  seconds: z.number(),
+  /** Cumulative seconds across months (used by `trial`). */
+  totalSeconds: z.number().nonnegative().optional(),
+});
 export type Usage = z.output<typeof Usage>;
 
 const KeyFile = z.strictObject({ publicKey: z.base64url(), privateKey: z.base64url() });
 
 /** A place nobody used for this long goes to the next person. */
 export const PLACE_IDLE_MS = 14 * 24 * 3_600_000;
+
+export function planOf(client: Client): QuotaPlan {
+  return client.plan ?? client.kind;
+}
+
+export function defaultLimitSeconds(plan: QuotaPlan): number | undefined {
+  if (plan === "trial") return TRIAL_SECONDS;
+  if (plan === "founder" || plan === "pro") return PLAN_MONTHLY_SECONDS;
+  return undefined;
+}
 
 const hashOf = (token: string) => createHash("sha256").update(token).digest("hex");
 const monthOf = (nowMs: number) => new Date(nowMs).toISOString().slice(0, 7);
@@ -82,11 +116,66 @@ export class ClientStore {
   }
 
   /** A new client; its token is told once and only its hash kept. */
-  add(kind: Client["kind"], name: string): { readonly id: string; readonly token: string } {
+  add(
+    kind: Client["kind"],
+    name: string,
+    options: {
+      readonly plan?: QuotaPlan;
+      readonly limitSeconds?: number;
+      readonly extraSeconds?: number;
+    } = {},
+  ): { readonly id: string; readonly token: string } {
     const token = randomBytes(32).toString("base64url");
     const id = hashOf(token);
-    writeJson(this.clientPath(id), { kind, name, createdAt: this.now() } satisfies Client);
+    const plan = options.plan;
+    const limitSeconds =
+      options.limitSeconds ?? (plan === undefined ? undefined : defaultLimitSeconds(plan));
+    const extraSeconds = options.extraSeconds;
+    const record: Client = {
+      kind,
+      name,
+      createdAt: this.now(),
+      ...(plan === undefined ? {} : { plan }),
+      ...(limitSeconds === undefined ? {} : { limitSeconds }),
+      ...(extraSeconds === undefined || extraSeconds <= 0 ? {} : { extraSeconds }),
+    };
+    writeJson(this.clientPath(id), record);
     return { id, token };
+  }
+
+  /** Changes a client's plan while keeping its token and any purchased top-up hours. */
+  setPlan(id: string, plan: QuotaPlan, options: { readonly limitSeconds?: number } = {}): boolean {
+    const parsed = Client.safeParse(readJson(this.clientPath(id)));
+    if (!parsed.success) return false;
+    const previous = planOf(parsed.data);
+    const limitSeconds = options.limitSeconds ?? defaultLimitSeconds(plan);
+    const { limitSeconds: _oldLimit, ...rest } = parsed.data;
+    const next: Client = {
+      ...rest,
+      kind: plan === "own" ? "own" : "beta",
+      plan,
+      ...(limitSeconds === undefined ? {} : { limitSeconds }),
+    };
+    writeJson(this.clientPath(id), next);
+    // Moving from a free trial to a monthly plan starts the paid month with a full allowance.
+    if (previous === "trial" && (plan === "founder" || plan === "pro")) {
+      const usage = this.usage(id);
+      writeJson(this.usagePath(id), { ...usage, seconds: 0 } satisfies Usage);
+    }
+    return true;
+  }
+
+  /** Adds purchased top-up seconds that persist across months. */
+  topUp(id: string, seconds: number): boolean {
+    if (!Number.isFinite(seconds) || seconds <= 0) return false;
+    const parsed = Client.safeParse(readJson(this.clientPath(id)));
+    if (!parsed.success) return false;
+    const next: Client = {
+      ...parsed.data,
+      extraSeconds: (parsed.data.extraSeconds ?? 0) + seconds,
+    };
+    writeJson(this.clientPath(id), next);
+    return true;
   }
 
   /** The client a token belongs to; null when it is unknown or was removed. */
@@ -115,28 +204,94 @@ export class ClientStore {
     rmSync(this.usagePath(id), { force: true });
   }
 
-  /** Seconds transcribed this month. */
+  /** Seconds transcribed this month (and cumulative total across months). */
   usage(id: string): Usage {
     const stored = Usage.safeParse(readJson(this.usagePath(id)));
     const month = monthOf(this.now());
-    if (!stored.success) return { lastUsedAt: 0, month, seconds: 0 };
-    return stored.data.month === month ? stored.data : { ...stored.data, month, seconds: 0 };
+    if (!stored.success) return { lastUsedAt: 0, month, seconds: 0, totalSeconds: 0 };
+    const totalSeconds = stored.data.totalSeconds ?? stored.data.seconds;
+    return stored.data.month === month
+      ? { ...stored.data, totalSeconds }
+      : { ...stored.data, month, seconds: 0, totalSeconds };
   }
 
-  charge(id: string, seconds: number): void {
-    if (!this.has(id)) return;
+  /** Current plan, usage and limits for one client. */
+  quota(id: string, betaSecondsPerMonth: number | null = null): QuotaSnapshot | null {
+    const parsed = Client.safeParse(readJson(this.clientPath(id)));
+    if (!parsed.success) return null;
+    const client = parsed.data;
+    const plan = planOf(client);
     const usage = this.usage(id);
+    const extraSeconds = client.extraSeconds ?? 0;
+    if (plan === "own") {
+      return {
+        plan,
+        period: "unlimited",
+        usedSeconds: usage.seconds,
+        limitSeconds: null,
+        extraSeconds: 0,
+      };
+    }
+    if (plan === "trial") {
+      return {
+        plan,
+        period: "total",
+        usedSeconds: usage.totalSeconds ?? usage.seconds,
+        limitSeconds: client.limitSeconds ?? TRIAL_SECONDS,
+        extraSeconds,
+      };
+    }
+    const limitSeconds =
+      plan === "beta"
+        ? (client.limitSeconds ?? betaSecondsPerMonth)
+        : (client.limitSeconds ?? PLAN_MONTHLY_SECONDS);
+    return {
+      plan,
+      period: "month",
+      usedSeconds: usage.seconds,
+      limitSeconds,
+      extraSeconds,
+    };
+  }
+
+  charge(id: string, seconds: number, betaSecondsPerMonth: number | null = null): void {
+    const parsed = Client.safeParse(readJson(this.clientPath(id)));
+    if (!parsed.success) return;
+    const client = parsed.data;
+    const usage = this.usage(id);
+    const snapshot = this.quota(id, betaSecondsPerMonth);
+    let fromExtra = 0;
+    if (snapshot !== null && snapshot.limitSeconds !== null && snapshot.extraSeconds > 0) {
+      const includedLeft = Math.max(0, snapshot.limitSeconds - snapshot.usedSeconds);
+      fromExtra = Math.min(snapshot.extraSeconds, Math.max(0, seconds - includedLeft));
+      if (fromExtra > 0) {
+        const remaining = Math.max(0, snapshot.extraSeconds - fromExtra);
+        const { extraSeconds: _oldExtra, ...rest } = client;
+        writeJson(
+          this.clientPath(id),
+          remaining > 0 ? ({ ...rest, extraSeconds: remaining } satisfies Client) : rest,
+        );
+      }
+    }
+    const periodCharge = seconds - fromExtra;
+    const priorTotal = usage.totalSeconds ?? usage.seconds;
+    const nextSeconds =
+      snapshot?.period === "month" ? usage.seconds + periodCharge : usage.seconds + seconds;
+    const nextTotal =
+      snapshot?.period === "total" ? priorTotal + periodCharge : priorTotal + seconds;
     writeJson(this.usagePath(id), {
       ...usage,
-      seconds: usage.seconds + seconds,
+      seconds: nextSeconds,
+      totalSeconds: nextTotal,
       lastUsedAt: this.now(),
     } satisfies Usage);
   }
 
-  /** A beta place, or null when all `places` are taken by people who use theirs. */
+  /** A self-claimed beta place, or null when all `places` are taken by people who use theirs. */
   claim(places: number): string | null {
     const now = this.now();
-    const beta = this.list().filter(({ client }) => client.kind === "beta");
+    // Only open beta places count against `places` or are reclaimed when idle; invited plans stay.
+    const beta = this.list().filter(({ client }) => planOf(client) === "beta");
     const idle = beta
       .map((entry) => ({
         id: entry.id,

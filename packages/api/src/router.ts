@@ -336,11 +336,14 @@ export const router = os.router({
     disconnect: os.compute.disconnect.handler(({ context, errors }) =>
       guard(errors, () => context.services.compute.disconnect()),
     ),
-    joinBeta: os.compute.joinBeta.handler(({ context, errors }) =>
-      guard(errors, () => context.services.compute.joinBeta()),
+    joinBeta: os.compute.joinBeta.handler(({ context, input, errors }) =>
+      guard(errors, () => context.services.compute.joinBeta(input)),
     ),
     leaveBeta: os.compute.leaveBeta.handler(({ context, errors }) =>
       guard(errors, () => context.services.compute.leaveBeta()),
+    ),
+    quota: os.compute.quota.handler(({ context, errors }) =>
+      guard(errors, () => context.services.compute.quota()),
     ),
   },
   live: {

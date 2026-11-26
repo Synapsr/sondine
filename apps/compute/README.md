@@ -115,12 +115,29 @@ listens on the machine's network, out of swap and without crash dumps. speech.cp
 the card through Vulkan: `NVIDIA_DRIVER_CAPABILITIES=all` and the image's EGL and X11
 libraries let the driver start; without them it finds only the CPU.
 
-## The beta
+## The beta and invited waves
 
 `SONDINE_COMPUTE_BETA_PLACES=10` lets anyone take a place in one click, until
 all are taken; when all are, a place unused for two weeks goes to the next person.
-`SONDINE_COMPUTE_BETA_HOURS` bounds each one's month. Behind Cloudflare Tunnel,
-`SONDINE_COMPUTE_ADDRESS_HEADER=cf-connecting-ip` lets the server slow down
-claims by address. The app knows the beta by `CLOUD_BETA`
+`SONDINE_COMPUTE_BETA_HOURS` bounds each open-beta place's month. Behind
+Cloudflare Tunnel, `SONDINE_COMPUTE_ADDRESS_HEADER=cf-connecting-ip` lets the
+server slow down claims by address. The app knows the beta by `CLOUD_BETA`
 (`apps/desktop/src/shared/cloud.ts`): the tunnel's URL and the key
-`sondine-compute key` prints. Taking places back to 0 closes it.
+`sondine-compute key` prints.
+
+For invite-only waves, leave `SONDINE_COMPUTE_BETA_PLACES=0` and issue tokens
+per plan:
+
+```bash
+# 60-minute cumulative free trial (does not reset monthly)
+node sondine-compute.js add "wave1-001" --endpoint https://cloud.sondine.app --plan trial
+
+# upgrade the same link in place to Founder (40 h/month) or Pro (40 h/month)
+node sondine-compute.js set-plan <id> founder
+
+# add a 10-hour top-up pack (spent only past the monthly limit, persists across months)
+node sondine-compute.js topup <id> --hours 10
+```
+
+Invited clients (`trial`, `founder`, `pro`) stay active while open claims are
+closed and are never evicted by idle beta recycling.

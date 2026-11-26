@@ -4,6 +4,7 @@ export {
   claimPlace,
   hello,
   leavePlace,
+  readQuota,
   RefusedError,
   type Fetch,
   type ServerAddress,

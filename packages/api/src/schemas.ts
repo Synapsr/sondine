@@ -1664,9 +1664,17 @@ export const ComputeConnectResult = z.strictObject({
 });
 export type ComputeConnectResult = z.output<typeof ComputeConnectResult>;
 
+export const ComputeJoinInput = z.strictObject({
+  /** Optional Wave 1 invite link (`sondine-compute://connect?...`) or raw 43-char token. */
+  link: z.string().max(1024).optional(),
+});
+export type ComputeJoinInput = z.input<typeof ComputeJoinInput>;
+
 export const ComputeJoinOutcome = z.enum([
   "joined",
   "cancelled",
+  "bad-link",
+  "refused",
   "full",
   "closed",
   "busy",
@@ -1680,6 +1688,15 @@ export const ComputeJoinResult = z.strictObject({
   status: ComputeStatus,
 });
 export type ComputeJoinResult = z.output<typeof ComputeJoinResult>;
+
+export const ComputeQuota = z.strictObject({
+  plan: z.enum(["own", "beta", "trial", "founder", "pro"]),
+  period: z.enum(["total", "month", "unlimited"]),
+  usedSeconds: z.number().nonnegative(),
+  limitSeconds: z.number().nonnegative().nullable(),
+  extraSeconds: z.number().nonnegative(),
+});
+export type ComputeQuota = z.output<typeof ComputeQuota>;
 
 /** « Effacer les N dernières minutes »: the choices the app offers. */
 export const ForgetInput = z.strictObject({

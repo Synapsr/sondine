@@ -1560,6 +1560,7 @@
   "compute_beta_detail": "A Synapsr server, free during the beta.",
   "compute_beta_full": "All places are taken. Write to us for what comes next.",
   "compute_beta_honour": "We give our word that we do not read or listen to your data, and it trains no model.",
+  "compute_beta_invite_label": "Invite link or code (optional)",
   "compute_beta_later": "Not now",
   "compute_beta_leave": "Give my beta place back",
   "compute_beta_others": "The audio also contains the voices of the people you talk with. The server keeps when your place was last used and the length transcribed in the month. Cloudflare carries the connection and sees your IP address, not the audio. During the beta, the service may be slow or unavailable.",
