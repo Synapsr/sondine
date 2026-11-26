@@ -563,7 +563,7 @@
   "welcome_system_audio_use": "The other side of calls, videos and music.",
   "welcome_model_continues": "You can continue: it goes on in the background.",
   "welcome_model_intro": "On this Mac, transcription needs this model. Without it, Sondine still records, and transcribes later.",
-  "welcome_model_title": "Transcription",
+  "welcome_where_title": "Where to transcribe?",
   "welcome_no_microphone_note": "Without the microphone, Sondine hears only the Mac’s sound.",
   "welcome_no_model_note": "Without a model, nothing is transcribed for now: the audio is kept.",
   "welcome_no_system_audio_note": "Without system audio, Sondine hears only the microphone.",

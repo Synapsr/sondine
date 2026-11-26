@@ -17,14 +17,16 @@ import { Field, FieldLabel } from "@sondine/ui/components/field";
 import { Input } from "@sondine/ui/components/input";
 import { Radio, RadioGroup, RadioLabel } from "@sondine/ui/components/radio-group";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, type ElementType } from "react";
 import { CLOUD_WAITLIST_URL } from "../../../shared/cloud";
 import { errorMessage, orpc } from "../../core/orpc";
 import { m } from "../../paraglide/messages.js";
 
 // Where transcription runs (ADR 040): this Mac, a machine of the user's, or
 // the beta in one click. Each server asks first, saying what leaves and who
-// could read it. The beta shows only in a build that knows one.
+// could read it. The beta shows only in a build that knows one. Settings asks
+// in a dialog; the first run shows the same words and the same calls in its
+// page (welcome/transcription-step.tsx).
 
 const connectText: Record<
   Exclude<ComputeConnectOutcome, "connected" | "cancelled">,
@@ -70,10 +72,20 @@ function useKeepChoice() {
   );
 }
 
-function destinationOption(value: ComputeDestination, label: string, detail: string) {
+/** Chooses this Mac, or a server already agreed to, which sends nothing new. */
+export function useChoose() {
+  return useMutation(orpc.compute.choose.mutationOptions({ onSuccess: useStoreStatus() }));
+}
+
+export function destinationOption(
+  value: ComputeDestination,
+  label: string,
+  detail: string,
+  disabled = false,
+) {
   return (
     <RadioLabel className="items-start">
-      <Radio value={value} className="mt-xxs" />
+      <Radio value={value} disabled={disabled} className="mt-xxs" />
       <span className="flex flex-col">
         <span>{label}</span>
         <span className="text-body-s text-cte-text-muted">{detail}</span>
@@ -86,7 +98,7 @@ export function ComputeSection() {
   const store = useStoreStatus();
   const compute = useCompute();
   const [asking, setAsking] = useState<"own" | "beta" | null>(null);
-  const choose = useMutation(orpc.compute.choose.mutationOptions({ onSuccess: store }));
+  const choose = useChoose();
   const disconnect = useMutation(orpc.compute.disconnect.mutationOptions({ onSuccess: store }));
   const leave = useMutation(orpc.compute.leaveBeta.mutationOptions({ onSuccess: store }));
   const status = compute.data;
@@ -160,6 +172,85 @@ export function ComputeSection() {
   );
 }
 
+/**
+ * Connecting the user's machine with the link it printed (ADR 040). `leave`
+ * is the user going away before the answer: the choice in force stays.
+ */
+export function useConnectOwn(current: ComputeDestination) {
+  const store = useStoreStatus();
+  const [link, setLink] = useState("");
+  const keep = useKeepChoice();
+  const connect = useMutation(
+    orpc.compute.connect.mutationOptions({ onSuccess: ({ status }) => store(status) }),
+  );
+  const outcome = connect.data?.outcome;
+  const problem =
+    connect.error !== null
+      ? errorMessage(connect.error)
+      : outcome === undefined || outcome === "connected" || outcome === "cancelled"
+        ? null
+        : connectText[outcome]();
+  return {
+    link,
+    setLink,
+    pending: connect.isPending,
+    problem,
+    submit(onConnected: () => void) {
+      connect.mutate(
+        { link },
+        {
+          onSuccess: (answer) => {
+            if (answer.outcome === "connected") onConnected();
+          },
+        },
+      );
+    },
+    /** After the answer. The link holds a token: it goes with the page or the dialog. */
+    finish() {
+      setLink("");
+      connect.reset();
+    },
+    /** The user's own leaving; an answer that ends the dialog still finds it pending. */
+    leave() {
+      if (connect.isPending) keep.mutate({ destination: current });
+      setLink("");
+      connect.reset();
+    },
+  };
+}
+
+/** The link field; its form is submitted by a button that names `id`. */
+export function OwnLinkForm({
+  id,
+  connect,
+  onConnected,
+}: {
+  id: string;
+  connect: ReturnType<typeof useConnectOwn>;
+  onConnected: () => void;
+}) {
+  return (
+    <form
+      id={id}
+      onSubmit={(event) => {
+        event.preventDefault();
+        connect.submit(onConnected);
+      }}
+    >
+      <Field className="items-stretch">
+        <FieldLabel>{m.compute_connect_label()}</FieldLabel>
+        <Input
+          value={connect.link}
+          autoComplete="off"
+          spellCheck={false}
+          placeholder="sondine-compute://connect?…"
+          onChange={(event) => connect.setLink(event.target.value)}
+        />
+      </Field>
+    </form>
+  );
+}
+
 /** What leaves, then the link the machine printed, unless it is connected already. */
 function OwnDialog({
   open,
@@ -174,70 +265,29 @@ function OwnDialog({
   onChoose: () => void;
   onClose: () => void;
 }) {
-  const store = useStoreStatus();
-  const [link, setLink] = useState("");
-  const keep = useKeepChoice();
-  const connect = useMutation(
-    orpc.compute.connect.mutationOptions({ onSuccess: ({ status }) => store(status) }),
-  );
+  const connect = useConnectOwn(current);
   const close = () => {
-    // The link holds a token: it goes with the dialog.
-    setLink("");
-    connect.reset();
+    connect.finish();
     onClose();
   };
-  // Only the user's own closing: an answer that closes the dialog still finds it pending.
-  const dismiss = () => {
-    if (connect.isPending) keep.mutate({ destination: current });
-    close();
-  };
-  const outcome = connect.data?.outcome;
-  const problem =
-    connect.error !== null
-      ? errorMessage(connect.error)
-      : outcome === undefined || outcome === "connected" || outcome === "cancelled"
-        ? null
-        : connectText[outcome]();
   return (
     <AlertDialog
       open={open}
       onOpenChange={(next) => {
-        if (!next) dismiss();
+        if (next) return;
+        connect.leave();
+        onClose();
       }}
     >
       <AlertDialogPopup>
         <AlertDialogTitle>{m.compute_own_confirm_title()}</AlertDialogTitle>
         <AlertDialogDescription>{m.compute_own_confirm()}</AlertDialogDescription>
         {connected ? null : (
-          <form
-            id="compute-connect"
-            onSubmit={(event) => {
-              event.preventDefault();
-              connect.mutate(
-                { link },
-                {
-                  onSuccess: ({ outcome }) => {
-                    if (outcome === "connected") close();
-                  },
-                },
-              );
-            }}
-          >
-            <Field className="items-stretch">
-              <FieldLabel>{m.compute_connect_label()}</FieldLabel>
-              <Input
-                value={link}
-                autoComplete="off"
-                spellCheck={false}
-                placeholder="sondine-compute://connect?…"
-                onChange={(event) => setLink(event.target.value)}
-              />
-            </Field>
-          </form>
+          <OwnLinkForm id="compute-connect" connect={connect} onConnected={close} />
         )}
-        {problem === null ? null : (
+        {connect.problem === null ? null : (
           <p role="alert" className="text-body-s text-error">
-            {problem}
+            {connect.problem}
           </p>
         )}
         <AlertDialogFooter>
@@ -255,8 +305,8 @@ function OwnDialog({
             <Button
               type="submit"
               form="compute-connect"
-              disabled={link.trim() === ""}
-              isPending={connect.isPending}
+              disabled={connect.link.trim() === ""}
+              isPending={connect.pending}
             >
               {m.compute_connect()}
             </Button>
@@ -268,10 +318,69 @@ function OwnDialog({
 }
 
 /**
- * The beta's warning, in Téo's words (2026-11-24): who could read the audio,
- * the word given that nobody does, and whom to write to for more. One click
- * takes a place.
+ * Taking one of the beta's places (ADR 040). `leave` is the user going away
+ * before the answer: the choice in force stays, and core gives the place back.
  */
+export function useJoinBeta(current: ComputeDestination) {
+  const store = useStoreStatus();
+  const keep = useKeepChoice();
+  const join = useMutation(
+    orpc.compute.joinBeta.mutationOptions({ onSuccess: ({ status }) => store(status) }),
+  );
+  const outcome = join.data?.outcome;
+  const problem =
+    join.error !== null
+      ? errorMessage(join.error)
+      : outcome === undefined || outcome === "joined" || outcome === "cancelled"
+        ? null
+        : joinText[outcome]();
+  return {
+    pending: join.isPending,
+    problem,
+    take(onJoined: () => void) {
+      join.mutate(
+        {},
+        {
+          onSuccess: (answer) => {
+            if (answer.outcome === "joined") onJoined();
+          },
+        },
+      );
+    },
+    /** After the answer. */
+    finish() {
+      join.reset();
+    },
+    /** The user's own leaving; an answer that ends the dialog still finds it pending. */
+    leave() {
+      if (join.isPending) keep.mutate({ destination: current });
+      join.reset();
+    },
+  };
+}
+
+/**
+ * The beta's warning, in Téo's words (2026-11-24): who could read the audio,
+ * the word given that nobody does, and whom to write to for more. `Lead`
+ * holds the first paragraph: the dialog's description, or a plain paragraph.
+ */
+export function BetaTerms({ Lead = "p" }: { Lead?: ElementType }) {
+  return (
+    <>
+      <Lead>{m.compute_beta_what()}</Lead>
+      <p className="text-body-s font-medium">{m.compute_beta_honour()}</p>
+      <p className="text-body-s text-cte-text-muted">{m.compute_beta_others()}</p>
+      <p className="text-body-s text-cte-text-muted">
+        {m.compute_beta_secure()}{" "}
+        <a className="underline" href={CLOUD_WAITLIST_URL} target="_blank" rel="noreferrer">
+          {m.compute_beta_write()}
+        </a>
+      </p>
+    </>
+  );
+}
+
+/** The beta's terms; one click takes a place. */
 export function BetaDialog({
   open,
   current,
@@ -281,65 +390,31 @@ export function BetaDialog({
   current: ComputeDestination;
   onClose: () => void;
 }) {
-  const store = useStoreStatus();
-  const keep = useKeepChoice();
-  const join = useMutation(
-    orpc.compute.joinBeta.mutationOptions({ onSuccess: ({ status }) => store(status) }),
-  );
+  const join = useJoinBeta(current);
   const close = () => {
-    join.reset();
+    join.finish();
     onClose();
   };
-  // Only the user's own closing: an answer that closes the dialog still finds it pending.
-  const dismiss = () => {
-    if (join.isPending) keep.mutate({ destination: current });
-    close();
-  };
-  const outcome = join.data?.outcome;
-  const problem =
-    join.error !== null
-      ? errorMessage(join.error)
-      : outcome === undefined || outcome === "joined" || outcome === "cancelled"
-        ? null
-        : joinText[outcome]();
   return (
     <AlertDialog
       open={open}
       onOpenChange={(next) => {
-        if (!next) dismiss();
+        if (next) return;
+        join.leave();
+        onClose();
       }}
     >
       <AlertDialogPopup>
         <AlertDialogTitle>{m.compute_beta_title()}</AlertDialogTitle>
-        <AlertDialogDescription>{m.compute_beta_what()}</AlertDialogDescription>
-        <p className="text-body-s font-medium">{m.compute_beta_honour()}</p>
-        <p className="text-body-s text-cte-text-muted">{m.compute_beta_others()}</p>
-        <p className="text-body-s text-cte-text-muted">
-          {m.compute_beta_secure()}{" "}
-          <a className="underline" href={CLOUD_WAITLIST_URL} target="_blank" rel="noreferrer">
-            {m.compute_beta_write()}
-          </a>
-        </p>
-        {problem === null ? null : (
+        <BetaTerms Lead={AlertDialogDescription} />
+        {join.problem === null ? null : (
           <p role="alert" className="text-body-s text-error">
-            {problem}
+            {join.problem}
           </p>
         )}
         <AlertDialogFooter>
           <AlertDialogClose>{m.compute_beta_later()}</AlertDialogClose>
-          <Button
-            isPending={join.isPending}
-            onClick={() =>
-              join.mutate(
-                {},
-                {
-                  onSuccess: ({ outcome }) => {
-                    if (outcome === "joined") close();
-                  },
-                },
-              )
-            }
-          >
+          <Button isPending={join.pending} onClick={() => join.take(close)}>
             {m.compute_beta_use()}
           </Button>
         </AlertDialogFooter>
