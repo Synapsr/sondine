@@ -36,7 +36,8 @@ import { TranscribeButton } from "../episode/transcribe-button";
 import { PlayButton } from "../player/play-button";
 import { useEpisodePages } from "./episode-pages";
 import { hourSummary } from "./today-view";
-import { AppIcon, AppIcons } from "../shell/app-icon";
+import { AppIcon, AppIcons, PageMark } from "../shell/app-icon";
+import { siteMark } from "../../lib/site-mark";
 
 // The rows of Today: a conversation, a media episode or a dictation on one
 // line, an hour of moments (collapsed, its moments loaded when opened), the
@@ -84,16 +85,20 @@ export function KindTile({
   size?: keyof typeof tileSize;
 }) {
   const [app] = episode.apps;
+  // A page whose site has its own mark (YouTube, Vimeo, Twitch) shows it in place of the browser.
+  const marked = siteMark(episode.page) !== null;
   return (
     <span
       aria-hidden
       className={cn(
         "relative flex shrink-0 items-center justify-center text-cte-text-muted",
         tileSize[size],
-        app === undefined && "bg-neutral-3",
+        (marked || app === undefined) && "bg-neutral-3",
       )}
     >
-      {app === undefined ? (
+      {marked ? (
+        <PageMark page={episode.page} className="size-[60%]" />
+      ) : app === undefined ? (
         tileIcon[episode.context ?? "none"]
       ) : (
         <AppIcon app={{ bundleId: app.bundleId }} name={app.name} className="size-full" />

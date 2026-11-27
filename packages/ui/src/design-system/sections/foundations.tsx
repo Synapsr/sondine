@@ -93,7 +93,9 @@ const motionTokens = [
 function isIcon(entry: [string, unknown]): entry is [string, ComponentType<IconProps>] {
   return entry[0].endsWith("Icon") && typeof entry[1] === "function";
 }
-const iconEntries = Object.entries(icons).filter(isIcon);
+// Widened first, so the guard alone says which exports are glyphs (BrandMark is not).
+const exported: readonly [string, unknown][] = Object.entries(icons);
+const iconEntries = exported.filter(isIcon);
 
 function useTokenValues(names: readonly string[]): Record<string, string> {
   const { resolvedTheme } = useTheme();
@@ -257,6 +259,17 @@ export default function FoundationsSection() {
             <figcaption className="text-body-xxs text-cte-text-muted">
               {name.replace(/Icon$/, "")}
             </figcaption>
+          </figure>
+        ))}
+      </Specimen>
+      <Specimen label="Brand marks" className="flex flex-wrap gap-xs">
+        {(["youtube", "vimeo", "twitch"] as const).map((brand) => (
+          <figure
+            key={brand}
+            className="flex w-[7.5rem] flex-col items-center gap-xs corner-xs bg-cte-surface px-xs py-s"
+          >
+            <icons.BrandMark brand={brand} className="text-body-xxl" />
+            <figcaption className="text-body-xxs text-cte-text-muted">{brand}</figcaption>
           </figure>
         ))}
       </Specimen>

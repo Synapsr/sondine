@@ -42,10 +42,31 @@ instead of Hugeicons. The repository is public under AGPL-3.0.
   (ADR 028), generated the same way.
 - 69 since 2026-11-23: tag (`IconTagFill18`) for tags on recordings
   (ADR 039), generated the same way.
-- The font is the upright variable WOFF2 of the `allo-font` npm package,
-  with its roundness axis set to 0 and every character kept (see the
-  amendment of 2026-11-27); its source, the command that made it, and both
-  sha256 are in `packages/ui/src/fonts/README.md`.
+- 72 since 2026-11-27: youtube, vimeo and twitch (`IconYoutube`,
+  `IconVimeo`, `IconTwitch`, from Nucleo Social Media,
+  `nucleo-social-media@1.0.3`), the site's mark before a recording played
+  from that site, in place of the browser's icon, at Téo's request. They come
+  from the same licensed Nucleo library, with the same notice, and the
+  generator takes the set like the other two. YouTube is a trademark of
+  Google LLC, Vimeo of Vimeo.com, Inc., Twitch of Twitch Interactive, Inc.;
+  Sondine shows a mark only to name the site a recording came from, beside
+  its name, and is affiliated with none of them. No favicon is ever fetched:
+  other sites keep the browser's icon.
+
+## Amendment — brand marks keep their colors (2026-11-27)
+
+A site's mark keeps its owner's colors, in light and dark, because the colors
+are part of the mark (Téo): YouTube's red (#ff0000) with its white play
+triangle, Vimeo's blue (#1ab7ea), Twitch's purple (#9146ff) with its white
+bubble. The values are Simple Icons' (CC0). They live as brand tokens in
+`packages/ui/src/styles/tokens.css`, with their Tailwind keys, and only
+`BrandMark` (`packages/ui/src/icon/brand-mark.tsx`) uses them: every other
+color stays a theme role, and the theme's red stays for errors and
+recording. White fills YouTube's triangle and Twitch's bubble so each mark
+reads the same on both grounds. The marks are decorative, the site's name
+always beside them; their contrast with the canvas and its tiles is 3.6 to
+4.6:1 for YouTube and Twitch, and 2.1 to 2.3:1 for Vimeo's blue in light
+(7.9:1 in dark).
 
 ## Amendment — Allo (2026-11-19)
 

@@ -1,6 +1,6 @@
 import { cn } from "@sondine/ui";
 import { ORPCError } from "@orpc/client";
-import type { EpisodeDetail, LiveStatus, Status } from "@sondine/api";
+import type { EpisodeDetail, EpisodeWebPage, LiveStatus, Status } from "@sondine/api";
 import { Badge } from "@sondine/ui/components/badge";
 import { Button } from "@sondine/ui/components/button";
 import { Progress } from "@sondine/ui/components/progress";
@@ -49,7 +49,8 @@ import { SameMomentLines } from "./same-moment-line";
 import { VoiceBadges } from "./voice-badge";
 import { Transcript } from "./transcript";
 import { TranscribeButton } from "./transcribe-button";
-import { EpisodeAppIcon } from "../shell/app-icon";
+import { EpisodeAppIcon, PageMark } from "../shell/app-icon";
+import { siteMark } from "../../lib/site-mark";
 import { cardClassName, ConversationLines, headingClassName } from "../journal/journal-block";
 import { backLinkClassName, titleClassName } from "../shell/screen";
 
@@ -245,7 +246,8 @@ function Saying({
  * « YouTube · Le titre »: the page an episode's media came from (ADR 023),
  * opened in the default browser by main, never in the window.
  */
-function PageLink({ episodeId, label }: { episodeId: number; label: string }) {
+function PageLink({ episodeId, page }: { episodeId: number; page: EpisodeWebPage }) {
+  const label = pageLabel(page);
   const open = useMutation(orpc.episodes.openPage.mutationOptions());
   return (
     <span className="flex flex-col items-start gap-xxs">
@@ -255,6 +257,7 @@ function PageLink({ episodeId, label }: { episodeId: number; label: string }) {
         aria-label={m.episode_page_open({ page: label })}
         onClick={() => open.mutate({ episodeId })}
       >
+        <PageMark page={page} />
         <span className="truncate">{label}</span>
         <ExternalLinkIcon className="text-cte-text-muted" />
       </button>
@@ -349,12 +352,11 @@ function Header({
         <div className="me-auto flex min-w-[16rem] flex-1 flex-col gap-xs">
           <h1 className={cn(titleClassName, "tabular-nums")}>{title}</h1>
           <p className="flex items-center gap-xxs text-cte-text-muted">
-            <EpisodeAppIcon episode={episode} />
+            {/* A site's mark leads the page's line below, not this one. */}
+            {siteMark(episode.page) === null ? <EpisodeAppIcon episode={episode} /> : null}
             {meta.join(" · ")}
           </p>
-          {episode.page === null ? null : (
-            <PageLink episodeId={episode.id} label={pageLabel(episode.page)} />
-          )}
+          {episode.page === null ? null : <PageLink episodeId={episode.id} page={episode.page} />}
           <SameMomentLines episodeId={episode.id} moments={detail.sameMoments} />
           <PrivacyLine privacy={detail.privacy} />
         </div>

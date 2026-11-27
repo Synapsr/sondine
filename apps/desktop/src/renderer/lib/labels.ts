@@ -9,6 +9,7 @@ import type { BadgeProps } from "@sondine/ui/components/badge";
 import { m } from "../paraglide/messages.js";
 import { getLocale } from "../paraglide/runtime.js";
 import { dayNoonMs, dayOf, relativeDay } from "./day";
+import { siteMark } from "./site-mark";
 import { durationParts, formatClock } from "./time";
 import type { Voice } from "./voices";
 
@@ -41,7 +42,10 @@ const sizeText: Record<EpisodeSize, () => string> = {
  */
 export function contextLabel(episode: EpisodeSummary): string | null {
   if (episode.context === null) return null;
-  const [app] = episode.apps;
+  // A site with its own mark (YouTube, Vimeo, Twitch) names what played it,
+  // as its icon does: « Média · YouTube », not the browser.
+  const [first] = episode.apps;
+  const app = episode.page !== null && siteMark(episode.page) !== null ? episode.page : first;
   return [
     // A phone recording of the user alone reads as a note (ADR 039).
     episode.note ? m.episode_context_note() : contextText[episode.context](),

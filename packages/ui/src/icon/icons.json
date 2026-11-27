@@ -59,13 +59,16 @@
   "sun": { "set": "ui-fill-18", "glyph": "IconSunFill18" },
   "tag": { "set": "ui-fill-18", "glyph": "IconTagFill18" },
   "trash": { "set": "ui-fill-18", "glyph": "IconTrashFill18" },
+  "twitch": { "set": "social-media", "glyph": "IconTwitch" },
   "user": { "set": "ui-fill-18", "glyph": "IconUserFill18" },
   "user-plus": { "set": "ui-fill-18", "glyph": "IconUserPlusFill18" },
   "users": { "set": "ui-fill-18", "glyph": "IconUsersFill18" },
   "video": { "set": "ui-fill-18", "glyph": "IconVideoFill18" },
+  "vimeo": { "set": "social-media", "glyph": "IconVimeo" },
   "volume": { "set": "ui-fill-18", "glyph": "IconVolumeUpFill18" },
   "warning": { "set": "ui-fill-18", "glyph": "IconTriangleWarningFill18" },
   "waveform": { "set": "ui-fill-18", "glyph": "IconWaveformLinesFill18" },
   "wifi": { "set": "ui-fill-18", "glyph": "IconWifiFill18" },
-  "x": { "set": "micro-bold", "glyph": "IconXmark" }
+  "x": { "set": "micro-bold", "glyph": "IconXmark" },
+  "youtube": { "set": "social-media", "glyph": "IconYoutube" }
 }

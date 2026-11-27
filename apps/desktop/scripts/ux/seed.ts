@@ -29,7 +29,8 @@ const { openDatabase, upsertTrackRun, openSpeechRegion, closeSpeechRegion, publi
   sondineDb;
 const { nameSpeaker, loadJournalSource, startJournalRun, publishJournalRun, setJournalMark } =
   sondineDb;
-const { setEpisodeTag, setUsageConsent, addVocabularyWord } = sondineDb;
+const { setEpisodeTag, setUsageConsent, addVocabularyWord, startWebPlay, endWebPlay } = sondineDb;
+const { cleanTitle, webPageOf } = await import("@sondine/core");
 const { USAGE_REPORT_VERSION } = await import("@sondine/protocol");
 
 const RATE = 16_000;
@@ -55,6 +56,8 @@ interface Episode {
   readonly voicedMin: number;
   /** The app it was heard from (a call, what played it) or said to (a dictation). */
   readonly app?: { readonly bundleId: string; readonly name: string };
+  /** The page a browser played it from: the tab's address and title, as the extension reports them (ADR 023). */
+  readonly page?: { readonly url: string; readonly title: string };
   readonly names?: Readonly<Record<string, string>>;
   readonly lines: readonly Line[];
   readonly journal?: readonly Item[];
@@ -144,6 +147,21 @@ function seedEpisode(base: number, trackRunId: number, ep: Episode): void {
     );
     if (ep.context === "dictation") {
       db.statement(`UPDATE episodes SET primary_app_id = ? WHERE id = ?`).run(appId, episodeId);
+    }
+    if (ep.page !== undefined) {
+      const page = webPageOf(ep.page.url);
+      if (page === null) throw new Error(`not a web page: ${ep.page.url}`);
+      const play = startWebPlay(db, {
+        appId: Number(appId),
+        page,
+        url: ep.page.url,
+        // As the play recorder keeps it: without « - YouTube ».
+        title: cleanTitle(page.site, ep.page.title),
+        atMs: base + ep.at * 1000,
+        nowMs: base + ep.at * 1000,
+      });
+      endWebPlay(db, play, base + end * 1000, base + end * 1000);
+      db.statement(`UPDATE episodes SET page_key = ? WHERE id = ?`).run(page.pageKey, episodeId);
     }
   }
   if (ep.lines.length === 0) return;
@@ -347,7 +365,11 @@ seedDay(base, "ux-today", [
     at: 7 * H + 45 * M,
     size: "moment",
     context: "media",
-    app: { bundleId: "com.apple.Music", name: "Music" },
+    app: { bundleId: "com.apple.Safari", name: "Safari" },
+    page: {
+      url: "https://www.youtube.com/watch?v=Sondine0001",
+      title: "Tempérer le chocolat sans thermomètre - YouTube",
+    },
     voicedMin: 4,
     lines: [["C", "Dans cette vidéo, on apprend à tempérer le chocolat sans thermomètre."]],
   },
