@@ -71,8 +71,15 @@ crosses oRPC or JSON.
 
 - The export holds retention (`Retention.hold`): no pass, scrub, expiry or
   import moves an archive file meanwhile. Capture does not wait.
-- A deletion while it runs (`Status.deletions` changes) throws the backup
-  away (`stale`): a deletion always wins (ADR 006).
+- A deletion while it runs (`Status.deletions` changes, or a person, a
+  discussion, a tag, a word, an added item, an agent or the voice read is
+  deleted) throws the backup away (`stale`): a deletion always wins
+  (ADR 006). The last check and the rename over the destination run in one
+  turn of core's thread, so a file the user replaces goes only for a
+  backup that holds.
+- The `.partial` files under way are listed in the data folder
+  (`backup-partials.json`); core's start removes those left by a crash, and
+  keeps listed those on a volume that is not there.
 - No VACUUM of the copy: it held core's thread about 3 s for a 165 MB
   database. `secure_delete` is on, so free pages hold nothing deleted.
 
@@ -92,7 +99,11 @@ crosses oRPC or JSON.
   moves the current data aside, in `before-restore/<stamp>/`, and the
   staging in: renames on one volume, so nothing is copied, and the marker
   says which half a crash interrupted. A staging without a marker is
-  removed.
+  removed. The marker lists what the staging holds; the marker and the
+  folders are synced at each step. Anything that does not match (an
+  unreadable marker, data still in place or already set aside, staged data
+  the marker does not list) stops the swap where it is: main starts
+  nothing and says where the data is.
 - The data set aside stays until the user deletes it (Settings ▸ Données).
 - After the restore, a note: listening is paused until « Reprendre
   l'écoute »; macOS may ask its permissions again; models to download again;

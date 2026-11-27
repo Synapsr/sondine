@@ -4,12 +4,13 @@ import {
   mkdirSync,
   readdirSync,
   readFileSync,
+  renameSync,
   rmSync,
   statfsSync,
   statSync,
   writeFileSync,
 } from "node:fs";
-import { open, rename, rm } from "node:fs/promises";
+import { open, rm } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import {
   backupArchiveFiles,
@@ -33,29 +34,50 @@ import { LAN_FILES, RENDERER_FILE } from "./backup-names";
 // copy still holds. The file is written beside its destination and renamed
 // once complete.
 
-/** In `backup-work/`: the `.partial` file an export is writing, outside the data folder. */
-export const PARTIAL_RECORD = "partial.json";
+/**
+ * In the data folder, beside the work folder: the `.partial` files exports
+ * were writing, outside the data folder. One stays listed until its file is
+ * gone, so a disk unplugged during a crash is cleaned once it is back.
+ */
+export const PARTIAL_RECORD = "backup-partials.json";
+
+function readPartials(dataDir: string): string[] {
+  try {
+    const value: unknown = JSON.parse(readFileSync(join(dataDir, PARTIAL_RECORD), "utf8"));
+    return Array.isArray(value)
+      ? value.filter(
+          (item): item is string => typeof item === "string" && item.endsWith(".sondine.partial"),
+        )
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+function writePartials(dataDir: string, partials: readonly string[]): void {
+  const path = join(dataDir, PARTIAL_RECORD);
+  if (partials.length === 0) {
+    rmSync(path, { force: true });
+    return;
+  }
+  writeFileSync(`${path}.tmp`, JSON.stringify([...new Set(partials)]), { mode: 0o600 });
+  renameSync(`${path}.tmp`, path);
+}
 
 /**
- * At core's start: removes the `.partial` file an export left when core
- * died, then the work folder (the database's copy).
+ * At core's start: removes the `.partial` files exports left when core died
+ * (those on a volume that is not there stay listed), then the work folder
+ * (the database's copy).
  */
 export function cleanInterruptedExport(dataDir: string): void {
-  const workDir = join(dataDir, DATA_LAYOUT.backupWorkDir);
-  try {
-    const record: unknown = JSON.parse(readFileSync(join(workDir, PARTIAL_RECORD), "utf8"));
-    const partial =
-      typeof record === "object" && record !== null
-        ? (record as { partial?: unknown }).partial
-        : null;
+  const left = readPartials(dataDir).filter((partial) => {
     // Only a file this code names: `<…>.sondine.partial`.
-    if (typeof partial === "string" && partial.endsWith(".sondine.partial")) {
-      rmSync(partial, { force: true });
-    }
-  } catch {
-    // No export was under way.
-  }
-  rmSync(workDir, { recursive: true, force: true });
+    if (!existsSync(dirname(partial))) return true;
+    rmSync(partial, { force: true });
+    return existsSync(partial);
+  });
+  writePartials(dataDir, left);
+  rmSync(join(dataDir, DATA_LAYOUT.backupWorkDir), { recursive: true, force: true });
 }
 
 export class BackupStale extends Error {
@@ -179,7 +201,6 @@ export async function writeExport(input: ExportInput): Promise<{ readonly bytes:
   mkdirSync(workDir, { recursive: true, mode: 0o700 });
   const copyPath = join(workDir, `${randomUUID()}.db`);
   const partial = `${input.path}.partial`;
-  const recordPath = join(workDir, PARTIAL_RECORD);
   let writer: BackupWriter | null = null;
   try {
     await snapshotDatabase(input.db, copyPath);
@@ -238,7 +259,7 @@ export async function writeExport(input: ExportInput): Promise<{ readonly bytes:
 
     await rm(partial, { force: true });
     // Should core die while it writes, its next start removes this file.
-    writeFileSync(recordPath, JSON.stringify({ partial }), { mode: 0o600 });
+    writePartials(input.dataDir, [...readPartials(input.dataDir), partial]);
     writer = await BackupWriter.create({
       path: partial,
       passphrase: input.passphrase,
@@ -263,21 +284,22 @@ export async function writeExport(input: ExportInput): Promise<{ readonly bytes:
     }
     await writer.finish();
     input.signal?.throwIfAborted();
+    // The last check and the rename run in one turn of core's thread: no
+    // deletion lands between them, and a file the user is replacing goes
+    // only for a backup that holds.
     if (!input.stillCurrent()) throw new BackupStale("something was deleted");
-    await rename(partial, input.path);
+    renameSync(partial, input.path);
     writer = null;
-    // A deletion during the rename: the file just published goes.
-    if (!input.stillCurrent()) {
-      await rm(input.path, { force: true });
-      throw new BackupStale("something was deleted");
-    }
     return { bytes: statSync(input.path).size };
   } catch (error) {
     await writer?.abort();
     await rm(partial, { force: true });
     throw error;
   } finally {
-    rmSync(recordPath, { force: true });
+    writePartials(
+      input.dataDir,
+      readPartials(input.dataDir).filter((listed) => listed !== partial || existsSync(partial)),
+    );
     for (const suffix of ["", "-wal", "-shm", "-journal"]) {
       rmSync(`${copyPath}${suffix}`, { force: true });
     }

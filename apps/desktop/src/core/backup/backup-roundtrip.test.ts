@@ -417,15 +417,33 @@ describe("a backup's round trip", () => {
   it("removes at start the partial file of an export core did not finish", () => {
     const data = tempDir("data");
     const partial = join(tempDir("out"), "Sondine.sondine.partial");
+    const away = join(data, "unplugged-disk", "Old.sondine.partial");
     writeFileSync(partial, "half a backup");
     mkdirSync(join(data, DATA_LAYOUT.backupWorkDir), { recursive: true });
-    writeFileSync(
-      join(data, DATA_LAYOUT.backupWorkDir, PARTIAL_RECORD),
-      JSON.stringify({ partial }),
-    );
+    writeFileSync(join(data, PARTIAL_RECORD), JSON.stringify([partial, away]));
     cleanInterruptedExport(data);
     expect(existsSync(partial)).toBe(false);
     expect(existsSync(join(data, DATA_LAYOUT.backupWorkDir))).toBe(false);
+    // A volume that is not there: its file stays listed, for the next start.
+    expect(JSON.parse(readFileSync(join(data, PARTIAL_RECORD), "utf8"))).toEqual([away]);
+    mkdirSync(join(data, "unplugged-disk"));
+    writeFileSync(away, "half");
+    cleanInterruptedExport(data);
+    expect(existsSync(away)).toBe(false);
+    expect(existsSync(join(data, PARTIAL_RECORD))).toBe(false);
+  });
+
+  it("keeps the staged data its marker does not list", async () => {
+    const { target, marker } = await stagedOver();
+    writeFileSync(
+      join(target, DATA_LAYOUT.restoreMarker),
+      JSON.stringify({ ...marker, items: [DATA_LAYOUT.database] }),
+    );
+    expect(() => applyStagedRestore(target)).toThrow(RestoreSwapError);
+    expect(existsSync(join(target, DATA_LAYOUT.restoreStagingDir, DATA_LAYOUT.archiveDir))).toBe(
+      true,
+    );
+    expect(readFileSync(join(target, DATA_LAYOUT.database), "utf8")).toBe("old database");
   });
 
   it("discards a staging no marker vouches for", () => {
@@ -500,6 +518,48 @@ describe("a backup's round trip", () => {
     seeded.db.close();
     expect(existsSync(path)).toBe(false);
     expect(existsSync(`${path}.partial`)).toBe(false);
+  });
+
+  it("leaves the backup it would replace when a deletion comes at the end", async () => {
+    const source = tempDir("source");
+    const seeded = seed(source);
+    const path = join(tempDir("out"), "Sondine.sondine");
+    writeFileSync(path, "the previous backup");
+    let checks = 0;
+    let total = 0;
+    // Count the checks of a complete export, then fail only the last one.
+    await writeExport({
+      db: seeded.db,
+      dataDir: source,
+      path: join(tempDir("out"), "count.sondine"),
+      passphrase: null,
+      includeAudio: true,
+      prefs: {},
+      appVersion: "0.11.0",
+      macName: "Mac inventé",
+      models: [],
+      nowMs: t0,
+      stillCurrent: () => (total += 1) > 0,
+      freeBytes: () => 1e12,
+    });
+    await expect(
+      writeExport({
+        db: seeded.db,
+        dataDir: source,
+        path,
+        passphrase: null,
+        includeAudio: true,
+        prefs: {},
+        appVersion: "0.11.0",
+        macName: "Mac inventé",
+        models: [],
+        nowMs: t0,
+        stillCurrent: () => (checks += 1) < total,
+        freeBytes: () => 1e12,
+      }),
+    ).rejects.toBeInstanceOf(BackupStale);
+    seeded.db.close();
+    expect(readFileSync(path, "utf8")).toBe("the previous backup");
   });
 
   it("refuses a volume without room, before writing", async () => {
