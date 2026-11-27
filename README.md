@@ -19,6 +19,9 @@ The captures show invented data.
 - **Transcribes** French and English, and separates the voices. Name them, and
   after a few confirmed examples Sondine suggests or recognizes them in later
   conversations.
+- **Spells** your words your way: names and terms you add in Settings, and the
+  people you named, replace a word the transcript heard that sounds the same.
+  What was heard can always be brought back.
 - **Groups** speech into conversations and short moments, with a daily
   journal and the commitments people made.
 - **Searches** everything: words, people, apps, days and your own tags.
@@ -78,7 +81,9 @@ with an NVIDIA card and 32 GB of RAM
 Mac with an RTX 5080; Sondine has not been tried yet on a Mac with less.
 Near-live text asks for 8 GB and the local journal for 16 GB, both measured on
 32 GB only. The beta server has a few places: when they are taken, the app
-says so.
+says so. The first run asks where to transcribe, on this Mac, on a computer of
+yours or on the beta server, and shows what that choice needs before anything
+leaves the Mac.
 
 The iPhone app is in a private TestFlight beta.
 
