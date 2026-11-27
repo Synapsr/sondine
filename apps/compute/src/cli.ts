@@ -14,9 +14,11 @@ import {
   SPEECH_CPP_RUNTIME,
 } from "@sondine/engines";
 import { formatServerLink, parseEndpoint, QuotaPlan } from "@sondine/engines/remote";
+import { BillingService } from "./billing.ts";
 import { ClientStore, planOf, TOPUP_SECONDS } from "./clients.ts";
 import { createComputeServer } from "./server.ts";
 import { Sessions } from "./sessions.ts";
+import { createStripeHttp } from "./stripe.ts";
 
 export const USAGE = `sondine-compute: transcribes for Macs that cannot run Sondine's model.
 
@@ -29,6 +31,8 @@ export const USAGE = `sondine-compute: transcribes for Macs that cannot run Sond
                                             adds persistent top-up hours to a Cloud plan (default 10 h)
   sondine-compute list                      the Macs, their plan, and the hours used
   sondine-compute remove ID                 removes one; its link stops working at once
+  sondine-compute rekey ID --endpoint URL   a new link for the same place (a lost Mac); the old one stops
+  sondine-compute places [N]                the Cloud wave's places, and how many are taken; N sets them (0 closes)
   sondine-compute key                       the server's public key
 
 Environment:
@@ -43,6 +47,13 @@ Environment:
   SONDINE_COMPUTE_BETA_PLACES   places anyone may take in one click (default 0: none)
   SONDINE_COMPUTE_BETA_HOURS    hours of audio per open-beta place and month (default 40)
   SONDINE_COMPUTE_ADDRESS_HEADER  where a trusted tunnel puts the caller's address
+
+Payment, for a server that sells its Cloud (ADR 047); all three, or none:
+  SONDINE_COMPUTE_STRIPE_KEY             a restricted key: Checkout and portal sessions, prices and subscriptions
+  SONDINE_COMPUTE_STRIPE_WEBHOOK_SECRET  the webhook's signing secret; Stripe calls PUBLIC_URL/v1/stripe
+  SONDINE_COMPUTE_PUBLIC_URL             this server's public address, where Stripe sends the browser back
+  SONDINE_COMPUTE_STRIPE_PORTAL          a customer portal configuration (bpc_…), optional
+  SONDINE_COMPUTE_TERMS_URL              the terms Checkout links to (default https://sondine.app/terms)
 `;
 
 export interface CliIo {
@@ -66,7 +77,7 @@ function formatHours(seconds: number): string {
 function parsePlan(raw: string | undefined, fallback: QuotaPlan): QuotaPlan {
   if (raw === undefined) return fallback;
   const parsed = QuotaPlan.safeParse(raw);
-  if (!parsed.success || parsed.data === "beta") {
+  if (!parsed.success || parsed.data === "beta" || parsed.data === "ended") {
     throw new CliError("plan must be one of: own, trial, cloud");
   }
   return parsed.data;
@@ -105,6 +116,44 @@ function resolveId(clients: ClientStore, prefix: string | undefined): string {
   return only.id;
 }
 
+/** The Cloud's payment, when the environment gives all it needs; else none. */
+function billingFrom(
+  env: Readonly<Record<string, string | undefined>>,
+  clients: ClientStore,
+  log: (event: string, fields?: Readonly<Record<string, string | number>>) => void,
+): BillingService | null {
+  const apiKey = env["SONDINE_COMPUTE_STRIPE_KEY"];
+  const webhookSecret = env["SONDINE_COMPUTE_STRIPE_WEBHOOK_SECRET"];
+  const publicUrl = parseEndpoint(env["SONDINE_COMPUTE_PUBLIC_URL"] ?? "");
+  const given = [apiKey, webhookSecret, env["SONDINE_COMPUTE_PUBLIC_URL"]].filter(
+    (value) => value !== undefined && value !== "",
+  ).length;
+  if (given === 0) return null;
+  if (apiKey === undefined || webhookSecret === undefined || publicUrl === null) {
+    throw new CliError(
+      "payment needs SONDINE_COMPUTE_STRIPE_KEY, SONDINE_COMPUTE_STRIPE_WEBHOOK_SECRET and SONDINE_COMPUTE_PUBLIC_URL",
+    );
+  }
+  const local = ["localhost", "127.0.0.1", "[::1]"].includes(new URL(publicUrl).hostname);
+  if (!publicUrl.startsWith("https://") && !local) {
+    throw new CliError("SONDINE_COMPUTE_PUBLIC_URL must be https");
+  }
+  const portal = env["SONDINE_COMPUTE_STRIPE_PORTAL"];
+  return new BillingService(clients, {
+    stripe: createStripeHttp({
+      apiKey,
+      ...(env["SONDINE_COMPUTE_STRIPE_API"] === undefined
+        ? {}
+        : { apiBase: env["SONDINE_COMPUTE_STRIPE_API"] }),
+    }),
+    webhookSecret,
+    publicUrl,
+    termsUrl: env["SONDINE_COMPUTE_TERMS_URL"] ?? "https://sondine.app/terms",
+    ...(portal === undefined || portal === "" ? {} : { portalConfiguration: portal }),
+    log,
+  });
+}
+
 export async function runCli(args: readonly string[], io: CliIo = {}): Promise<number> {
   const envMap = io.env ?? process.env;
   const out = io.out ?? ((line: string) => console.log(line));
@@ -141,6 +190,8 @@ export async function runCli(args: readonly string[], io: CliIo = {}): Promise<n
     const clients = new ClientStore(env("STATE", "state"));
     switch (command) {
       case "serve": {
+        // Settings first: a server that should take payments never starts without.
+        const billing = billingFrom(envMap, clients, log);
         const weights = env("MODEL", join("model", "model.gguf"));
         const executable = env("SPEECH", "./speech");
         if (!existsSync(weights)) throw new CliError(`no model at ${weights}`);
@@ -185,6 +236,7 @@ export async function runCli(args: readonly string[], io: CliIo = {}): Promise<n
         const server = createComputeServer({
           clients,
           sessions,
+          billing,
           name: env("NAME", hostname()).slice(0, 64),
           beta:
             betaSecondsPerMonth === null ? null : { places, secondsPerMonth: betaSecondsPerMonth },
@@ -194,7 +246,9 @@ export async function runCli(args: readonly string[], io: CliIo = {}): Promise<n
         const listen = /^(.*):(\d+)$/.exec(env("LISTEN", "127.0.0.1:8443"));
         if (listen?.[1] === undefined)
           throw new CliError("SONDINE_COMPUTE_LISTEN is not address:port");
-        server.listen(Number(listen[2]), listen[1], () => log("listening", { places }));
+        server.listen(Number(listen[2]), listen[1], () =>
+          log("listening", { places, wave: clients.wave().places, billing: billing ? 1 : 0 }),
+        );
         let stopping = false;
         const stop = () => {
           if (stopping) return;
@@ -277,7 +331,8 @@ export async function runCli(args: readonly string[], io: CliIo = {}): Promise<n
       case "list": {
         const betaHours = positive("BETA_HOURS", "40") * 3_600;
         for (const { id, client } of clients.list()) {
-          const plan = planOf(client);
+          const billing = clients.billing(id);
+          const plan = planOf(client, billing);
           const snapshot = clients.quota(id, betaHours);
           const used = ((snapshot?.usedSeconds ?? 0) / 3_600).toFixed(2);
           const limit =
@@ -288,12 +343,37 @@ export async function runCli(args: readonly string[], io: CliIo = {}): Promise<n
             snapshot !== null && snapshot.extraSeconds > 0
               ? ` (+${formatHours(snapshot.extraSeconds)})`
               : "";
-          out(`${id.slice(0, 12)}  ${plan.padEnd(5)}  ${limit}${extra}  ${client.name}`);
+          const status =
+            billing?.subscription === undefined ? "" : `  ${billing.subscription.status}`;
+          out(`${id.slice(0, 12)}  ${plan.padEnd(5)}  ${limit}${extra}  ${client.name}${status}`);
         }
         return 0;
       }
       case "remove": {
         clients.remove(resolveId(clients, argument));
+        return 0;
+      }
+      case "rekey": {
+        const endpoint = parseEndpoint(values.endpoint ?? "");
+        if (endpoint === null) {
+          throw new CliError("sondine-compute rekey ID --endpoint https://address");
+        }
+        const moved = clients.rekey(resolveId(clients, argument));
+        if (moved === null) throw new CliError("no such Mac (see list)");
+        const serverKey = clients.key().publicKey.toString("base64url");
+        out(formatServerLink({ endpoint, serverKey, token: moved.token }));
+        return 0;
+      }
+      case "places": {
+        if (argument !== undefined) {
+          const wanted = Number(argument);
+          if (!Number.isInteger(wanted) || wanted < 0) {
+            throw new CliError("places must be a whole number, 0 or more");
+          }
+          clients.setWavePlaces(wanted);
+        }
+        const { places: waveplaces, taken } = clients.wave();
+        out(`${taken} taken of ${waveplaces} places`);
         return 0;
       }
       case "key":

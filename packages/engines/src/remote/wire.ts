@@ -48,13 +48,27 @@ export const AsrJob = z.strictObject({
 });
 export type AsrJob = z.output<typeof AsrJob>;
 
-/** Quota tier of a compute client (ADR 040); pricing lives outside the compute server. */
-export const QuotaPlan = z.enum(["own", "beta", "trial", "cloud"]);
+/**
+ * Quota tier of a compute client (ADR 040, 047). `ended`: a Cloud subscription
+ * that stopped; its top-ups stay usable.
+ */
+export const QuotaPlan = z.enum(["own", "beta", "trial", "cloud", "ended"]);
 export type QuotaPlan = z.output<typeof QuotaPlan>;
 
 /** Whether a client's included seconds reset each month, never reset, or are unlimited. */
 export const QuotaPeriod = z.enum(["total", "month", "unlimited"]);
 export type QuotaPeriod = z.output<typeof QuotaPeriod>;
+
+/** A place's subscription, as Stripe last told the server (ADR 047). */
+export const Subscription = z.strictObject({
+  /** `past_due`: a renewal failed and Stripe tries again; the service goes on. */
+  status: z.enum(["active", "past_due", "ended"]),
+  /** When the current period ends: the next renewal, or the end of a cancelled one. */
+  periodEnd: z.int().nullable(),
+  /** The subscription ends at `periodEnd` rather than renews. */
+  cancelAtPeriodEnd: z.boolean(),
+});
+export type Subscription = z.output<typeof Subscription>;
 
 export const QuotaSnapshot = z.strictObject({
   plan: QuotaPlan,
@@ -62,12 +76,42 @@ export const QuotaSnapshot = z.strictObject({
   usedSeconds: z.number().nonnegative(),
   limitSeconds: z.number().nonnegative().nullable(),
   extraSeconds: z.number().nonnegative(),
+  /** Null without a subscription, and on a server that takes no payment. */
+  subscription: Subscription.nullable().optional(),
 });
 export type QuotaSnapshot = z.output<typeof QuotaSnapshot>;
+
+/** What a place may buy (ADR 047): the Founder plan, or ten more hours. */
+export const BillingItem = z.enum(["subscription", "topup"]);
+export type BillingItem = z.output<typeof BillingItem>;
+
+/** The language of the pages Stripe shows. */
+export const BillingLocale = z.enum(["fr", "en"]);
+export type BillingLocale = z.output<typeof BillingLocale>;
 
 export const Open = z.discriminatedUnion("kind", [
   /** One of the beta's places, without an account. */
   z.strictObject({ v: z.literal(1), at: z.int(), kind: z.literal("claim") }),
+  /** How full the Cloud's wave is, before taking a place (ADR 047). */
+  z.strictObject({ v: z.literal(1), at: z.int(), kind: z.literal("wave") }),
+  /** A place of the wave with its free trial, without an account. */
+  z.strictObject({ v: z.literal(1), at: z.int(), kind: z.literal("trial") }),
+  /** A Stripe page for this place: Checkout to buy `item`, or the customer portal. */
+  z.strictObject({
+    v: z.literal(1),
+    at: z.int(),
+    kind: z.literal("checkout"),
+    token: Token,
+    item: BillingItem,
+    locale: BillingLocale,
+  }),
+  z.strictObject({
+    v: z.literal(1),
+    at: z.int(),
+    kind: z.literal("portal"),
+    token: Token,
+    locale: BillingLocale,
+  }),
   /** Is this server mine, and what does it run? */
   z.strictObject({ v: z.literal(1), at: z.int(), kind: z.literal("hello"), token: Token }),
   /** How much of this client's plan has been used. */
@@ -98,6 +142,10 @@ export const RefusalCode = z.enum([
   "quota",
   /** The client's clock is too far off. */
   "clock",
+  /** This place may not buy that now: already subscribed, or a top-up without a plan. */
+  "not_allowed",
+  /** Stripe did not answer; try again later. */
+  "billing_unavailable",
   "bad_request",
 ]);
 export type RefusalCode = z.output<typeof RefusalCode>;
@@ -112,14 +160,11 @@ export const OpenReply = z.discriminatedUnion("kind", [
     engineVersion: z.string(),
     name: z.string().max(64),
   }),
-  z.strictObject({
-    kind: z.literal("quota"),
-    plan: QuotaPlan,
-    period: QuotaPeriod,
-    usedSeconds: z.number().nonnegative(),
-    limitSeconds: z.number().nonnegative().nullable(),
-    extraSeconds: z.number().nonnegative(),
-  }),
+  z.strictObject({ kind: z.literal("quota"), ...QuotaSnapshot.shape }),
+  /** The share of the wave's places taken, rounded down: no count is given. */
+  z.strictObject({ kind: z.literal("wave"), percent: z.int().min(0).max(100), full: z.boolean() }),
+  /** A Stripe page to open in the browser. */
+  z.strictObject({ kind: z.literal("page"), url: z.url() }),
   z.strictObject({ kind: z.literal("session"), id: z.string().regex(/^[0-9a-f]{32}$/) }),
 ]);
 export type OpenReply = z.output<typeof OpenReply>;

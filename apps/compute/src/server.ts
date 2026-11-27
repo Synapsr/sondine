@@ -17,6 +17,7 @@ import {
   type RefusalCode,
   type Responded,
 } from "@sondine/engines/remote";
+import type { BillingService } from "./billing.ts";
 import { isInvitedPlan, planOf, type ClientStore } from "./clients.ts";
 import type { ServerLog, Sessions } from "./sessions.ts";
 
@@ -35,6 +36,8 @@ export interface ComputeServerOptions {
   readonly name: string;
   /** Null: no beta here. */
   readonly beta: BetaOptions | null;
+  /** Null: this server takes no payment (ADR 047). */
+  readonly billing?: BillingService | null;
   /** The header a trusted tunnel puts the caller's address in, to slow down claims. */
   readonly addressHeader?: string;
   readonly log?: ServerLog;
@@ -65,6 +68,7 @@ class HttpError extends Error {
 
 export function createComputeServer(options: ComputeServerOptions): Server {
   const { clients, sessions, beta } = options;
+  const billing = options.billing ?? null;
   const now = options.now ?? Date.now;
   const log = options.log ?? (() => undefined);
   const key = clients.key();
@@ -108,7 +112,7 @@ export function createComputeServer(options: ComputeServerOptions): Server {
   }
 
   /** The answer, and for a session what to hold for it. */
-  function decide(request: IncomingMessage, received: Responded): Decision {
+  async function decide(request: IncomingMessage, received: Responded): Promise<Decision> {
     const refuse = (code: RefusalCode): Decision => ({ reply: { kind: "refused", code } });
     let parsed: unknown;
     try {
@@ -129,8 +133,31 @@ export function createComputeServer(options: ComputeServerOptions): Server {
       return true;
     };
 
+    if (message.kind === "wave") {
+      const { places, taken } = clients.wave();
+      if (places === 0) return refuse("closed");
+      return {
+        reply: {
+          kind: "wave",
+          percent: Math.min(100, Math.floor((taken * 100) / places)),
+          full: taken >= places,
+        },
+      };
+    }
+    if (message.kind === "trial") {
+      const { places, taken } = clients.wave();
+      if (places === 0) return refuse("closed");
+      // A full wave costs no claim of the address's.
+      if (taken >= places) return refuse("full");
+      if (!first()) return refuse("bad_request");
+      if (!mayClaim(request)) return refuse("busy");
+      const token = clients.trial();
+      log(token === null ? "wave-full" : "trial-started");
+      return token === null ? refuse("full") : { reply: { kind: "claimed", token } };
+    }
     if (message.kind === "claim") {
-      if (beta === null) return refuse("closed");
+      // A wave replaces the open beta: an app that knows only the beta takes no trial it could not pay.
+      if (beta === null || clients.wave().places > 0) return refuse("closed");
       if (!first()) return refuse("bad_request");
       if (!mayClaim(request)) return refuse("busy");
       const token = clients.claim(beta.places);
@@ -159,9 +186,22 @@ export function createComputeServer(options: ComputeServerOptions): Server {
         if (snapshot === null) return refuse("unauthorized");
         return { reply: { kind: "quota", ...snapshot } };
       }
+      case "checkout":
+      case "portal": {
+        if (billing === null) return refuse("closed");
+        const page = await billing.page(
+          known,
+          message.kind === "checkout"
+            ? { kind: "checkout", item: message.item, locale: message.locale }
+            : { kind: "portal", locale: message.locale },
+        );
+        return "url" in page ? { reply: { kind: "page", url: page.url } } : refuse(page.refused);
+      }
       case "leave":
-        // Invited plans (`trial`, `cloud`) cannot be deleted by a client click; only the operator removes them.
-        if (isInvitedPlan(planOf(known.client))) return refuse("bad_request");
+        // Invited and paid plans cannot be deleted by a client click; only the operator removes them.
+        if (isInvitedPlan(planOf(known.client, clients.billing(known.id)))) {
+          return refuse("bad_request");
+        }
         sessions.dropClient(known.id);
         clients.remove(known.id);
         return { reply: { kind: "left" } };
@@ -196,7 +236,7 @@ export function createComputeServer(options: ComputeServerOptions): Server {
     slowDown();
     const body = await readBody(request, MAX_OPEN_BYTES);
     const received = respond(key, body, PROLOGUE);
-    const { reply, session } = decide(request, received);
+    const { reply, session } = await decide(request, received);
     const { message, ...channel } = received.answer(Buffer.from(JSON.stringify(reply)));
     if (session !== undefined) sessions.add(session.id, session.clientId, channel, session.job);
     send(response, 200, message);
@@ -206,6 +246,18 @@ export function createComputeServer(options: ComputeServerOptions): Server {
     const path = (request.url ?? "").split("?")[0] ?? "";
     if (path === "/healthz" && request.method === "GET") return send(response, 204);
     if (path === "/v1/open" && request.method === "POST") return openSession(request, response);
+    if (path === "/v1/stripe" && request.method === "POST" && billing !== null) {
+      const body = await readBody(request, MAX_WEBHOOK_BYTES);
+      const signature = request.headers["stripe-signature"];
+      const status = await billing.webhook(
+        body,
+        Array.isArray(signature) ? signature[0] : signature,
+      );
+      return send(response, status);
+    }
+    if ((path === "/billing/done" || path === "/billing/back") && request.method === "GET") {
+      return sendPage(response, path === "/billing/done" ? "done" : "back", request.url ?? "");
+    }
     const match = /^\/v1\/s\/([0-9a-f]{32})(?:\/(\d{1,4}))?$/.exec(path);
     const id = match?.[1];
     if (id === undefined) throw new HttpError(404);
@@ -247,6 +299,41 @@ export function createComputeServer(options: ComputeServerOptions): Server {
   );
   server.maxConnections = 200;
   return server;
+}
+
+/** The longest webhook call read: Stripe's events are a few kilobytes. */
+const MAX_WEBHOOK_BYTES = 256 * 1024;
+
+const PAGES = {
+  done: {
+    fr: ["Paiement reçu", "Vous pouvez revenir dans Sondine : il se met à jour seul."],
+    en: ["Payment received", "You can go back to Sondine: it updates by itself."],
+  },
+  back: {
+    fr: ["Retour à Sondine", "Vous pouvez fermer cette page et revenir dans Sondine."],
+    en: ["Back to Sondine", "You can close this page and go back to Sondine."],
+  },
+} as const;
+
+/** Where Stripe sends the browser back: a still page, no script, nothing loaded. */
+function sendPage(response: ServerResponse, page: keyof typeof PAGES, url: string): void {
+  const lang = new URLSearchParams(url.split("?")[1] ?? "").get("lang") === "en" ? "en" : "fr";
+  const [title, text] = PAGES[page][lang];
+  const body = Buffer.from(
+    `<!doctype html><html lang="${lang}"><meta charset="utf-8"><meta name="viewport" content="width=device-width">` +
+      `<title>${title}</title><style>body{font:16px/1.5 system-ui,sans-serif;max-width:32rem;margin:20vh auto;padding:0 1rem;color:#1d1d1f;background:#fff}` +
+      `@media(prefers-color-scheme:dark){body{color:#f5f5f7;background:#1d1d1f}}</style>` +
+      `<h1>${title}</h1><p>${text}</p></html>`,
+  );
+  response.writeHead(200, {
+    "cache-control": "no-store",
+    "x-content-type-options": "nosniff",
+    "content-security-policy": "default-src 'none'; style-src 'unsafe-inline'",
+    "referrer-policy": "no-referrer",
+    "content-type": "text/html; charset=utf-8",
+    "content-length": body.length,
+  });
+  response.end(body);
 }
 
 function send(response: ServerResponse, status: number, body?: Buffer): void {

@@ -1,10 +1,14 @@
 // Compute servers (ADR 040): the Mac's side for core, the channel and the
 // wire for apps/compute.
 export {
+  billingPage,
   claimPlace,
   hello,
+  isStripePage,
   leavePlace,
   readQuota,
+  readWave,
+  startTrial,
   RefusedError,
   type Fetch,
   type ServerAddress,
