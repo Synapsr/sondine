@@ -10,13 +10,12 @@ export interface TextPart {
 
 /**
  * A matched word: the accent at 35% reads in both modes (the theme's 20% mix
- * is near black on a dark canvas). The current match is the full accent with
- * black text, legible on that orange in both modes.
+ * is near black on a dark canvas). The current match is the full accent, the
+ * ink, with the text that sits on it: white in light, dark in dark.
  */
 export const matchClassName =
   "corner-xs bg-[color-mix(in_srgb,var(--color-1)_35%,transparent)] text-cte-text";
-export const currentMatchClassName =
-  "corner-xs bg-color-1 text-[color:light-dark(var(--neutral-10),var(--neutral-1))]";
+export const currentMatchClassName = "corner-xs bg-color-1 text-cte-accent-text";
 
 /** `text` in order, matched parts flagged; ranges outside the text are clamped. */
 export function highlightParts(text: string, ranges: readonly TextRange[]): TextPart[] {
