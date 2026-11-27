@@ -241,6 +241,8 @@ export const analysisQueueLayer = (options: AnalysisOptions = {}) =>
       models.onInstalled(() => scheduler.wake());
       // Another place to transcribe: the queue looks now, and what was leaving stops.
       compute.onChanged(() => scheduler.placeChanged());
+      // A place that paid, or got its hours back: what waited for the server goes now.
+      compute.onHoursLeft(() => scheduler.hoursLeft());
       scheduler.start();
       let closing = false;
       const takePastDictations = async () => {

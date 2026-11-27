@@ -2370,6 +2370,22 @@ export const apiLayer = Layer.effect(
             "compute.quota",
             Effect.promise(() => compute.quota()),
           ),
+        wave: () =>
+          call(
+            "compute.wave",
+            Effect.promise(() => compute.wave()),
+          ),
+        openBilling: (input) =>
+          call(
+            "compute.openBilling",
+            Effect.promise(async () => {
+              const page = await compute.billing(input);
+              if ("outcome" in page) return page;
+              // Only Stripe's own pages (checked in billingPage), in the browser, never the window.
+              main.post({ type: "open-page", url: page.url });
+              return { outcome: "opened" as const };
+            }),
+          ),
       },
       live: {
         setEnabled: (input) =>

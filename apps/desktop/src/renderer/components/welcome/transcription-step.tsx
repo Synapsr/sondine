@@ -230,7 +230,7 @@ function OwnScreen({
   );
 }
 
-/** The Cloud terms in the page; « Utiliser le cloud » takes a place or connects an invite. */
+/** The Cloud terms in the page; « Essayer 60 min gratuites » takes a place, or connects an invite. */
 function BetaScreen({
   status,
   onBack,
@@ -265,12 +265,14 @@ function BetaScreen({
               }, invite)
             }
           >
-            {m.compute_beta_use()}
+            {status.beta.joined || invite.trim() !== ""
+              ? m.compute_beta_use()
+              : m.compute_trial_start()}
           </Button>
         )
       }
     >
-      <BetaTerms />
+      <BetaTerms joined={status.beta.joined} />
       {status.beta.joined ? null : <BetaInviteField value={invite} onChange={setInvite} />}
       {join.problem === null ? null : (
         <p role="alert" className="text-body-s text-error">

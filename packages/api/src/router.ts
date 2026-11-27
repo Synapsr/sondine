@@ -345,6 +345,12 @@ export const router = os.router({
     quota: os.compute.quota.handler(({ context, errors }) =>
       guard(errors, () => context.services.compute.quota()),
     ),
+    wave: os.compute.wave.handler(({ context, errors }) =>
+      guard(errors, () => context.services.compute.wave()),
+    ),
+    openBilling: os.compute.openBilling.handler(({ context, input, errors }) =>
+      guard(errors, () => context.services.compute.openBilling(input)),
+    ),
   },
   live: {
     setEnabled: os.live.setEnabled.handler(({ context, input, errors }) =>

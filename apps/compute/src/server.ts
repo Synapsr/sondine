@@ -197,14 +197,16 @@ export function createComputeServer(options: ComputeServerOptions): Server {
         );
         return "url" in page ? { reply: { kind: "page", url: page.url } } : refuse(page.refused);
       }
-      case "leave":
-        // Invited and paid plans cannot be deleted by a client click; only the operator removes them.
-        if (isInvitedPlan(planOf(known.client, clients.billing(known.id)))) {
-          return refuse("bad_request");
-        }
+      case "leave": {
+        // Invited and paid plans cannot be deleted by a client click; only the operator removes
+        // them. A trial nobody used yet may be given back: the Mac took it, then changed its mind.
+        const plan = planOf(known.client, clients.billing(known.id));
+        const unused = plan === "trial" && clients.usage(known.id).lastUsedAt === 0;
+        if (isInvitedPlan(plan) && !unused) return refuse("bad_request");
         sessions.dropClient(known.id);
         clients.remove(known.id);
         return { reply: { kind: "left" } };
+      }
       case "asr": {
         const { job } = message;
         if (

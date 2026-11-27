@@ -1691,13 +1691,52 @@ export const ComputeJoinResult = z.strictObject({
 export type ComputeJoinResult = z.output<typeof ComputeJoinResult>;
 
 export const ComputeQuota = z.strictObject({
-  plan: z.enum(["own", "beta", "trial", "cloud"]),
+  /** `ended`: a Cloud subscription that stopped; its top-ups stay (ADR 047). */
+  plan: z.enum(["own", "beta", "trial", "cloud", "ended"]),
   period: z.enum(["total", "month", "unlimited"]),
   usedSeconds: z.number().nonnegative(),
   limitSeconds: z.number().nonnegative().nullable(),
   extraSeconds: z.number().nonnegative(),
+  /** As Stripe last told the server; absent without a subscription. */
+  subscription: z
+    .strictObject({
+      status: z.enum(["active", "past_due", "ended"]),
+      periodEnd: WallMs.nullable(),
+      cancelAtPeriodEnd: z.boolean(),
+    })
+    .nullable()
+    .optional(),
 });
 export type ComputeQuota = z.output<typeof ComputeQuota>;
+
+/** How full the Cloud's wave is (ADR 047): a share of its places, never a count. */
+export const ComputeWave = z.strictObject({
+  percent: z.int().min(0).max(100),
+  full: z.boolean(),
+});
+export type ComputeWave = z.output<typeof ComputeWave>;
+
+/** A Stripe page, opened in the browser: the Founder plan, ten hours, or the portal. */
+export const ComputeBillingInput = z.strictObject({
+  page: z.enum(["subscription", "topup", "portal"]),
+  locale: z.enum(["fr", "en"]),
+});
+export type ComputeBillingInput = z.input<typeof ComputeBillingInput>;
+
+export const ComputeBillingOutcome = z.enum([
+  "opened",
+  /** Not for this place now: subscribed already, or ten hours without a plan. */
+  "not-allowed",
+  /** Stripe or the server did not answer; try again. */
+  "unavailable",
+  /** This Mac has no Cloud place, or the server takes no payment. */
+  "closed",
+  "mismatch",
+]);
+export type ComputeBillingOutcome = z.output<typeof ComputeBillingOutcome>;
+
+export const ComputeBillingResult = z.strictObject({ outcome: ComputeBillingOutcome });
+export type ComputeBillingResult = z.output<typeof ComputeBillingResult>;
 
 /** « Effacer les N dernières minutes »: the choices the app offers. */
 export const ForgetInput = z.strictObject({

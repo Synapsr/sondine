@@ -41,6 +41,9 @@ import type {
   ComputeJoinInput,
   ComputeJoinResult,
   ComputeQuota,
+  ComputeBillingInput,
+  ComputeBillingResult,
+  ComputeWave,
   ComputeStatus,
   ContextAddInput,
   ContextAddResult,
@@ -343,6 +346,10 @@ export interface ApiServices {
     joinBeta(input: z.output<typeof ComputeJoinInput>): Promise<ComputeJoinResult>;
     leaveBeta(): Promise<ComputeStatus>;
     quota(): Promise<ComputeQuota | null>;
+    /** How full the Cloud's wave is; null when this build or its server has none. */
+    wave(): Promise<ComputeWave | null>;
+    /** Opens a Stripe page in the browser; the app never talks to Stripe (ADR 047). */
+    openBilling(input: z.output<typeof ComputeBillingInput>): Promise<ComputeBillingResult>;
   };
   readonly live: {
     setEnabled(input: z.output<typeof LiveEnabledInput>): Promise<LiveStatus>;

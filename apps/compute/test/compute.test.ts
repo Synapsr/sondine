@@ -641,6 +641,42 @@ describe("the beta's places", () => {
 });
 
 describe("plans, trial and top-ups (Wave 1)", () => {
+  it("counts two Macs on one place together, against the same hours (ADR 047)", async () => {
+    let calls = 0;
+    const { endpoint, serverKey, clients } = await serve(async (asked) => {
+      calls += 1;
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      return heard(asked);
+    });
+    const { id, token } = clients.add("beta", "two-macs", { plan: "trial", limitSeconds: 5 });
+    // A backup restored on a second Mac carries the same token.
+    const first = remote({ endpoint, serverKey, token });
+    const second = remote({ endpoint, serverKey, token });
+    await Promise.all([
+      first.transcribe(request(audio(RATE * 2), "a")),
+      second.transcribe(request(audio(RATE * 2), "b")),
+    ]);
+    expect(calls).toBe(2);
+    expect(clients.quota(id)).toMatchObject({ usedSeconds: 4, limitSeconds: 5 });
+    // What one Mac has in flight counts for the other: 4 + 2 is past 5.
+    await expect(second.transcribe(request(audio(RATE * 2), "c"))).rejects.toMatchObject({
+      code: "quota_exhausted",
+    });
+  });
+
+  it("lets a Mac give back a trial it never used, and nothing more", async () => {
+    const { endpoint, serverKey, clients } = await serve();
+    const unused = clients.add("beta", "trial", { plan: "trial" });
+    await leavePlace({ endpoint, serverKey, token: unused.token });
+    expect(clients.has(unused.id)).toBe(false);
+    const used = clients.add("beta", "trial", { plan: "trial" });
+    clients.charge(used.id, 1);
+    await expect(leavePlace({ endpoint, serverKey, token: used.token })).rejects.toMatchObject({
+      refusal: "bad_request",
+    });
+    expect(clients.has(used.id)).toBe(true);
+  });
+
   it("runs a cumulative trial even when open beta is closed, never resets next month, and refuses leave and top-up", async () => {
     let at = Date.now();
     const { endpoint, serverKey, clients } = await serve(undefined, { now: () => at });
