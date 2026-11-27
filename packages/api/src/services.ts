@@ -12,6 +12,13 @@ import type {
   AnalysisCheck,
   AnalysisRequestResult,
   AnalysisWaitForInput,
+  BackupChooseResult,
+  BackupExportInput,
+  BackupExportResult,
+  BackupInspectResult,
+  BackupPassphraseInput,
+  BackupRestoreResult,
+  BackupStatus,
   BrowserEnabledInput,
   BrowserShowExtensionResult,
   BrowserStatus,
@@ -552,6 +559,19 @@ export interface ApiServices {
     get(): Promise<UsageStatus>;
     setSharing(input: z.output<typeof UsageSharingInput>): Promise<UsageStatus>;
     processCrashed(input: z.output<typeof UsageCrashInput>): Promise<Record<string, never>>;
+  };
+  /** A whole backup and its restore (ADR 048). */
+  readonly backup: {
+    status(): Promise<BackupStatus>;
+    /** Yields the status at once, then on every change (progress at most 4 times a second). */
+    watch(signal: AbortSignal | undefined): AsyncIterable<BackupStatus>;
+    export(input: z.output<typeof BackupExportInput>): Promise<BackupExportResult>;
+    choose(): Promise<BackupChooseResult>;
+    inspect(input: z.output<typeof BackupPassphraseInput>): Promise<BackupInspectResult>;
+    restore(input: z.output<typeof BackupPassphraseInput>): Promise<BackupRestoreResult>;
+    cancel(): Promise<Record<string, never>>;
+    deletePrevious(): Promise<BackupStatus>;
+    closeNote(): Promise<BackupStatus>;
   };
   readonly diagnostics: {
     report(): Promise<DiagnosticReport>;

@@ -1117,6 +1117,14 @@ See [ADR 012](decisions/012-third-parties-and-biometrics.md).
   episodes' ids and refuses the text once any of them is gone. Search's
   « ⋯ » takes the results (up to 500 episodes with their best matches) as
   Markdown or `sondine.search/2` (`docs/schemas/search-2.schema.json`).
+- Backup and restore (ADR 048): Settings ▸ Données writes all of Sondine to
+  one `.sondine` file (the database's online copy, archived audio, context
+  files, the phones' identity, the window's own settings; never models),
+  encrypted by default. Core writes it at the path of main's save panel,
+  holding retention, and throws it away when a deletion comes meanwhile.
+  A restore is unpacked and checked into `restore-staging/`; main
+  relaunches and swaps it in before the helper and core start, the data it
+  replaces kept in `before-restore/`. `backup.*` is off MCP.
 - Context added to a conversation (ADR 024): ⌘V outside a field
   (`context.paste`: main reads the clipboard, files first, then an image it
   writes as PNG into the context staging folder, then text), drops

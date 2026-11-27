@@ -14,6 +14,13 @@ import {
   AnalysisCheck,
   AnalysisRequestResult,
   AnalysisWaitForInput,
+  BackupChooseResult,
+  BackupExportInput,
+  BackupExportResult,
+  BackupInspectResult,
+  BackupPassphraseInput,
+  BackupRestoreResult,
+  BackupStatus,
   BrowserEnabledInput,
   BrowserShowExtensionResult,
   BrowserStatus,
@@ -1129,6 +1136,50 @@ export const contract = {
       .meta({ event: "process_crashed", mcp: null })
       .input(UsageCrashInput)
       .output(NoOutput),
+  },
+  // A whole backup and its restore (ADR 048), in the app only: an agent never
+  // exports the memory or replaces it, and a phone never reaches it.
+  backup: {
+    status: base.meta({ event: "backup_viewed", mcp: null }).input(NoInput).output(BackupStatus),
+    watch: base
+      .meta({ event: "backup_watched", mcp: null })
+      .input(NoInput)
+      .output(eventIterator(BackupStatus)),
+    /** A save panel, then core writes the backup there; returns once it is written or stopped. */
+    export: base
+      .meta({ event: "backup_exported", mcp: null })
+      .input(BackupExportInput)
+      .output(BackupExportResult),
+    /** An open panel for a `.sondine` file; reads its clear header only. */
+    choose: base
+      .meta({ event: "backup_chosen", mcp: null })
+      .input(NoInput)
+      .output(BackupChooseResult),
+    /** Opens the chosen backup and reads its summary; checks the version and the space. */
+    inspect: base
+      .meta({ event: "backup_inspected", mcp: null })
+      .input(BackupPassphraseInput)
+      .output(BackupInspectResult),
+    /**
+     * Unpacks and checks the chosen backup, then asks main to relaunch on it:
+     * the data it replaces is kept aside.
+     */
+    restore: base
+      .meta({ event: "backup_restored", mcp: null })
+      .input(BackupPassphraseInput)
+      .output(BackupRestoreResult),
+    /** Stops the backup or the restore under way; a partial file is removed. */
+    cancel: base.meta({ event: "backup_cancelled", mcp: null }).input(NoInput).output(NoOutput),
+    /** Deletes the data the last restore replaced. */
+    deletePrevious: base
+      .meta({ event: "backup_previous_deleted", mcp: null })
+      .input(NoInput)
+      .output(BackupStatus),
+    /** Closes the note after a restore. */
+    closeNote: base
+      .meta({ event: "backup_note_closed", mcp: null })
+      .input(NoInput)
+      .output(BackupStatus),
   },
   diagnostics: {
     /** « Envoyer un diagnostic » (ADR 042): the text the user reads, then sends or not. */

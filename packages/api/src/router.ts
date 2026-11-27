@@ -619,6 +619,35 @@ export const router = os.router({
       guard(errors, () => context.services.usage.processCrashed(input)),
     ),
   },
+  backup: {
+    status: os.backup.status.handler(({ context, errors }) =>
+      guard(errors, () => context.services.backup.status()),
+    ),
+    watch: os.backup.watch.handler(async function* ({ context, signal }) {
+      for await (const status of context.services.backup.watch(signal)) yield status;
+    }),
+    export: os.backup.export.handler(({ context, input, errors }) =>
+      guard(errors, () => context.services.backup.export(input)),
+    ),
+    choose: os.backup.choose.handler(({ context, errors }) =>
+      guard(errors, () => context.services.backup.choose()),
+    ),
+    inspect: os.backup.inspect.handler(({ context, input, errors }) =>
+      guard(errors, () => context.services.backup.inspect(input)),
+    ),
+    restore: os.backup.restore.handler(({ context, input, errors }) =>
+      guard(errors, () => context.services.backup.restore(input)),
+    ),
+    cancel: os.backup.cancel.handler(({ context, errors }) =>
+      guard(errors, () => context.services.backup.cancel()),
+    ),
+    deletePrevious: os.backup.deletePrevious.handler(({ context, errors }) =>
+      guard(errors, () => context.services.backup.deletePrevious()),
+    ),
+    closeNote: os.backup.closeNote.handler(({ context, errors }) =>
+      guard(errors, () => context.services.backup.closeNote()),
+    ),
+  },
   diagnostics: {
     report: os.diagnostics.report.handler(({ context, errors }) =>
       guard(errors, () => context.services.diagnostics.report()),

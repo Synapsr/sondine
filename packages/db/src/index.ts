@@ -18,6 +18,24 @@ export {
   type AgentClient,
 } from "./agents";
 export {
+  backupArchiveFiles,
+  backupContextFiles,
+  backupCounts,
+  databaseMigrations,
+  dismissRestoredNote,
+  migrationRefusal,
+  prepareExportCopy,
+  prepareRestoredCopy,
+  RESTORED_KEY,
+  restoredNote,
+  snapshotDatabase,
+  TRANSIENT_SETTING_KEYS,
+  type BackupArchiveFile,
+  type BackupCounts,
+  type BackupMigration,
+  type RestoredNote,
+} from "./backup";
+export {
   addContextItems,
   contextEpisodeOf,
   deleteOrphanContext,

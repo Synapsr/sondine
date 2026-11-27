@@ -53,3 +53,4 @@ and link the replacement.
 | [045](045-automatic-updates.md)             | Sondine updates itself, with a yes                               | Accepted |
 | [046](046-vocabulary.md)                    | The Vocabulary, and the journal's model for look-alikes          | Accepted |
 | [047](047-cloud-billing.md)                 | Payer le Cloud Sondine depuis l'app                              | Accepted |
+| [048](048-backup-and-restore.md)            | A whole backup in one file, and its restore                      | Accepted |

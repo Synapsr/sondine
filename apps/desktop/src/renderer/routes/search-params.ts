@@ -100,6 +100,7 @@ export const SettingsPage = z.enum([
   "phone",
   "agents",
   "statistics",
+  "data",
   "advanced",
 ]);
 export type SettingsPage = z.output<typeof SettingsPage>;

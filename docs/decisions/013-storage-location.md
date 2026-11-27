@@ -1,6 +1,8 @@
 # 013 — Storage location
 
-Status: Proposed — 2026-11-02
+Status: Proposed — 2026-11-02; amended 2026-11-27 by ADR 048 (the export
+is a whole backup, encrypted by default; without a passphrase by the user's
+explicit choice)
 
 ## Context
 
@@ -24,7 +26,8 @@ by app data protection prompts.
   the app bundle, so main copies the bundled VAD model there, checked by
   sha256 at each launch, and points the helper at the copy.
 - The container is excluded from Time Machine and cloud backup by default;
-  Settings offers an explicit encrypted local export.
+  Settings offers an explicit local export of everything (ADR 048),
+  encrypted by default, or not, when the user chooses so knowingly.
 - Development builds run as Electron.app, which is not entitled to the
   group, and use `~/Library/Application Support/Sondine Dev`. Unsigned and
   ad-hoc packaged builds fall back to `~/Library/Application Support/Sondine`.

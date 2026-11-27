@@ -15,6 +15,7 @@ import { exportJsonSchemas } from "./transcript-json";
 import type {
   AgentsStatus,
   AnalysisCheck,
+  BackupStatus,
   ComputeStatus,
   ListeningStatus,
   ModelsStatus,
@@ -200,6 +201,14 @@ const status: Status = {
   changes: 0,
   updatedAtMs: 1_793_610_000_000,
 };
+
+const backupStatus: BackupStatus = {
+  operation: { kind: "idle" },
+  estimate: { databaseBytes: 0, audioBytes: 0, contextBytes: 0 },
+  previous: null,
+  restored: null,
+};
+const noExport = { bytes: null, neededBytes: null, freeBytes: null };
 
 const chatStatus = { enabled: false, providers: null, choice: null, canRead: true };
 const journalState = {
@@ -845,6 +854,27 @@ function fakeServices(overrides: Partial<ApiServices> = {}) {
         };
       },
     },
+    backup: {
+      status: async () => backupStatus,
+      watch: async function* () {
+        yield backupStatus;
+      },
+      export: async (input) => {
+        calls.push({ method: "backup.export", input: { includeAudio: input.includeAudio } });
+        return { outcome: "cancelled", ...noExport };
+      },
+      choose: async () => ({ outcome: "cancelled", fileName: null, protected: false }),
+      inspect: async () => ({
+        outcome: "none-chosen",
+        summary: null,
+        neededBytes: null,
+        freeBytes: null,
+      }),
+      restore: async () => ({ outcome: "none-chosen" }),
+      cancel: async () => ({}),
+      deletePrevious: async () => backupStatus,
+      closeNote: async () => backupStatus,
+    },
     vocabulary: {
       list: async () => ({ words: [], people: [], modelReads: false }),
       add: async (input) => {
@@ -954,6 +984,15 @@ describe("contract metadata", () => {
       "analysis.check",
       "analysis.request",
       "analysis.setWaitFor",
+      "backup.cancel",
+      "backup.choose",
+      "backup.closeNote",
+      "backup.deletePrevious",
+      "backup.export",
+      "backup.inspect",
+      "backup.restore",
+      "backup.status",
+      "backup.watch",
       "browser.setEnabled",
       "browser.showExtension",
       "browser.status",

@@ -27,6 +27,17 @@ export const USAGE_RULES = {
   analysis_wait_set: "action",
   audio_files_imported: "action",
   audio_imported: "action",
+  // A backup and its restore (ADR 048): not counted until the question
+  // the user answered names them (ADR 042).
+  backup_cancelled: "never",
+  backup_chosen: "never",
+  backup_exported: "never",
+  backup_inspected: "never",
+  backup_note_closed: "never",
+  backup_previous_deleted: "never",
+  backup_restored: "never",
+  backup_viewed: "never",
+  backup_watched: "never",
   browser_extension_shown: "action",
   browser_link_set: "action",
   browser_viewed: "never",

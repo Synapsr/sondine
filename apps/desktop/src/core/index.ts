@@ -2,6 +2,7 @@ import type { MessageEvent as ElectronMessageEvent, ParentPort } from "electron"
 import { Effect } from "effect";
 import { CoreToMain, MainToCore } from "../shared/core-messages";
 import { SystemSignals } from "./analysis/analysis-layer";
+import { Backup } from "./backup/backup-layer";
 import { Exports } from "./exports";
 import { EpisodeMedia, mediaReplyMessage } from "./audio/episode-media";
 import { CoreState } from "./status/core-state";
@@ -179,6 +180,13 @@ function handle(event: ElectronMessageEvent) {
         Effect.gen(function* () {
           const exports = yield* Exports;
           exports.confirm(message.requestId);
+        }),
+      );
+      return;
+    case "backup-save-picked":
+      void runtime.runPromise(
+        Effect.gen(function* () {
+          (yield* Backup).receiveSavePath(message.requestId, message.path);
         }),
       );
       return;

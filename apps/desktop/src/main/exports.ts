@@ -97,7 +97,7 @@ async function writeWhole(target: string, write: (file: FileHandle) => Promise<v
 }
 
 /** The path the user chose in a save panel, or null when they closed it. */
-async function askSavePath(
+export async function askSavePath(
   window: BrowserWindow | null,
   options: SaveDialogOptions,
 ): Promise<string | null> {

@@ -3422,3 +3422,142 @@ export type VocabularyUpdateInput = z.input<typeof VocabularyUpdateInput>;
 
 export const VocabularyRemoveInput = z.strictObject({ id: z.int().positive() });
 export type VocabularyRemoveInput = z.input<typeof VocabularyRemoveInput>;
+
+// ——— Backup and restore (ADR 048) ———
+
+/**
+ * What the window keeps in its own storage and a backup carries: the
+ * language, the appearance, the shortcuts. Nothing else of it travels.
+ */
+export const BACKUP_RENDERER_KEYS = [
+  "PARAGLIDE_LOCALE",
+  "sondine.theme",
+  "sondine.shortcuts",
+] as const;
+
+export const BackupRendererPrefs = z.partialRecord(
+  z.enum(BACKUP_RENDERER_KEYS),
+  z.string().max(16_384),
+);
+export type BackupRendererPrefs = z.output<typeof BackupRendererPrefs>;
+
+/** A passphrase the user chose: at least 12 characters. */
+export const BackupPassphrase = z.string().min(12).max(1024);
+
+export const BackupOperation = z.discriminatedUnion("kind", [
+  z.strictObject({ kind: z.literal("idle") }),
+  /** Writing a backup: plaintext bytes written of about `totalBytes`. */
+  z.strictObject({ kind: z.literal("exporting"), doneBytes: Count, totalBytes: Count }),
+  /** Unpacking and checking a backup before it replaces the data: bytes of the file read. */
+  z.strictObject({ kind: z.literal("restoring"), doneBytes: Count, totalBytes: Count }),
+]);
+export type BackupOperation = z.output<typeof BackupOperation>;
+
+export const BackupStatus = z.strictObject({
+  operation: BackupOperation,
+  /** What a backup would hold now. */
+  estimate: z.strictObject({
+    databaseBytes: Count,
+    audioBytes: Count,
+    contextBytes: Count,
+  }),
+  /** The data the last restore replaced, kept until the user deletes it. */
+  previous: z.strictObject({ restoredAtMs: WallMs, bytes: Count }).nullable(),
+  /** A restore just happened: the note after it, until the user closes it. */
+  restored: z
+    .strictObject({
+      restoredAtMs: WallMs,
+      /** When the backup was made. */
+      createdAtMs: WallMs,
+      /** Models the backed-up Mac had that this one lacks, to download again. */
+      missingModels: z.array(z.strictObject({ artifactId: z.string(), displayName: z.string() })),
+      prefs: BackupRendererPrefs,
+    })
+    .nullable(),
+});
+export type BackupStatus = z.output<typeof BackupStatus>;
+
+export const BackupExportInput = z.strictObject({
+  /** Null: « Sans phrase de passe », chosen explicitly; anyone who finds the file reads it. */
+  passphrase: BackupPassphrase.nullable(),
+  includeAudio: z.boolean(),
+  prefs: BackupRendererPrefs,
+});
+export type BackupExportInput = z.input<typeof BackupExportInput>;
+
+export const BackupExportResult = z.strictObject({
+  /**
+   * `stale`: something was deleted while the backup was written, so it was
+   * thrown away (a deletion always wins, ADR 006). `no-space`: the chosen
+   * volume lacks room. `busy`: a backup or a restore already runs.
+   */
+  outcome: z.enum(["saved", "cancelled", "stale", "no-space", "busy", "failed"]),
+  /** The file's size, once saved. */
+  bytes: Count.nullable(),
+  /** Bytes the backup needs and the volume had, for `no-space`. */
+  neededBytes: Count.nullable(),
+  freeBytes: Count.nullable(),
+});
+export type BackupExportResult = z.output<typeof BackupExportResult>;
+
+/** What a backup holds, as the restore screen shows it before anything is replaced. */
+export const BackupSummaryView = z.strictObject({
+  createdAtMs: WallMs,
+  macName: z.string(),
+  appVersion: z.string(),
+  includeAudio: z.boolean(),
+  episodes: Count,
+  people: Count,
+  audioMs: Count,
+  contextItems: Count,
+  firstEpisodeAtMs: WallMs.nullable(),
+  lastEpisodeAtMs: WallMs.nullable(),
+  bytes: Count,
+});
+export type BackupSummaryView = z.output<typeof BackupSummaryView>;
+
+export const BackupChooseResult = z.strictObject({
+  /** `chosen`: a backup, read up to its clear header. */
+  outcome: z.enum(["chosen", "cancelled", "not-a-backup", "unsupported", "busy"]),
+  fileName: z.string().nullable(),
+  /** Whether it asks for its passphrase. */
+  protected: z.boolean(),
+});
+export type BackupChooseResult = z.output<typeof BackupChooseResult>;
+
+export const BackupPassphraseInput = z.strictObject({
+  /** Null for a backup made without one. */
+  passphrase: z.string().min(1).max(1024).nullable(),
+});
+export type BackupPassphraseInput = z.input<typeof BackupPassphraseInput>;
+
+const BackupRefusal = z.enum([
+  "none-chosen",
+  "wrong-passphrase",
+  "not-a-backup",
+  "damaged",
+  /** Made by a newer Sondine: update this one first. */
+  "newer",
+  "unsupported",
+  "no-space",
+  "busy",
+]);
+
+export const BackupInspectResult = z.strictObject({
+  outcome: z.union([z.literal("ok"), BackupRefusal]),
+  summary: BackupSummaryView.nullable(),
+  neededBytes: Count.nullable(),
+  freeBytes: Count.nullable(),
+});
+export type BackupInspectResult = z.output<typeof BackupInspectResult>;
+
+export const BackupRestoreResult = z.strictObject({
+  /** `restarting`: the backup is staged; Sondine quits and opens again on it. */
+  outcome: z.union([
+    z.literal("restarting"),
+    z.literal("cancelled"),
+    z.literal("failed"),
+    BackupRefusal,
+  ]),
+});
+export type BackupRestoreResult = z.output<typeof BackupRestoreResult>;
