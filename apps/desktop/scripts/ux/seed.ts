@@ -292,13 +292,6 @@ seedDay(base, "ux-today", [
         who: "A",
         dueText: "demain",
       },
-      {
-        kind: "commitment",
-        text: "Envoyer le planning à l'équipe",
-        line: 7,
-        who: "A",
-        dueText: "vendredi",
-      },
     ],
   },
   {
@@ -315,16 +308,7 @@ seedDay(base, "ux-today", [
       ["A", "On peut prendre celle de la terrasse au printemps."],
       ["B", "Parfait. Je t'envoie les textes d'ici lundi."],
     ],
-    journal: [
-      { kind: "event", text: "Maquette du site : garder la page des horaires", line: 2 },
-      {
-        kind: "commitment",
-        text: "Envoyer les textes du site",
-        line: 4,
-        who: "B",
-        dueText: "lundi",
-      },
-    ],
+    journal: [{ kind: "event", text: "Maquette du site : garder la page des horaires", line: 2 }],
   },
   {
     at: 3 * H + 30 * M,
@@ -465,28 +449,12 @@ seedDay(base, "ux-demos", [
       { kind: "event", text: "Clés du deuxième café le 3 janvier", line: 1 },
       {
         kind: "commitment",
-        text: "Redemander un chiffrage complet des travaux",
-        line: 5,
-        who: "C",
-        dueText: "mercredi",
-        dueIn: untilWeekday(3),
-      },
-      {
-        kind: "commitment",
         text: "Envoyer le devis à Marc",
         line: 6,
         who: "B",
         to: "D",
         dueText: "jeudi",
         dueIn: untilWeekday(4),
-      },
-      {
-        kind: "commitment",
-        text: "Publier l'annonce de recrutement",
-        line: 8,
-        who: "B",
-        dueText: "demain",
-        dueIn: 1,
       },
     ],
   },
@@ -508,13 +476,6 @@ seedDay(base, "ux-demos-phone", [
         kind: "event",
         text: "Idée : une carte du midi à emporter, trois plats par semaine",
         line: 0,
-      },
-      {
-        kind: "commitment",
-        text: "Demander à Jules si la cuisine peut suivre",
-        line: 2,
-        who: "A",
-        dueText: "cette semaine",
       },
     ],
   },
@@ -794,17 +755,15 @@ for (let daysAgo = 2; daysAgo <= 80; daysAgo += 1) {
   seedDay(day.getTime(), `ux-history-${daysAgo}`, spaced);
 }
 
-// What the user ticked off: most commitments older than ten days.
-const tenDaysAgo = base - 10 * 86_400_000;
+// What the user ticked off: every commitment of the days before, so Today
+// lists today's few (the site's demo keeps it simple, Téo, 2026-11-27).
 for (const row of db
   .statement(
     `SELECT i.id FROM journal_items i JOIN episodes e ON e.id = i.episode_id
      WHERE i.kind = 'commitment' AND e.started_at_ms < ? ORDER BY i.id`,
   )
-  .all(tenDaysAgo)) {
-  if (random() < 0.7) {
-    setJournalMark(db, { itemId: Number(row["id"]), markId: null }, { status: "done" }, now);
-  }
+  .all(base)) {
+  setJournalMark(db, { itemId: Number(row["id"]), markId: null }, { status: "done" }, now);
 }
 
 // Tags (ADR 039): the first conversation, every dictation that is an idea, some others.
