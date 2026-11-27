@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.10.0 — 2026-11-27
+
+Sondine takes the look of its site, shows the logo of the video you heard, and Search gets tighter.
+
+### Improved
+
+#### A new look, as on the site
+
+Sondine takes the look of its site, on the Mac and the iPhone: a sharper Allo, firmer titles, the sky's colors, and a dark mode that is softer, with quieter edges.
+
+#### The logos of YouTube, Vimeo and Twitch
+
+A video heard on YouTube, Vimeo or Twitch shows that site's logo, in its colors, and its name, in Today, in Search and at the top of the recording, instead of your browser's.
+
+#### A tighter search
+
+In Search, the number of recordings found now sits at the end of the search field, and the results start right under the filters.
+
+### Fixed
+
+#### The word you jump to stays readable
+
+In a recording opened from Search, the match you are on was black on black in light mode; it now reads in white on black, and dark on white in dark mode.
+
+#### The chosen option shows in dark mode
+
+In dark mode, the circle of the option you chose shows its dot again, as in light mode.
+
 ## 0.9.0 — 2026-11-26
 
 Sondine learns your words, the first run lets you pick the cloud, and your own transcription server runs in Docker.
