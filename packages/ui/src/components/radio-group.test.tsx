@@ -65,11 +65,14 @@ describe("RadioGroup", () => {
     expect(dots).toHaveLength(1);
     for (const token of [
       "absolute inset-[30%] corner-full",
-      "bg-neutral-1 dark:bg-neutral-10",
+      "bg-neutral-1",
       "data-disabled:bg-neutral-6",
     ]) {
       expect(dots[0]).toContain(token);
     }
+    // The dot takes the canvas color on the ink fill in both modes; white on
+    // white hid it in dark mode.
+    expect(dots[0]).not.toContain("dark:bg-neutral-10");
   });
 
   it("renders padded rows whose fill follows the radio", () => {
