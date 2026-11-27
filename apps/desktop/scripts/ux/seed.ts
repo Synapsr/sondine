@@ -87,6 +87,12 @@ function seedDay(base: number, uid: string, list: readonly Episode[]): void {
     nowMs: base,
   });
   for (const episode of list) seedEpisode(base, trackRunId, episode);
+  // The run ends after its last episode, as a capture that stopped would: an
+  // episode's timeline (its playback) stays within the run.
+  const end = Math.max(0, ...list.map(episodeEnd));
+  db.statement(
+    "UPDATE track_runs SET state = 'closed', sample_end = ?, ended_wall_ms = ? WHERE id = ?",
+  ).run(end * RATE, base + end * 1000, trackRunId);
 }
 
 /** An episode lasts about its voiced time, and at least its lines (seconds from the day's base). */
@@ -363,15 +369,24 @@ seedDay(base, "ux-today", [
   },
   {
     at: 7 * H + 45 * M,
-    size: "moment",
+    size: "conversation",
     context: "media",
     app: { bundleId: "com.apple.Safari", name: "Safari" },
     page: {
       url: "https://www.youtube.com/watch?v=Sondine0001",
       title: "Tempérer le chocolat sans thermomètre - YouTube",
     },
-    voicedMin: 4,
-    lines: [["C", "Dans cette vidéo, on apprend à tempérer le chocolat sans thermomètre."]],
+    voicedMin: 9,
+    lines: [
+      ["C", "Aujourd'hui, on tempère du chocolat noir, sans thermomètre."],
+      ["C", "On fait fondre les deux tiers au bain-marie, doucement."],
+      ["C", "Le secret, c'est de ne jamais laisser bouillir l'eau."],
+      ["C", "Hors du feu, on ajoute le dernier tiers, haché fin."],
+      ["C", "On remue jusqu'à ce que tout soit lisse et brillant."],
+      ["C", "Pour vérifier, une goutte sur le bout d'une spatule."],
+      ["C", "Si elle fige en cinq minutes, sans traces blanches, c'est gagné."],
+      ["C", "La semaine prochaine : les bonbons au praliné."],
+    ],
   },
   {
     at: 8 * H + 20 * M,
@@ -419,6 +434,106 @@ seedDay(base - 24 * H * 1000, "ux-yesterday", [
     lines: [["A", "Idée : une formule goûter pour les enfants le mercredi."]],
   },
 ]);
+
+/** Days from today to the next `weekday` (0 Sunday … 6 Saturday), for a due date said as a day's name. */
+const untilWeekday = (weekday: number): number => (weekday - new Date(now).getDay() + 7) % 7 || 7;
+
+// The site's demos (sondine.app's hero film and pictures): a FaceTime call of
+// four named voices with its commitments, and an idea recorded on the iPhone
+// while walking, as the phone's recordings reach the Mac (ADR 032).
+seedDay(base, "ux-demos", [
+  {
+    at: 5 * H + 15 * M,
+    size: "conversation",
+    context: "call",
+    app: { bundleId: "com.apple.FaceTime", name: "FaceTime" },
+    voicedMin: 18,
+    names: { A: "@self", B: "Camille", C: "Jules", D: "Marc" },
+    lines: [
+      ["B", "On fait le point sur l'ouverture du deuxième café ?"],
+      ["A", "Oui. Le bail est signé, on récupère les clés le 3 janvier."],
+      ["C", "Les travaux peuvent commencer la semaine suivante, j'ai deux devis."],
+      ["D", "Côté budget, on tient si les travaux restent sous quarante mille."],
+      ["B", "Le moins cher ne fait pas la ventilation, il faudra la prévoir à part."],
+      ["C", "Je redemande un chiffrage complet d'ici mercredi."],
+      ["D", "Et Camille envoie le devis jeudi, je le relis avant la banque."],
+      ["A", "Il nous faut aussi deux personnes de plus dans l'équipe."],
+      ["B", "Je publie l'annonce demain matin."],
+      ["A", "Parfait, on se rappelle vendredi."],
+    ],
+    journal: [
+      { kind: "event", text: "Clés du deuxième café le 3 janvier", line: 1 },
+      {
+        kind: "commitment",
+        text: "Redemander un chiffrage complet des travaux",
+        line: 5,
+        who: "C",
+        dueText: "mercredi",
+        dueIn: untilWeekday(3),
+      },
+      {
+        kind: "commitment",
+        text: "Envoyer le devis à Marc",
+        line: 6,
+        who: "B",
+        to: "D",
+        dueText: "jeudi",
+        dueIn: untilWeekday(4),
+      },
+      {
+        kind: "commitment",
+        text: "Publier l'annonce de recrutement",
+        line: 8,
+        who: "B",
+        dueText: "demain",
+        dueIn: 1,
+      },
+    ],
+  },
+]);
+seedDay(base, "ux-demos-phone", [
+  {
+    at: 7 * H + 18 * M,
+    size: "conversation",
+    context: "in_person",
+    voicedMin: 2,
+    names: { A: "@self" },
+    lines: [
+      ["A", "Idée pour le deuxième café : une carte du midi à emporter."],
+      ["A", "Trois plats seulement, qui changent chaque semaine."],
+      ["A", "Demander à Jules si la cuisine peut suivre à deux."],
+    ],
+    journal: [
+      {
+        kind: "event",
+        text: "Idée : une carte du midi à emporter, trois plats par semaine",
+        line: 0,
+      },
+      {
+        kind: "commitment",
+        text: "Demander à Jules si la cuisine peut suivre",
+        line: 2,
+        who: "A",
+        dueText: "cette semaine",
+      },
+    ],
+  },
+]);
+{
+  // The walk came from the iPhone: a phone track and its recording, with the
+  // name typed on the phone.
+  const run = Number(
+    db.statement("SELECT id FROM track_runs WHERE uid = 'ux-demos-phone'").get()?.["id"],
+  );
+  db.statement(
+    "UPDATE track_runs SET source_kind = 'phone', track_key = 'phone:ux-walk' WHERE id = ?",
+  ).run(run);
+  db.statement(
+    `INSERT INTO phone_recordings (recording_id, device_id, state, track_run_id, sha256,
+       time_uncertain, received_at_ms, name, name_typed_at_ms)
+     VALUES ('ux-walk', 'ux-iphone', 'stored', ?, ?, 0, ?, 'Idée en marchant', ?)`,
+  ).run(run, "0".repeat(64), now, now);
+}
 
 // Weeks before: a made-up history, the same at every run (a fixed pseudo-random
 // sequence), for the calendar's weeks and months and the commitments page.
