@@ -150,6 +150,10 @@ const useFakeHelper = !app.isPackaged && process.env.SONDINE_FAKE_HELPER === "1"
 // SONDINE_HELPER_HAL=fake runs the real helper without audio hardware or
 // permission prompts. Development only: a packaged app always uses Core Audio.
 const helperHal = process.env.SONDINE_HELPER_HAL;
+// SONDINE_UX_BACKUP_FILE answers the backup's save and open panels with one
+// path, and a staged restore quits without relaunching, for the captures on
+// invented data (scripts/ux). Development only.
+const uxBackupFile = app.isPackaged ? undefined : process.env.SONDINE_UX_BACKUP_FILE;
 const useFakeHal = !app.isPackaged && helperHal === "fake";
 
 const groupContainer = loadGroupContainerAccess();
@@ -225,11 +229,20 @@ function start(): void {
   mkdirSync(paths.runDir, { recursive: true, mode: 0o700 });
   // A restore core staged before the relaunch (ADR 048): the data is swapped
   // now, before the helper or core opens any of it.
+  // When it cannot finish, nothing starts: no core may write a new database
+  // among half-moved folders.
   try {
     const swap = applyStagedRestore(paths.root);
     if (swap.kind !== "none") log.info("backup.swap", { ...swap });
   } catch (error) {
     logFailure("backup.swap")(error);
+    const locale = trayLocale(app.getLocale());
+    dialog.showErrorBox(
+      m.backup_swap_failed_title({}, { locale }),
+      m.backup_swap_failed_detail({ folder: paths.root }, { locale }),
+    );
+    app.exit(1);
+    return;
   }
 
   const isAppUrl = appUrlGuard(devServerUrl);
@@ -715,6 +728,14 @@ function start(): void {
           );
         return;
       case "backup-save":
+        if (uxBackupFile !== undefined) {
+          core.post({
+            type: "backup-save-picked",
+            requestId: message.requestId,
+            path: uxBackupFile,
+          });
+          return;
+        }
         void askSavePath(window, {
           defaultPath: join(app.getPath("documents"), message.fileName),
           filters: [{ name: "Sondine", extensions: ["sondine"] }],
@@ -730,10 +751,15 @@ function start(): void {
       // A restore is staged: Sondine opens again on it (the swap comes first at launch).
       case "backup-restart":
         log.info("backup.relaunch");
-        app.relaunch();
+        // The captures' script opens the app again itself (no development server after a relaunch).
+        if (uxBackupFile === undefined) app.relaunch();
         app.quit();
         return;
       case "pick-file":
+        if (message.purpose === "backup" && uxBackupFile !== undefined) {
+          core.post({ type: "file-picked", requestId: message.requestId, path: uxBackupFile });
+          return;
+        }
         void pickFile(message, locale, window).then(
           (path) => core.post({ type: "file-picked", requestId: message.requestId, path }),
           (error: unknown) => {

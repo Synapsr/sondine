@@ -1,4 +1,4 @@
-import { mkdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { open } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import {
@@ -9,8 +9,8 @@ import {
   type Migration,
 } from "@sondine/db";
 import { DATA_LAYOUT } from "../../shared/data-layout";
-import { restoreStamp, type RestoreMarker } from "../../shared/restore-marker";
-import { openBackup, type BackupSummary, type FileSink } from "./backup-format";
+import { RESTORED_ITEMS, restoreStamp, type RestoreMarker } from "../../shared/restore-marker";
+import { openBackup, writeAll, type BackupSummary, type FileSink } from "./backup-format";
 import { isRestorableName, RENDERER_FILE } from "./backup-names";
 import { volumeFreeBytes } from "./backup-export";
 
@@ -95,9 +95,7 @@ export async function stageRestore(
         const handle = await open(target, "wx", 0o600);
         handles.add(handle);
         return {
-          write: async (bytes) => {
-            await handle.write(bytes);
-          },
+          write: (bytes) => writeAll(handle, bytes),
           end: async () => {
             await handle.sync();
             handles.delete(handle);
@@ -123,6 +121,8 @@ export async function stageRestore(
       models: summary.models,
       prefs,
     });
+    // A cancel that came during the last checks still wins.
+    input.signal?.throwIfAborted();
     markStaged(input.dataDir, restoreStamp(input.nowMs));
     return { summary };
   } catch (error) {
@@ -134,12 +134,13 @@ export async function stageRestore(
   }
 }
 
-/** The last step: the staging is complete, main may swap it in. */
+/** The last step: the staging is complete, main may swap it in. It lists what it holds. */
 function markStaged(dataDir: string, stamp: string): void {
+  const staging = join(dataDir, DATA_LAYOUT.restoreStagingDir);
+  const items = RESTORED_ITEMS.filter((item) => existsSync(join(staging, item)));
   const path = join(dataDir, DATA_LAYOUT.restoreMarker);
-  writeFileSync(`${path}.tmp`, JSON.stringify({ stamp, phase: "staged" } satisfies RestoreMarker), {
-    mode: 0o600,
-  });
+  const marker: RestoreMarker = { stamp, phase: "staged", items };
+  writeFileSync(`${path}.tmp`, JSON.stringify(marker), { mode: 0o600 });
   renameSync(`${path}.tmp`, path);
 }
 

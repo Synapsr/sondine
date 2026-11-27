@@ -2048,6 +2048,7 @@ export const apiLayer = Layer.effect(
               const episodeIds = episodesOfPerson(input.personId);
               const removed = deletePerson(db, input.personId);
               if (removed) {
+                backup.noteRemoval();
                 history.clear();
                 access.contentChanged();
                 calls.refresh();
@@ -2512,6 +2513,7 @@ export const apiLayer = Layer.effect(
               history.track("context", episodeScope("assertions", [item.episodeId]), () =>
                 removeContextItem(db, input.itemId),
               );
+              backup.noteRemoval();
               yield* contextChanged;
               // Its file stays while ⌘Z can bring it back; its open copies go now.
               void store.collect();
@@ -2880,7 +2882,14 @@ export const apiLayer = Layer.effect(
         start: (input) => call("voiceRead.start", voiceRead.start(input.selfName)),
         finish: () => call("voiceRead.finish", voiceRead.finish),
         cancel: () => call("voiceRead.cancel", voiceRead.cancel),
-        forget: () => call("voiceRead.forget", voiceRead.forget),
+        forget: () =>
+          call(
+            "voiceRead.forget",
+            Effect.andThen(
+              Effect.sync(() => backup.noteRemoval()),
+              voiceRead.forget,
+            ),
+          ),
       },
       onboarding: {
         get: () =>
@@ -2950,7 +2959,10 @@ export const apiLayer = Layer.effect(
             "vocabulary.remove",
             Effect.suspend(() =>
               removeVocabularyWord(db, input.id)
-                ? Effect.succeed({})
+                ? Effect.sync(() => {
+                    backup.noteRemoval();
+                    return {};
+                  })
                 : Effect.fail(new ServiceFailure("not-found", `No word ${input.id} in the list.`)),
             ),
           ),
@@ -3012,6 +3024,7 @@ export const apiLayer = Layer.effect(
                   ),
                 );
               }
+              backup.noteRemoval();
               access.contentChanged();
               changed();
               log.info("tags.deleted", { tagId: input.tagId, recordings });
@@ -3099,7 +3112,11 @@ export const apiLayer = Layer.effect(
           call(
             "chat.remove",
             Effect.tryPromise({
-              try: () => chat.remove(input.discussionId),
+              try: () => {
+                // Counted before: an export that read it stops either way.
+                backup.noteRemoval();
+                return chat.remove(input.discussionId);
+              },
               catch: (error) => error,
             }),
           ),
@@ -3147,7 +3164,10 @@ export const apiLayer = Layer.effect(
           call(
             "agents.remove",
             Effect.try({
-              try: () => agents.remove(input.agentId),
+              try: () => {
+                backup.noteRemoval();
+                return agents.remove(input.agentId);
+              },
               catch: (error) => error,
             }),
           ),

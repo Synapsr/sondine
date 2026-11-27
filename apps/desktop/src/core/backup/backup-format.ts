@@ -93,6 +93,16 @@ function u32(value: number): Buffer {
 
 // ——— Writing ———
 
+/** Writes all of `bytes`: a write may take fewer than it was given. */
+export async function writeAll(handle: FileHandle, bytes: Buffer): Promise<void> {
+  let done = 0;
+  while (done < bytes.length) {
+    const { bytesWritten } = await handle.write(bytes, done, bytes.length - done);
+    if (bytesWritten === 0) throw new Error("the disk took no bytes");
+    done += bytesWritten;
+  }
+}
+
 export interface BackupWriterOptions {
   readonly path: string;
   readonly passphrase: string | null;
@@ -136,7 +146,7 @@ export class BackupWriter {
       createHash("sha256").update(header),
     );
     try {
-      await handle.write(Buffer.concat([MAGIC, u32(header.length), header]));
+      await writeAll(handle, Buffer.concat([MAGIC, u32(header.length), header]));
       await writer.addBuffer(
         SUMMARY_NAME,
         Buffer.from(JSON.stringify(BackupSummary.parse(options.summary)), "utf8"),
@@ -224,7 +234,7 @@ export class BackupWriter {
     const head = Buffer.alloc(5);
     head.writeUInt32BE(sealed.length, 0);
     head.writeUInt8(final ? 1 : 0, 4);
-    await this.handle.write(Buffer.concat([head, sealed]));
+    await writeAll(this.handle, Buffer.concat([head, sealed]));
   }
 }
 
@@ -483,6 +493,8 @@ export async function openBackup(path: string, passphrase: string | null): Promi
         if (second.length < BLOCK || second.some((byte) => byte !== 0)) throw damaged("tar end");
         const expected = hash.copy().digest();
         await stream.drain();
+        // Nothing may follow the last frame: the whole file is what was checked.
+        if (stream.offset !== fileBytes) throw damaged("bytes after the last frame");
         if (stream.digest === null || !stream.digest.equals(expected)) {
           throw damaged("the stream's digest differs");
         }
