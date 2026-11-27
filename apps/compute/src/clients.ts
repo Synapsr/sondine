@@ -61,7 +61,9 @@ export type Usage = z.output<typeof Usage>;
 
 const KeyFile = z.strictObject({ publicKey: z.base64url(), privateKey: z.base64url() });
 
-const StripeId = (prefix: string) => z.string().regex(new RegExp(`^${prefix}_[A-Za-z0-9]{1,250}$`));
+/** Stripe's ids: a prefix, then letters, digits and underscores (`cs_test_…`, `cus_…`). */
+const StripeId = (prefix: string) =>
+  z.string().regex(new RegExp(`^${prefix}_[A-Za-z0-9_]{1,250}$`));
 
 /**
  * A place's link to Stripe (ADR 047). `ref` is what Stripe knows the place by:
@@ -74,16 +76,21 @@ const Billing = z.strictObject({
     .strictObject({
       id: StripeId("sub"),
       status: z.enum(["active", "past_due", "ended"]),
-      /** The period its 40 hours count in; they come back with the next one. */
-      periodStart: z.int().nullable(),
+      /**
+       * The start of the last period Stripe said was paid: its 40 hours count
+       * there, and come back only with the next paid one. Null before the first.
+       */
+      paidPeriodStart: z.int().nullable(),
       periodEnd: z.int().nullable(),
       cancelAtPeriodEnd: z.boolean(),
     })
     .optional(),
+  /** The subscription Checkout this place opened and has not paid yet: one at a time. */
+  pending: z.strictObject({ id: StripeId("cs"), url: z.url(), expiresAt: z.int() }).optional(),
   /** Seconds bought as top-ups; spent ones are counted in `usage/`. */
   topupSeconds: z.number().nonnegative().optional(),
-  /** Checkout sessions already credited, newest last: a session is never paid twice. */
-  credited: z.array(StripeId("cs")).max(64).optional(),
+  /** Every Checkout session already credited: a session is never paid twice. */
+  credited: z.array(StripeId("cs")).optional(),
 });
 export type Billing = z.output<typeof Billing>;
 
@@ -93,13 +100,20 @@ const Wave = z.strictObject({ places: z.int().nonnegative() });
 const Events = z.record(z.string().max(255), z.int());
 export const EVENTS_KEPT_MS = 30 * 24 * 3_600_000;
 
+/** How often a running server says so: `rekey` waits for it to stop. */
+export const SERVING_BEAT_MS = 10_000;
+
 /** A place nobody used for this long goes to the next person. */
 export const PLACE_IDLE_MS = 14 * 24 * 3_600_000;
 
 /** A client's plan: its subscription's, once it has one, else the one it was given. */
 export function planOf(client: Client, billing: Billing | null = null): QuotaPlan {
   const subscription = billing?.subscription;
-  if (subscription !== undefined) return subscription.status === "ended" ? "ended" : "cloud";
+  if (subscription !== undefined) {
+    if (subscription.status === "ended") return "ended";
+    // A subscription gives its hours once a period of it is paid, not before.
+    if (subscription.paidPeriodStart !== null) return "cloud";
+  }
   return client.plan ?? client.kind;
 }
 
@@ -306,7 +320,7 @@ export class ClientStore {
    * come back at each renewal; else the UTC calendar month.
    */
   private periodOf(id: string): string {
-    const start = this.billing(id)?.subscription?.periodStart;
+    const start = this.billing(id)?.subscription?.paidPeriodStart;
     return start === undefined || start === null ? monthOf(this.now()) : `period-${start}`;
   }
 
@@ -535,6 +549,27 @@ export class ClientStore {
   private events(): Record<string, number> {
     const stored = Events.safeParse(readJson(join(this.directory, "stripe-events.json")));
     return stored.success ? stored.data : {};
+  }
+
+  /** The running server says it runs, every few seconds (`SERVING_BEAT_MS`). */
+  beat(): void {
+    writeFileSync(join(this.directory, "serving"), String(this.now()), { mode: 0o600 });
+  }
+
+  stopped(): void {
+    rmSync(join(this.directory, "serving"), { force: true });
+  }
+
+  /** Whether a server runs on this state, in this process or another (a container's). */
+  serving(): boolean {
+    try {
+      return (
+        this.now() - Number(readFileSync(join(this.directory, "serving"), "utf8")) <
+        3 * SERVING_BEAT_MS
+      );
+    } catch {
+      return false;
+    }
   }
 
   private wavePath(): string {

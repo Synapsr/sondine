@@ -664,6 +664,20 @@ describe("plans, trial and top-ups (Wave 1)", () => {
     });
   });
 
+  it("admits no two requests at once on the same hours", async () => {
+    const { endpoint, serverKey, clients } = await serve(async (asked) => {
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      return heard(asked);
+    });
+    const { id, token } = clients.add("beta", "pipelined", { plan: "trial", limitSeconds: 5 });
+    const results = await Promise.allSettled([
+      remote({ endpoint, serverKey, token }).transcribe(request(audio(RATE * 4), "a")),
+      remote({ endpoint, serverKey, token }).transcribe(request(audio(RATE * 4), "b")),
+    ]);
+    expect(results.map((result) => result.status).toSorted()).toEqual(["fulfilled", "rejected"]);
+    expect(clients.quota(id)).toMatchObject({ usedSeconds: 4 });
+  });
+
   it("lets a Mac give back a trial it never used, and nothing more", async () => {
     const { endpoint, serverKey, clients } = await serve();
     const unused = clients.add("beta", "trial", { plan: "trial" });

@@ -71,9 +71,17 @@ class FakeStripe implements StripeHttp {
   readonly sessions = new Map<string, { mode: string; ref: string; quantity: number }>();
   readonly subscriptions = new Map<string, FakeSubscription>();
   failing = false;
+  /** How long Stripe takes to answer a read: what it answers is what it held when asked. */
+  slowMs = 0;
   pageUrl: (id: string) => string = (id) => `https://checkout.stripe.com/c/pay/${id}`;
 
   async get(path: string, query?: Readonly<Record<string, FormValue>>): Promise<unknown> {
+    const answer = this.read(path, query);
+    if (this.slowMs > 0) await new Promise((resolve) => setTimeout(resolve, this.slowMs));
+    return answer;
+  }
+
+  private read(path: string, query?: Readonly<Record<string, FormValue>>): unknown {
     if (this.failing) throw new StripeError(503, "Stripe answered 503");
     if (path === "/v1/prices") {
       expect(query?.["lookup_keys"]).toEqual(Object.values(LOOKUP_KEYS));
@@ -95,7 +103,7 @@ class FakeStripe implements StripeHttp {
     if (subscription?.[1] !== undefined) {
       const found = this.subscriptions.get(subscription[1]);
       if (found === undefined) throw new StripeError(404, "Stripe answered 404");
-      return found;
+      return structuredClone(found);
     }
     throw new StripeError(404, `unexpected GET ${path}`);
   }
@@ -108,7 +116,8 @@ class FakeStripe implements StripeHttp {
     if (this.failing) throw new StripeError(503, "Stripe answered 503");
     this.posts.push({ path, body, ...(key === undefined ? {} : { key }) });
     if (path === "/v1/checkout/sessions") {
-      const id = `cs_${randomBytes(6).toString("hex")}`;
+      // As Stripe makes them: `cs_test_…`, an underscore after the mode.
+      const id = `cs_test_${randomBytes(6).toString("hex")}`;
       this.sessions.set(id, {
         mode: String(body["mode"]),
         ref: String(body["client_reference_id"]),
@@ -155,7 +164,9 @@ const silentEngine: AsrEngine = {
   },
 };
 
-async function serve(options: { places?: number; billing?: boolean; now?: () => number } = {}) {
+async function serve(
+  options: { places?: number; billing?: boolean; now?: () => number; beta?: null } = {},
+) {
   const clients = new ClientStore(state, options.now);
   if (options.places !== undefined) clients.setWavePlaces(options.places);
   const stripe = new FakeStripe();
@@ -176,7 +187,7 @@ async function serve(options: { places?: number; billing?: boolean; now?: () => 
     sessions,
     billing,
     name: "test",
-    beta: { places: 5, secondsPerMonth: 40 * HOUR },
+    beta: options.beta === null ? null : { places: 5, secondsPerMonth: 40 * HOUR },
   });
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
   cleanups.push(async () => {
@@ -215,7 +226,7 @@ async function serve(options: { places?: number; billing?: boolean; now?: () => 
     const subscription = stripe.subscribe(ref, "cus_1", startSec);
     expect(
       await send("checkout.session.completed", {
-        id: "cs_paid1",
+        id: [...stripe.sessions.keys()].at(-1),
         mode: "subscription",
         payment_status: "paid",
         client_reference_id: ref,
@@ -491,7 +502,7 @@ describe("Stripe's webhook", () => {
     const ref = clients.billing(idOf(link))?.ref ?? "";
     const subscription = stripe.subscribe(ref, "cus_9", Math.floor(Date.now() / 1000));
     const paid = {
-      id: "cs_x",
+      id: "cs_test_x1",
       mode: "subscription",
       payment_status: "paid",
       client_reference_id: ref,
@@ -510,7 +521,7 @@ describe("Stripe's webhook", () => {
     const { send, logged } = await serve({ places: 10 });
     expect(
       await send("checkout.session.completed", {
-        id: "cs_u",
+        id: "cs_test_u1",
         mode: "subscription",
         payment_status: "unpaid",
         client_reference_id: "f".repeat(32),
@@ -518,7 +529,7 @@ describe("Stripe's webhook", () => {
     ).toBe(200);
     expect(
       await send("checkout.session.completed", {
-        id: "cs_v",
+        id: "cs_live_v1",
         mode: "payment",
         payment_status: "paid",
         client_reference_id: "f".repeat(32),
@@ -628,5 +639,130 @@ describe("the calls to Stripe", () => {
     });
     expect(code).toBe(1);
     expect(errors.join("")).toMatch(/payment needs/);
+  });
+});
+
+// Codex Astra's review of the PR (2026-11-27): each case it found, as a test.
+describe("money under concurrency and out of order", () => {
+  it("credits ten hours once, whatever Stripe sends at the same time", async () => {
+    const { subscribed, send, stripe } = await serve({ places: 10 });
+    const { link, ref } = await subscribed();
+    await billingPage(link, { kind: "checkout", item: "topup", locale: "fr" });
+    const paid = {
+      id: [...stripe.sessions.keys()].at(-1),
+      mode: "payment",
+      payment_status: "paid",
+      client_reference_id: ref,
+      customer: "cus_1",
+    };
+    stripe.slowMs = 30;
+    const answers = await Promise.all([
+      send("checkout.session.completed", paid, { id: "evt_same" }),
+      send("checkout.session.completed", paid, { id: "evt_same" }),
+      send("checkout.session.async_payment_succeeded", paid),
+    ]);
+    expect(answers).toEqual([200, 200, 200]);
+    expect((await readQuota(link)).extraSeconds).toBe(TOPUP_SECONDS);
+  });
+
+  it("stores the subscription as Stripe last said it, not as a slower answer did", async () => {
+    const { subscribed, send, stripe } = await serve({ places: 10 });
+    const { link, subscription } = await subscribed();
+    stripe.slowMs = 40;
+    const first = send("customer.subscription.updated", { id: subscription.id });
+    // Stripe cancels it while the first answer is on its way.
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    subscription.status = "canceled";
+    const second = send("customer.subscription.deleted", { id: subscription.id });
+    expect(await Promise.all([first, second])).toEqual([200, 200]);
+    expect((await readQuota(link)).plan).toBe("ended");
+  });
+
+  it("gives a period's hours only once it is paid", async () => {
+    const { address, linkOf, send, stripe, clients } = await serve({ places: 10 });
+    const link = linkOf(await startTrial(address));
+    await billingPage(link, { kind: "checkout", item: "subscription", locale: "fr" });
+    const ref = clients.billing(idOf(link))?.ref ?? "";
+    const subscription = stripe.subscribe(ref, "cus_2", Math.floor(Date.now() / 1000));
+    // Active by its status alone, before any paid invoice: still the trial.
+    expect(await send("customer.subscription.created", { id: subscription.id })).toBe(200);
+    expect((await readQuota(link)).plan).toBe("trial");
+    expect(await send("invoice.paid", { subscription: subscription.id })).toBe(200);
+    expect(await readQuota(link)).toMatchObject({ plan: "cloud", usedSeconds: 0 });
+
+    clients.charge(idOf(link), 40 * HOUR);
+    // The renewal fails: a new period at Stripe, but no hours for it.
+    const next = (subscription.items.data[0]?.current_period_end ?? 0) + 1;
+    subscription.items.data[0] = {
+      current_period_start: next,
+      current_period_end: next + 30 * 86_400,
+    };
+    subscription.status = "past_due";
+    expect(await send("invoice.payment_failed", { subscription: subscription.id })).toBe(200);
+    expect(await readQuota(link)).toMatchObject({ plan: "cloud", usedSeconds: 40 * HOUR });
+    subscription.status = "active";
+    expect(await send("invoice.paid", { subscription: subscription.id })).toBe(200);
+    expect(await readQuota(link)).toMatchObject({ usedSeconds: 0 });
+  });
+
+  it("opens one subscription page at a time, and never takes a second subscription", async () => {
+    const { address, linkOf, send, stripe, clients } = await serve({ places: 10 });
+    const link = linkOf(await startTrial(address));
+    const first = await billingPage(link, { kind: "checkout", item: "subscription", locale: "fr" });
+    const again = await billingPage(link, { kind: "checkout", item: "subscription", locale: "en" });
+    expect(again).toBe(first);
+    expect(stripe.posts.filter((post) => post.path === "/v1/checkout/sessions")).toHaveLength(1);
+
+    const ref = clients.billing(idOf(link))?.ref ?? "";
+    const kept = stripe.subscribe(ref, "cus_3", Math.floor(Date.now() / 1000));
+    expect(await send("invoice.paid", { subscription: kept.id })).toBe(200);
+    // A second subscription for the same place (a page paid twice): logged, never taken.
+    const other = stripe.subscribe(ref, "cus_4", Math.floor(Date.now() / 1000) + 99);
+    expect(await send("invoice.paid", { subscription: other.id })).toBe(200);
+    other.status = "canceled";
+    expect(await send("customer.subscription.deleted", { id: other.id })).toBe(200);
+    expect(await readQuota(link)).toMatchObject({ plan: "cloud" });
+    expect(clients.billing(idOf(link))).toMatchObject({
+      customer: "cus_3",
+      subscription: { id: kept.id },
+    });
+  });
+
+  it("keeps a place that opened a Checkout page, and a paid beta place once the beta closes", async () => {
+    const { address, linkOf, clients } = await serve({ places: 10, beta: null });
+    const link = linkOf(await startTrial(address));
+    await billingPage(link, { kind: "checkout", item: "subscription", locale: "fr" });
+    await expect(leavePlace(link)).rejects.toMatchObject({ refusal: "bad_request" });
+
+    const beta = clients.add("beta", "team");
+    clients.setBilling(beta.id, {
+      ref: "a".repeat(32),
+      customer: "cus_5",
+      subscription: {
+        id: "sub_5",
+        status: "active",
+        paidPeriodStart: Date.now(),
+        periodEnd: Date.now() + 86_400_000,
+        cancelAtPeriodEnd: false,
+      },
+    });
+    expect((await readQuota(linkOf(beta.token))).plan).toBe("cloud");
+    await expect(readQuota(linkOf(clients.add("beta", "unpaid").token))).rejects.toMatchObject({
+      refusal: "closed",
+    });
+  });
+
+  it("moves no place's files while a server runs on them", async () => {
+    const { subscribed, endpoint, clients } = await serve({ places: 10 });
+    const { link } = await subscribed();
+    clients.beat();
+    const errors: string[] = [];
+    const code = await runCli(["rekey", idOf(link).slice(0, 12), "--endpoint", endpoint], {
+      env: { SONDINE_COMPUTE_STATE: state },
+      err: (line) => errors.push(line),
+    });
+    expect(code).toBe(1);
+    expect(errors.join("")).toContain("stop the server first");
+    expect((await readQuota(link)).plan).toBe("cloud");
   });
 });

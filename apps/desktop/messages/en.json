@@ -1564,7 +1564,6 @@
   "compute_beta_honour": "We give our word that we do not read or listen to your data, and it trains no model.",
   "compute_beta_invite_label": "Invite link or code (optional)",
   "compute_beta_later": "Not now",
-  "compute_beta_leave": "Give my beta place back",
   "compute_beta_others": "The audio also contains the voices of the people you talk with. This server is not reserved for Sondine: software agents of Synapsr have administrator access to it and could, too, technically access the audio and the text during transcription. The server keeps when your access was last used, the length transcribed and, if you subscribe, your Stripe customer and subscription identifiers. Cloudflare carries the connection and sees your IP address, not the audio.",
   "compute_beta_quota": "This Cloud link has no quota left.",
   "compute_beta_refused": "This invite link or code is not recognized or was revoked.",

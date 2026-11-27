@@ -39,13 +39,13 @@ export const CONSENT: Readonly<
 > = {
   fr: {
     subscription: (terms) =>
-      `J’accepte les [conditions](${terms}) et je demande que le service commence tout de suite, avant la fin du délai de rétractation de 14 jours. Si je me rétracte dans ce délai, je paierai les heures déjà utilisées, au prorata du prix.`,
+      `J’accepte les [conditions](${terms}) et je demande que le service commence tout de suite, avant la fin du délai de rétractation de 14 jours. Si je me rétracte dans ce délai, je paierai les heures déjà transcrites, au prorata des 40 h.`,
     topup: (terms) =>
       `J’accepte les [conditions](${terms}) et je demande que les 10 heures soient créditées tout de suite, avant la fin du délai de rétractation de 14 jours. Si je me rétracte dans ce délai, je paierai les heures utilisées jusqu’à ce que je vous en informe.`,
   },
   en: {
     subscription: (terms) =>
-      `I accept the [terms](${terms}) and ask for the service to start right away, before the 14-day withdrawal period ends. If I withdraw within that period, I will pay for the hours already used, in proportion to the price.`,
+      `I accept the [terms](${terms}) and ask for the service to start right away, before the 14-day withdrawal period ends. If I withdraw within that period, I will pay for the hours already transcribed, pro rata of the 40 h.`,
     topup: (terms) =>
       `I accept the [terms](${terms}) and ask for the 10 hours to be credited right away, before the 14-day withdrawal period ends. If I withdraw within that period, I will pay for the hours used until I tell you.`,
   },
@@ -109,12 +109,17 @@ const Prices = z.looseObject({
 });
 
 const Page = z.looseObject({ url: z.url() });
+const CheckoutPage = z.looseObject({
+  id: z.string().regex(/^cs_[A-Za-z0-9_]{1,250}$/),
+  url: z.url(),
+});
 
 /** Stripe's statuses, in ours: an unpaid first invoice is no subscription yet. */
 function statusOf(status: string): "active" | "past_due" | "ended" | null {
-  if (status === "active" || status === "trialing") return "active";
+  if (status === "active") return "active";
   if (status === "past_due") return "past_due";
-  if (status === "incomplete") return null;
+  // No subscription yet, or one in a trial Sondine never offers: nothing to give.
+  if (status === "incomplete" || status === "trialing") return null;
   return "ended";
 }
 
@@ -132,12 +137,18 @@ export const INVOICE_FOOTER: Readonly<
     `Sondine Cloud terms accepted on ${day}: ${terms}. Service started at your request; if you withdraw within 14 days, the hours used remain due in proportion to the price.`,
 };
 
+/** A pending Checkout page is given again until this close to its end. */
+const PENDING_MARGIN_MS = 5 * 60_000;
+/** How long a subscription's Checkout page stays open: Stripe's shortest. */
+const PENDING_MS = 30 * 60_000;
+
 export class BillingService {
   private readonly clients: ClientStore;
   private readonly options: BillingOptions;
   private readonly log: ServerLog;
   private readonly now: () => number;
   private prices: Promise<Readonly<Record<keyof typeof LOOKUP_KEYS, string>>> | null = null;
+  private queue: Promise<unknown> = Promise.resolve();
 
   constructor(clients: ClientStore, options: BillingOptions) {
     this.clients = clients;
@@ -148,6 +159,14 @@ export class BillingService {
 
   /** The Stripe page a place asked for, or why it may not have it. */
   async page(
+    known: { readonly id: string; readonly client: Client },
+    request: PageRequest,
+  ): Promise<PageResult> {
+    // One at a time with the webhook: a page reads and writes the place's state too.
+    return this.serially(() => this.pageNow(known, request));
+  }
+
+  private async pageNow(
     { id, client }: { readonly id: string; readonly client: Client },
     request: PageRequest,
   ): Promise<PageResult> {
@@ -161,13 +180,22 @@ export class BillingService {
         return { url: await this.portal(billing.customer, request.locale) };
       }
       if (request.item === "subscription") {
-        // The owner's machine pays nothing; a subscription or a gift is enough.
-        if (plan === "own" || plan === "cloud") return { refused: "not_allowed" };
+        // The owner's machine pays nothing; a subscription that goes on, or a gift, is enough.
+        if (plan === "own" || plan === "cloud" || subscribed) return { refused: "not_allowed" };
+        // The page already open, whatever the language: two pages could make two subscriptions.
+        const pending = billing.pending;
+        if (pending !== undefined && pending.expiresAt - this.now() > PENDING_MARGIN_MS) {
+          return { url: pending.url };
+        }
       } else if (!subscribed || billing.customer === undefined) {
         return { refused: "not_allowed" };
       }
       this.clients.setBilling(id, billing);
-      return { url: await this.checkout(billing, request.item, request.locale) };
+      const session = await this.checkout(billing, request.item, request.locale);
+      if (request.item === "subscription") {
+        this.clients.setBilling(id, { ...this.clients.billingOf(id), pending: session });
+      }
+      return { url: session.url };
     } catch (error) {
       if (!(error instanceof StripeError)) throw error;
       this.log("billing-unavailable", { status: error.status });
@@ -178,6 +206,8 @@ export class BillingService {
   /**
    * One webhook call: its HTTP status. 400 for what Stripe did not sign; 500
    * when Stripe should send it again; 200 once handled, or known already.
+   * Calls are handled one after the other, Stripe's answers included: two at
+   * once could credit a session twice, or store an older subscription last.
    */
   async webhook(rawBody: Buffer, signature: string | undefined): Promise<number> {
     const nowSec = Math.floor(this.now() / 1000);
@@ -190,16 +220,26 @@ export class BillingService {
     }
     const event = Event.safeParse(parsed);
     if (!event.success) return 400;
-    if (this.clients.handled(event.data.id)) return 200;
-    try {
-      await this.handle(event.data.type, event.data.data.object);
-    } catch (error) {
-      if (!(error instanceof StripeError) && !(error instanceof z.ZodError)) throw error;
-      this.log("billing-failed", { status: error instanceof StripeError ? error.status : 0 });
-      return 500;
-    }
-    this.clients.markHandled(event.data.id);
-    return 200;
+    const { id, type, data } = event.data;
+    return this.serially(async () => {
+      if (this.clients.handled(id)) return 200;
+      try {
+        await this.handle(type, data.object);
+      } catch (error) {
+        if (!(error instanceof StripeError) && !(error instanceof z.ZodError)) throw error;
+        this.log("billing-failed", { status: error instanceof StripeError ? error.status : 0 });
+        return 500;
+      }
+      this.clients.markHandled(id);
+      return 200;
+    });
+  }
+
+  /** Runs `work` after every other billing work of this server, failures included. */
+  private serially<T>(work: () => Promise<T>): Promise<T> {
+    const run = this.queue.then(work, work);
+    this.queue = run.catch(() => undefined);
+    return run;
   }
 
   private async handle(type: string, object: unknown): Promise<void> {
@@ -211,13 +251,14 @@ export class BillingService {
       case "customer.subscription.updated":
       case "customer.subscription.deleted":
         // Only its id: the subscription is read again from Stripe.
-        return this.sync(z.looseObject({ id: Id }).parse(object).id);
+        return this.sync(z.looseObject({ id: Id }).parse(object).id, false);
       case "invoice.paid":
       case "invoice.payment_failed": {
         const invoice = Invoice.parse(object);
         const subscription =
           idOf(invoice.subscription) ?? idOf(invoice.parent?.subscription_details?.subscription);
-        if (subscription !== null) await this.sync(subscription);
+        // Only a paid invoice opens a period's hours; a failed one keeps the last paid period.
+        if (subscription !== null) await this.sync(subscription, type === "invoice.paid");
         return;
       }
       default:
@@ -236,16 +277,20 @@ export class BillingService {
       return;
     }
     const billing = this.clients.billingOf(id);
-    const customer = idOf(session.customer) ?? billing.customer;
-    const withCustomer: Billing = customer === undefined ? billing : { ...billing, customer };
-    this.clients.setBilling(id, withCustomer);
+    // The first customer stays: a late event of another page never replaces it.
+    const customer = billing.customer ?? idOf(session.customer) ?? undefined;
+    const { pending, ...rest } = billing;
+    this.clients.setBilling(id, {
+      ...(pending?.id === session.id ? rest : billing),
+      ...(customer === undefined ? {} : { customer }),
+    });
     const subscription = idOf(session.subscription);
     if (session.mode === "subscription" && subscription !== null) {
-      await this.sync(subscription);
+      await this.sync(subscription, session.payment_status === "paid");
       return;
     }
     if (session.mode !== "payment") return;
-    if (withCustomer.credited?.includes(session.id) === true) return;
+    if (this.clients.billingOf(id).credited?.includes(session.id) === true) return;
     const items = LineItems.parse(
       await this.options.stripe.get(
         `/v1/checkout/sessions/${encodeURIComponent(session.id)}/line_items`,
@@ -257,16 +302,21 @@ export class BillingService {
       .reduce((sum, item) => sum + Math.max(1, Math.min(item.quantity ?? 1, 10)), 0);
     if (packs === 0) return;
     const latest = this.clients.billingOf(id);
+    if (latest.credited?.includes(session.id) === true) return;
     this.clients.setBilling(id, {
       ...latest,
       topupSeconds: (latest.topupSeconds ?? 0) + packs * TOPUP_SECONDS,
-      credited: [...(latest.credited ?? []), session.id].slice(-64),
+      credited: [...(latest.credited ?? []), session.id],
     });
     this.log("billing-topup");
   }
 
-  /** Reads the subscription from Stripe rather than the event: events come out of order. */
-  private async sync(subscriptionId: string): Promise<void> {
+  /**
+   * Reads the subscription from Stripe rather than the event: events come out
+   * of order. `paid`: Stripe said its current period was paid, which alone
+   * opens that period's hours.
+   */
+  private async sync(subscriptionId: string, paid: boolean): Promise<void> {
     const subscription = StripeSubscription.parse(
       await this.options.stripe.get(`/v1/subscriptions/${encodeURIComponent(subscriptionId)}`),
     );
@@ -278,26 +328,28 @@ export class BillingService {
     const status = statusOf(subscription.status);
     if (id === null || status === null) return;
     const billing = this.clients.billingOf(id);
-    // An older subscription's events never replace a newer one that goes on.
     const current = billing.subscription;
-    if (
-      current !== undefined &&
-      current.id !== subscription.id &&
-      current.status !== "ended" &&
-      status === "ended"
-    ) {
+    // One subscription per place: another one that goes on is never taken in place of it.
+    // The operator refunds and cancels the second one (it is logged).
+    if (current !== undefined && current.id !== subscription.id && current.status !== "ended") {
+      if (status !== "ended") this.log("billing-duplicate");
       return;
     }
     const item = subscription.items?.data[0];
     const start = subscription.current_period_start ?? item?.current_period_start ?? null;
     const end = subscription.current_period_end ?? item?.current_period_end ?? null;
+    const same = current?.id === subscription.id;
+    const before = same ? current.paidPeriodStart : null;
+    const now = paid && start !== null ? start * 1000 : null;
+    // A period only moves forward: an older answer never takes back the hours of a newer one.
+    const paidPeriodStart = now === null ? before : before === null ? now : Math.max(before, now);
     this.clients.setBilling(id, {
       ...billing,
-      ...(customer === null ? {} : { customer }),
+      ...(billing.customer === undefined && customer !== null ? { customer } : {}),
       subscription: {
         id: subscription.id,
         status,
-        periodStart: start === null ? null : start * 1000,
+        paidPeriodStart,
         periodEnd: end === null ? null : end * 1000,
         cancelAtPeriodEnd:
           subscription.cancel_at_period_end === true ||
@@ -330,8 +382,9 @@ export class BillingService {
     billing: Billing,
     item: BillingItem,
     locale: BillingLocale,
-  ): Promise<string> {
+  ): Promise<{ readonly id: string; readonly url: string; readonly expiresAt: number }> {
     const prices = await this.priceIds();
+    const expiresAt = this.now() + PENDING_MS;
     const base = this.options.publicUrl;
     const metadata = { sondine_ref: billing.ref };
     const customer = billing.customer;
@@ -362,6 +415,7 @@ export class BillingService {
         ...(customer === undefined
           ? {}
           : { customer, customer_update: { address: "auto", name: "auto" } }),
+        expires_at: Math.ceil(expiresAt / 1000),
         success_url: `${base}/billing/done?lang=${locale}`,
         cancel_url: `${base}/billing/back?lang=${locale}`,
         locale,
@@ -378,7 +432,8 @@ export class BillingService {
       // Two clicks in the same minute open the same page.
       `checkout-${billing.ref}-${item}-${locale}-${Math.floor(this.now() / 60_000)}`,
     );
-    return Page.parse(session).url;
+    const page = CheckoutPage.parse(session);
+    return { id: page.id, url: page.url, expiresAt };
   }
 
   private async portal(customer: string, locale: BillingLocale): Promise<string> {

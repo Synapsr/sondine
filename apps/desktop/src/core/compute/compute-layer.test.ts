@@ -209,14 +209,14 @@ describe("where transcription runs", () => {
       { kind: "leave", token: oldToken },
     ]);
 
-    // Disconnecting an invited plan stays local and never sends `leave` to the server.
+    // The server erases the place: this Mac forgets it.
     const beforeLeave = server.asked.length;
     await service.leaveBeta();
     expect(service.status()).toMatchObject({
       destination: "device",
       beta: { joined: false, invited: false },
     });
-    expect(server.asked).toHaveLength(beforeLeave);
+    expect(server.asked.slice(beforeLeave)).toMatchObject([{ kind: "leave", token }]);
 
     // Quota is read on demand when remote.
     expect(await service.joinBeta(token)).toBe("joined");
@@ -336,5 +336,30 @@ describe("the Cloud's wave and payment (ADR 047)", () => {
     server.answer(quota(3_600, 36_000));
     await service.quota();
     expect(woken).toBe(1);
+  });
+});
+
+describe("a Cloud place the server keeps (ADR 047)", () => {
+  it("keeps its link when the server refuses to erase it, and reads its plan from anywhere", async () => {
+    const server = answering({ kind: "claimed", token });
+    const service = await compute({ beta: { endpoint, serverKey }, fetch: server.fetch });
+    await service.joinBeta();
+    const refusing = answering({ kind: "refused", code: "bad_request" });
+    const kept = await compute({ beta: { endpoint, serverKey }, fetch: refusing.fetch });
+    await kept.leaveBeta();
+    // Paid or used: this Mac stops sending to it, and keeps what reaches its plan.
+    expect(kept.status()).toMatchObject({ destination: "device", beta: { joined: true } });
+    const quota: OpenReply = {
+      kind: "quota",
+      plan: "cloud",
+      period: "month",
+      usedSeconds: 0,
+      limitSeconds: 144_000,
+      extraSeconds: 0,
+    };
+    const reading = answering(quota);
+    const elsewhere = await compute({ beta: { endpoint, serverKey }, fetch: reading.fetch });
+    expect(await elsewhere.quota()).toMatchObject({ plan: "cloud" });
+    expect(reading.asked).toMatchObject([{ kind: "quota", token }]);
   });
 });

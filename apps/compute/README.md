@@ -177,7 +177,8 @@ the terms' URL in the public details (Checkout's consent needs it) and the tax
 registrations. The server writes, beside the places, `billing/` (a random
 reference Stripe knows the place by, its customer and subscription),
 `stripe-events.json` and `wave.json`. `rekey ID --endpoint URL` gives a lost
-Mac's place a new link; the old one stops working.
+Mac's place a new link; the old one stops working. Stop the server first: rekey
+moves the place's files, and refuses while the server says it runs.
 
 On Synapsr's server the service runs in Docker Compose (project `sondine`,
 service `compute`): copy `state/` aside, replace the bundle, set the variables

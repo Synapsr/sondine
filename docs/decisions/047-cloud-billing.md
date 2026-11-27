@@ -12,9 +12,11 @@ L'ADR 040 a ouvert une bêta gratuite de quelques places sur une machine de Syna
 ### 1. Une vague, un essai, un forfait
 
 - **La vague.** L'opérateur fixe un nombre de places (`sondine-compute places 10`, sans redémarrer). La Vague 1 commence à 10. Une place est prise par un abonnement en cours, ou un forfait donné par l'opérateur, ou un essai ou un abonnement terminé qui a servi dans les 14 derniers jours. Une place qui n'a pas servi depuis 14 jours ne compte plus, mais n'est pas effacée : son lien, son forfait et ses recharges restent valables.
+- **Les places limitent les admissions, pas l'usage.** Une place qui revient après 14 jours sans usage reprend sans qu'on vérifie la capacité : elle garde son lien, son forfait et ses recharges. La jauge peut donc compter un peu plus de places qu'il n'y en a ; elle affiche alors 100 %.
 - **La jauge dit vrai.** L'app montre « Vague 1 : 70 % des places prises », c'est-à-dire `⌊prises × 100 / places⌋` sur les vraies places. Le serveur ne donne aucun nombre. Afficher plus de places qu'il n'y en a, pour faire croire à une rareté, a été refusé, sous toutes ses formes.
 - **L'essai : 60 minutes cumulées, en un clic.** Pas de carte, pas de compte. Trois essais par jour au plus depuis une même adresse, et une vague pleine refuse sans en consommer un. Un essai jamais utilisé peut être rendu par le Mac, et il est alors effacé.
 - **Le forfait Fondateur.** 19 € TTC par mois pour 40 h ; le tarif normal est de 29 €, et le prix reste à 19 € tant que l'abonnement dure. Les 40 h reviennent à chaque période payée, à la date anniversaire de Stripe et non le 1er du mois. Les heures non utilisées ne se reportent pas.
+- **Seule une période payée donne ses heures.** Un abonnement donne ses 40 h quand Stripe dit qu'une période est payée (Checkout payé, `invoice.paid`), jamais sur son seul statut. Un renouvellement refusé garde la période payée précédente et ses heures restantes. Une seule page Checkout d'abonnement est ouverte à la fois par place (30 min) ; si deux abonnements existent quand même, le serveur garde le premier, note `billing-duplicate`, et l'opérateur rembourse et résilie l'autre.
 - **La recharge : 10 h pour 10 € TTC,** réservée aux abonnés, une par achat. Elle ne sert qu'au-delà des 40 h et n'expire pas : après la fin d'un abonnement, la place passe au plan `ended`, 0 h incluse, et garde ses recharges.
 - **Un paiement refusé** laisse le service ouvert pendant que Stripe réessaie (`past_due`). Si toutes les tentatives échouent, l'abonnement se termine.
 - **Une résiliation** se fait dans le portail Stripe, en fin de période.
@@ -49,6 +51,7 @@ L'ADR 040 a ouvert une bêta gratuite de quelques places sur une machine de Syna
 - **Des agents logiciels administrent la machine qui transcrit.** C'est la décision de Téo, le 2026-11-27 : OpenBot et 8 agents logiciels de Synapsr gardent `sudo` et Docker sur `synapsr`, qui fait aussi tourner d'autres services. L'app, `/cloud`, `docs/network.md` et les textes du site disent qu'ils pourraient techniquement accéder à l'audio et au texte pendant la transcription. Aucun texte ne dit « dédié ».
 - **Une place est une personne, pas un Mac.** La sauvegarde de l'ADR 048 emporte le jeton : deux Mac de la même personne peuvent partager une place, et donc son quota. Le serveur compte ce qu'un Mac a en cours contre l'autre (c'est testé).
 - **Un Mac perdu, sans compte.** L'opérateur donne un nouveau lien à la même place (`sondine-compute rekey`), et l'ancien cesse de marcher.
+- **`rekey` exige le serveur arrêté.** Il déplace les fichiers de la place ; le serveur signale qu'il tourne toutes les 10 s (`state/serving`), et `rekey` refuse tant que ce signal a moins de 30 s.
 - **La référence de la place.** La carte Cloud Sondine montre l'identifiant que `sondine-compute list` affiche : les 12 premiers caractères de l'empreinte du jeton, avec un bouton pour la copier (Téo, 2026-11-27). La personne la donne pour toute demande, un effacement par exemple. Elle nomme la place sans permettre de s'en servir, et ce n'est pas la référence connue de Stripe.
 
 ### 5. Le droit de la consommation
@@ -56,6 +59,26 @@ L'ADR 040 a ouvert une bêta gratuite de quelques places sur une machine de Syna
 - **Rétractation, au prorata des heures utilisées.** Au paiement, la personne demande que le service commence tout de suite. Si elle se rétracte dans les 14 jours, elle paie les heures déjà utilisées, au prorata du prix : heures de la période ÷ 40 h × prix payé pour l'abonnement, heures utilisées ÷ 10 h × 10 € pour une recharge (article L.221-25 du Code de la consommation ; Téo, 2026-11-27). Le texte d'acceptation de Checkout le dit, en français et en anglais (`CONSENT`, `billing.ts`).
 - **Confirmation sur support durable** (article L.221-13). C'est l'e-mail de reçu de Stripe et la facture PDF, avec un lien vers les conditions et une phrase qui résume la rétractation. Pour une recharge, la session Checkout porte elle-même ce pied de facture (`INVOICE_FOOTER`, avec la date d'acceptation). Pour un abonnement, ce sont le pied de facture par défaut du compte et les e-mails de reçu, réglés dans le tableau de bord de Stripe.
 - **Pas de médiateur de la consommation.** C'est la décision de Téo, le 2026-11-27 : « on oublie, c'est pas important ». Il a entendu le risque : l'article L.612-1 impose à un professionnel qui vend à des particuliers de proposer un médiateur, et l'article L.641-1 prévoit une amende administrative en cas de manquement. Le site retire l'emplacement `MEDIATOR` et son blocage. À revoir si le Cloud s'ouvre au-delà des premières vagues.
+
+## Relecture de Codex Astra (2026-11-27)
+
+`codex exec -m gpt-6-astra`, sur toute la PR, en lecture seule. 13 remarques : 11 retenues et corrigées, chacune avec un test, et 2 écartées.
+
+- **Retenues :**
+  - les identifiants `cs_test_…` étaient refusés, et aucune recharge réelle n'était créditée ;
+  - une recharge pouvait être créditée deux fois en concurrence, ou de nouveau après 64 achats ;
+  - une réponse lente de Stripe pouvait faire revivre un abonnement résilié, ou faire reculer une période : webhook et pages sont maintenant traités un par un, et une période ne recule plus ;
+  - plusieurs pages Checkout pouvaient créer plusieurs abonnements ;
+  - des heures étaient données sans période payée ;
+  - deux demandes de transcription simultanées passaient sur les mêmes heures, à cause de l'attente ajoutée à l'admission : l'admission est redevenue synchrone ;
+  - le Mac effaçait le lien d'une place payée en la quittant ;
+  - `rekey` pouvait tourner en même temps que le serveur ;
+  - la carte Cloud dépendait de l'endroit choisi pour transcrire ;
+  - l'attente du paiement n'avait pas de vraie limite de 15 min ;
+  - la fermeture de la bêta bloquait une place de bêta qui avait payé.
+- **Écartées :**
+  - le retour d'une place inactive au-delà de la capacité : c'est voulu, et la règle est maintenant écrite plus haut ;
+  - la limite de 3 essais par jour et par adresse, remise à zéro à chaque redémarrage : elle date de l'ADR 040, les essais restent bornés par les places, et les redémarrages sont rares. Il n'y a pas d'état de plus sur le disque.
 
 ## Conséquences
 

@@ -156,7 +156,7 @@ export function ComputeSection() {
           isPending={leave.isPending}
           onClick={() => leave.mutate({})}
         >
-          {beta.invited ? m.compute_cloud_disconnect() : m.compute_beta_leave()}
+          {m.compute_cloud_disconnect()}
         </Button>
       ) : null}
       {error === null ? null : (
