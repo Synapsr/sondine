@@ -41,7 +41,7 @@ const core = vi.hoisted(() => {
       return {
         destination,
         own: own ? { name: "atelier", host: "10.0.0.1:8443" } : null,
-        beta: { available: true, joined, invited },
+        beta: { available: true, joined, invited, reference: joined ? "0123456789ab" : null },
       };
     },
     choose(destination: string) {

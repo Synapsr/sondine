@@ -72,7 +72,7 @@ const listening: ListeningStatus = {
 const computeStatus: ComputeStatus = {
   destination: "device",
   own: null,
-  beta: { available: true, joined: false, invited: false },
+  beta: { available: true, joined: false, invited: false, reference: null },
 };
 
 const analysisCheck: AnalysisCheck = {

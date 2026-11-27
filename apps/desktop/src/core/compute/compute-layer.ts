@@ -27,6 +27,7 @@ import {
   type ServerAddress,
   type ServerLink,
 } from "@sondine/engines/remote";
+import { createHash } from "node:crypto";
 import { Context, Effect, Layer } from "effect";
 import { CLOUD_BETA } from "../../shared/cloud";
 import { Database } from "../database";
@@ -110,6 +111,12 @@ export const computeLayer = (options: ComputeOptions = {}) =>
               available: beta !== null,
               joined: place !== null,
               invited: place?.invited === true,
+              // The prefix of the token's hash the server's `list` shows: it names the place,
+              // and gives nothing to use it with.
+              reference:
+                place === null
+                  ? null
+                  : createHash("sha256").update(place.token).digest("hex").slice(0, 12),
             },
           };
         },

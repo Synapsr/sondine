@@ -364,7 +364,10 @@ describe("paying from the app", () => {
       mode: "payment",
       line_items: [{ price: "price_topup", quantity: 1 }],
       customer: "cus_1",
-      invoice_creation: { enabled: true },
+      invoice_creation: {
+        enabled: true,
+        invoice_data: { footer: expect.stringContaining("https://sondine.app/fr/terms") },
+      },
     });
     const paid = {
       id: [...stripe.sessions.keys()].at(-1),

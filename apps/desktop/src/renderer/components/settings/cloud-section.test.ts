@@ -24,6 +24,17 @@ vi.mock("../../core/orpc", () => ({
   errorMessage: String,
   orpc: {
     compute: {
+      get: {
+        queryOptions: () => ({
+          queryKey: ["compute"],
+          queryFn: () =>
+            Promise.resolve({
+              destination: "beta",
+              own: null,
+              beta: { available: true, joined: true, invited: false, reference: "0123456789ab" },
+            }),
+        }),
+      },
       quota: {
         queryOptions: () => ({
           queryKey: ["compute", "quota"],
@@ -182,6 +193,12 @@ describe("the Cloud's plan", () => {
     expect(text()).toContain(m.cloud_extra({ hours: "10" }));
     expect(text()).toContain(m.cloud_subscribe());
     expect(text()).not.toContain(m.cloud_topup());
+  });
+
+  it("names the place for the operator, never with its token", async () => {
+    await render(trial(0));
+    await vi.waitFor(() => expect(text()).toContain("0123456789ab"));
+    expect(text()).toContain(m.cloud_reference_detail());
   });
 
   it("says why a page did not open", async () => {

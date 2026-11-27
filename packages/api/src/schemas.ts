@@ -1633,8 +1633,20 @@ export const ComputeStatus = z.strictObject({
   destination: ComputeDestination,
   /** The user's machine, once connected: never its token. */
   own: z.strictObject({ name: z.string(), host: z.string() }).nullable(),
-  /** `available`: this build knows Cloud. `joined`: this Mac has a token. `invited`: joined by invite link/code. */
-  beta: z.strictObject({ available: z.boolean(), joined: z.boolean(), invited: z.boolean() }),
+  /**
+   * `available`: this build knows Cloud. `joined`: this Mac has a token. `invited`: joined by
+   * invite link/code. `reference`: the place's id as `sondine-compute list` shows it, to name it
+   * in a request to the operator (ADR 047); never the token.
+   */
+  beta: z.strictObject({
+    available: z.boolean(),
+    joined: z.boolean(),
+    invited: z.boolean(),
+    reference: z
+      .string()
+      .regex(/^[0-9a-f]{12}$/)
+      .nullable(),
+  }),
 });
 export type ComputeStatus = z.output<typeof ComputeStatus>;
 

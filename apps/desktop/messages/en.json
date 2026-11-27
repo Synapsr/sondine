@@ -1701,5 +1701,9 @@
   "cloud_waiting_stop": "Stop waiting",
   "cloud_not_allowed": "That is not possible for your place right now.",
   "cloud_unavailable": "Payment does not answer. Try again in a moment.",
-  "cloud_closed": "This server takes no payment."
+  "cloud_closed": "This server takes no payment.",
+  "cloud_reference": "Place reference:",
+  "cloud_reference_copy": "Copy",
+  "cloud_reference_copied": "Copied",
+  "cloud_reference_detail": "Give it with any request about your place, an erasure for instance. It cannot be used to transcribe."
 }
