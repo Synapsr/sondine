@@ -1,4 +1,15 @@
-import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import {
+  closeSync,
+  existsSync,
+  fsyncSync,
+  mkdirSync,
+  openSync,
+  readdirSync,
+  readFileSync,
+  renameSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { join } from "node:path";
 import { DATA_LAYOUT } from "../shared/data-layout";
 import { RESTORED_ITEMS, RestoreMarker } from "../shared/restore-marker";
@@ -10,12 +21,30 @@ import { RESTORED_ITEMS, RestoreMarker } from "../shared/restore-marker";
 // volume: nothing is copied, and a crash in the middle finishes at the next
 // launch, the marker saying which half was under way.
 
+/** Makes a file or a folder's entries durable: a power loss keeps what came before it. */
+function sync(path: string): void {
+  const fd = openSync(path, "r");
+  try {
+    fsyncSync(fd);
+  } finally {
+    closeSync(fd);
+  }
+}
+
 function writeMarker(root: string, marker: RestoreMarker): void {
   const path = join(root, DATA_LAYOUT.restoreMarker);
   const temp = `${path}.tmp`;
   writeFileSync(temp, JSON.stringify(marker), { mode: 0o600 });
+  sync(temp);
   renameSync(temp, path);
+  sync(join(root, DATA_LAYOUT.restoreStagingDir));
 }
+
+const MARKER_FILES = new Set(["READY.json", "READY.json.tmp"]);
+
+/** What the staging holds besides its marker. */
+const stagedNames = (staging: string) =>
+  readdirSync(staging).filter((name) => !MARKER_FILES.has(name));
 
 function readMarker(root: string): RestoreMarker | null {
   const path = join(root, DATA_LAYOUT.restoreMarker);
@@ -58,14 +87,17 @@ export function applyStagedRestore(root: string): SwapOutcome {
   }
   const marker = readMarker(root);
   if (marker === null) throw new RestoreSwapError("the restore's marker is unreadable");
+  if (!marker.items.includes(DATA_LAYOUT.database)) {
+    throw new RestoreSwapError("the restore's marker lists no database");
+  }
   const aside = join(root, DATA_LAYOUT.beforeRestoreDir, marker.stamp);
   const update = (phase: RestoreMarker["phase"]) => writeMarker(root, { ...marker, phase });
   let moved = 0;
   if (marker.phase === "staged" || marker.phase === "out") {
-    for (const item of marker.items) {
-      if (!existsSync(join(staging, item))) {
-        throw new RestoreSwapError(`${item} is missing from the staging before anything moved in`);
-      }
+    // The staging holds exactly what the marker lists, before anything moves.
+    const staged = stagedNames(staging).toSorted();
+    if (JSON.stringify(staged) !== JSON.stringify([...marker.items].toSorted())) {
+      throw new RestoreSwapError("the staging does not hold what its marker lists");
     }
     update("out");
     mkdirSync(aside, { recursive: true, mode: 0o700 });
@@ -79,6 +111,8 @@ export function applyStagedRestore(root: string): SwapOutcome {
       renameSync(from, join(aside, item));
       moved += 1;
     }
+    sync(aside);
+    sync(root);
   }
   update("in");
   for (const item of marker.items) {
@@ -93,6 +127,11 @@ export function applyStagedRestore(root: string): SwapOutcome {
     if (existsSync(to)) throw new RestoreSwapError(`${item} is still in place; it is not replaced`);
     renameSync(from, to);
     moved += 1;
+  }
+  sync(root);
+  // Anything still staged was not listed: it stays, for a person to look at.
+  if (stagedNames(staging).length > 0) {
+    throw new RestoreSwapError("the staging holds data its marker did not list");
   }
   rmSync(staging, { recursive: true, force: true });
   return { kind: "swapped", stamp: marker.stamp, moved };
