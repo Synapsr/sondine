@@ -30,9 +30,18 @@ describe("sondine.app/cloud", () => {
     expect(page.status).toBe(200);
     const html = await page.text();
     expect(html).toContain("Me prévenir");
-    // Where the e-mail goes is said beside the field.
+    // Where the e-mail goes and the Wave 1 non-ZDR limit are said beside the field.
     expect(html).toContain("Discord");
+    expect(html).toContain("ZDR");
     expect(html).toContain('href="/fr/privacy-policy"');
+    expect(html).toContain('href="/fr/terms"');
+
+    const enHtml = await (
+      await handle(new Request("https://sondine.app/cloud?lang=en"), env)
+    ).text();
+    expect(enHtml).toContain("zero data retention (ZDR)");
+    expect(enHtml).toContain('href="/privacy-policy"');
+    expect(enHtml).toContain('href="/terms"');
     const calls: { url: string; body: string }[] = [];
     const send = (async (url: string, init: RequestInit) => {
       calls.push({ url, body: String(init.body) });
