@@ -23,6 +23,8 @@ const core = vi.hoisted(() => {
     givenBack: 0,
     /** How full the wave is; null: the server has none. */
     waveData: null as { percent: number; full: boolean } | null,
+    /** How many times the window asked how full the wave is. */
+    waveAsked: 0,
     outcome: "joined",
     /** Resolves when the server answers. */
     answer: Promise.resolve(),
@@ -33,6 +35,7 @@ const core = vi.hoisted(() => {
       this.lastInvite = undefined;
       this.givenBack = 0;
       this.waveData = null;
+      this.waveAsked = 0;
       this.outcome = "joined";
       this.answer = Promise.resolve();
     },
@@ -117,7 +120,10 @@ vi.mock("../../core/orpc", () => {
         wave: {
           queryOptions: () => ({
             queryKey: ["compute", "wave"],
-            queryFn: () => Promise.resolve(core.waveData),
+            queryFn: () => {
+              core.waveAsked += 1;
+              return Promise.resolve(core.waveData);
+            },
           }),
         },
       },
@@ -249,12 +255,22 @@ function click(selector: string): void {
   element.click();
 }
 
+/** The dialog's own button, last: the invite link's comes before it. */
+function pressDialog(): void {
+  const buttons = [
+    ...document.querySelectorAll<HTMLElement>("[role=alertdialog] button:not(#dismiss)"),
+  ];
+  const button = buttons.at(-1);
+  if (button === undefined) throw new Error("no dialog button");
+  button.click();
+}
+
 /** Opens a destination's dialog and presses its button. */
 async function ask(destination: Exclude<ComputeDestination, "device">): Promise<void> {
   click(`#radio-${destination}`);
   await vi.waitFor(() => expect(dialog()).not.toBeNull());
   if (destination === "beta") {
-    click("[role=alertdialog] button:not(#dismiss)");
+    pressDialog();
     return;
   }
   const form = document.querySelector("form");
@@ -343,6 +359,11 @@ describe("choosing where transcription runs", () => {
     expect(await reread()).toBe("device");
   });
 
+  it("asks nothing of the wave until the Cloud is chosen", async () => {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(core.waveAsked).toBe(0);
+  });
+
   it("shows how full the wave is before a place is taken, and the trial's button", async () => {
     core.waveData = { percent: 70, full: false };
     click("#radio-beta");
@@ -362,12 +383,17 @@ describe("choosing where transcription runs", () => {
   it("sends the invite code typed in Settings, and offers Disconnect instead of Leave", async () => {
     click("#radio-beta");
     await vi.waitFor(() => expect(dialog()).not.toBeNull());
+    // The field hides behind its link.
+    [...document.querySelectorAll("button")]
+      .find((button) => button.textContent === m.compute_beta_invite_open())
+      ?.click();
+    await new Promise((resolve) => setTimeout(resolve, 20));
     const input = document.querySelector<HTMLInputElement>("[role=alertdialog] input");
     expect(input).not.toBeNull();
     input!.value = "invite-token-123";
     input!.dispatchEvent(new document.defaultView!.Event("input", { bubbles: true }));
     await new Promise((resolve) => setTimeout(resolve, 10));
-    click("[role=alertdialog] button:not(#dismiss)");
+    pressDialog();
     await vi.waitFor(() => expect(dialog()).toBeNull());
     expect(core.lastInvite).toBe("invite-token-123");
     await vi.waitFor(() =>

@@ -1695,5 +1695,8 @@
   "cloud_reference": "Référence de la place :",
   "cloud_reference_copy": "Copier",
   "cloud_reference_copied": "Copiée",
-  "cloud_reference_detail": "Donnez-la pour toute demande sur votre place, un effacement par exemple. Elle ne permet pas de l’utiliser."
+  "cloud_reference_detail": "Donnez-la pour toute demande sur votre place, un effacement par exemple. Elle ne permet pas de l’utiliser.",
+  "compute_trial_summary": "L’audio de vos conversations terminées part chiffré vers un serveur de Synapsr, qui le transcrit puis l’efface. Pendant la transcription, ses administrateurs, dont des agents logiciels, pourraient techniquement y accéder. Nous nous engageons à ne rien lire ni écouter, et rien n’entraîne de modèle.",
+  "compute_trial_privacy": "Ce que le serveur garde",
+  "compute_beta_invite_open": "J’ai un lien d’invitation"
 }
