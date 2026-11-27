@@ -634,6 +634,11 @@ function start(): void {
       // The page an episode came from (ADR 023): core vouches for it, main
       // opens only http(s), in the default browser, never in the window.
       case "open-page":
+        // The captures' runs (`ux:cloud-shots`, development only) open no browser.
+        if (!app.isPackaged && process.env["SONDINE_DEV_NO_BROWSER"] === "1") {
+          log.info("open-page.skipped");
+          return;
+        }
         if (/^https?:\/\//.test(message.url)) {
           void shell.openExternal(message.url).catch(logFailure("open-page"));
         }
