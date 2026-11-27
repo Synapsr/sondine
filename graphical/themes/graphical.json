@@ -40,15 +40,15 @@
         "warning": "#ffea00",
         "error": "#fc032d",
         "color-1": "#000000",
-        "color-2": "#153d85",
-        "color-3": "#bfe8f5",
-        "color-4": "#ffd0b0"
+        "color-2": "#2596be",
+        "color-3": "#b8e2f2",
+        "color-4": "#e98a3a"
       },
       "dark": {
-        "neutral-1": "#000000",
-        "neutral-2": "#202020",
-        "neutral-3": "#2b2b2b",
-        "neutral-4": "#3d3d3d",
+        "neutral-1": "#141416",
+        "neutral-2": "#1b1b1e",
+        "neutral-3": "#232326",
+        "neutral-4": "#2b2b2f",
         "neutral-5": "#565656",
         "neutral-6": "#838383",
         "neutral-7": "#ababab",
@@ -59,9 +59,9 @@
         "warning": "#ffea00",
         "error": "#fc032d",
         "color-1": "#ffffff",
-        "color-2": "#153d85",
-        "color-3": "#bfe8f5",
-        "color-4": "#ffd0b0"
+        "color-2": "#2596be",
+        "color-3": "#b8e2f2",
+        "color-4": "#e98a3a"
       }
     },
     "spacing": {
@@ -75,8 +75,8 @@
       "xxl": 50.88
     },
     "letterSpacing": {
-      "xs": -0.02,
-      "s": -0.01,
+      "xs": -0.035,
+      "s": -0.015,
       "m": 0,
       "l": 0.01,
       "xl": 0.02
@@ -123,9 +123,9 @@
       "display": {
         "family": "\"Allo\", sans-serif",
         "weights": {
-          "regular": 400,
-          "medium": 500,
-          "heavy": 600
+          "regular": 460,
+          "medium": 560,
+          "heavy": 640
         }
       },
       "data": {

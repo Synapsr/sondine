@@ -43,8 +43,9 @@ instead of Hugeicons. The repository is public under AGPL-3.0.
 - 69 since 2026-11-23: tag (`IconTagFill18`) for tags on recordings
   (ADR 039), generated the same way.
 - The font is the upright variable WOFF2 of the `allo-font` npm package,
-  without subsetting; its source, sha256 and version are in
-  `packages/ui/src/fonts/README.md`.
+  with its roundness axis set to 0 and every character kept (see the
+  amendment of 2026-11-27); its source, the command that made it, and both
+  sha256 are in `packages/ui/src/fonts/README.md`.
 
 ## Amendment — Allo (2026-11-19)
 
@@ -53,6 +54,17 @@ without a serif. It replaces Timeless Grotesk, whose file and license left
 the repository. Allo is Josh Puckett's redrawing of Inter, with optical size,
 weight and roundness axes; its open license removes the earlier risk of a
 paid or changed license.
+
+## Amendment — Allo 1.1.0 at roundness 0 (2026-11-27)
+
+The app takes the site's art direction (ADR 033's amendment): Allo 1.1.0
+with its `ROND` axis fixed at 0, the face the site uses, in place of Allo
+1.0.3 at its default roundness of 50. The file is made from the package's
+variable WOFF2 with fontTools, which removes the axis; its named instances
+move to roundness 0 first, so the iPhone app still finds `AlloVariable-*` by
+name. It keeps every character of the source, where the site's copy is a
+Latin cut, because transcripts can be in any language the font covers. The
+Mac and the iPhone ship the same file, 218 KB instead of 448 KB.
 
 ## Consequences
 

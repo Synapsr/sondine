@@ -27,7 +27,7 @@ export function createMainWindow(options: MainWindowOptions): BrowserWindow {
     titleBarStyle: "hiddenInset",
     trafficLightPosition: { x: 18, y: 18 },
     // The sidebar's ground (neutral-2), so the first frame does not flash.
-    backgroundColor: nativeTheme.shouldUseDarkColors ? "#202020" : "#fbfbfb",
+    backgroundColor: nativeTheme.shouldUseDarkColors ? "#1b1b1e" : "#fbfbfb",
     webPreferences: {
       preload: options.preload,
       contextIsolation: true,

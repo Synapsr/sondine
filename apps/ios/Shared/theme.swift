@@ -4,7 +4,8 @@ import SwiftUI
 // The Mac's design tokens, for the phone and its widget extension (the Live
 // Activity, the control): the same ink, neutrals, spacing, corners, type and
 // motion, copied from Graphical's theme (graphical/generated/theme.css), in
-// the Mac's face, Allo (`Fonts/`, SIL OFL, its WOFF2 read by Core Text).
+// the Mac's face, Allo at roundness 0 (`Fonts/`, SIL OFL, its WOFF2 read by
+// Core Text; packages/ui/src/fonts/README.md says how it was made).
 // The accent is ink, black in light mode and white in dark (ADR 037); red
 // marks only a recording under way and what went wrong (U9).
 
@@ -12,19 +13,19 @@ enum Theme {
     /// `color-1`, `neutral-10`: ink. Primary actions, text, the day shown.
     static let ink = Color(light: 0x000000, dark: 0xFFFFFF)
     /// What sits on ink: `neutral-1`.
-    static let onInk = Color(light: 0xFFFFFF, dark: 0x000000)
+    static let onInk = Color(light: 0xFFFFFF, dark: 0x141416)
     /// `error`: a recording under way, and what went wrong.
     static let danger = Color(red: 0xFC / 255, green: 0x03 / 255, blue: 0x2D / 255)
     static let success = Color(red: 0, green: 0x90 / 255, blue: 0x6C / 255)
 
     /// `neutral-1`: the canvas.
-    static let canvas = Color(light: 0xFFFFFF, dark: 0x000000)
+    static let canvas = Color(light: 0xFFFFFF, dark: 0x141416)
     /// `neutral-2`: a quiet surface on the canvas.
-    static let raised = Color(light: 0xFBFBFB, dark: 0x202020)
+    static let raised = Color(light: 0xFBFBFB, dark: 0x1B1B1E)
     /// `neutral-3`: a tile, a field, a pressed row.
-    static let surface = Color(light: 0xF4F4F4, dark: 0x2B2B2B)
+    static let surface = Color(light: 0xF4F4F4, dark: 0x232326)
     /// `neutral-4`: hairlines and rings.
-    static let line = Color(light: 0xE7E7E7, dark: 0x3D3D3D)
+    static let line = Color(light: 0xE7E7E7, dark: 0x2B2B2F)
     /// `neutral-5`: what cannot be reached (days to come).
     static let faint = Color(light: 0xCDCDCD, dark: 0x565656)
     /// `neutral-10` and `neutral-7`: text, and muted text.
@@ -92,7 +93,7 @@ enum Theme {
     static func registerFonts() { _ = fontsRegistered }
 
     private static let fontsRegistered: Bool = {
-        guard let url = Bundle.main.url(forResource: "AlloVariable", withExtension: "woff2") else { return false }
+        guard let url = Bundle.main.url(forResource: "AlloRound0", withExtension: "woff2") else { return false }
         return CTFontManagerRegisterFontsForURL(url as CFURL, .process, nil)
     }()
 }

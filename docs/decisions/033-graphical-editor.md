@@ -49,3 +49,23 @@ starts.
 - A later editor version is applied with the graphical-adopt skill;
   `apps/desktop/src/renderer/graphical/editor.d.ts` declares the part of it
   the app uses.
+
+## Amendment — the site's art direction (2026-11-27)
+
+Téo asked for the app to take the art direction of Sondine's site, in light
+and dark, so that the site's demonstrations look like the app. Of three
+directions (the site's theme values only; those plus a halo of the sky's
+colors behind the window; those plus the site's sky photo), he chose the
+theme values only, as more modern and simpler. The app takes no image, no
+gradient and no animation from the site.
+
+- The « Sondine » theme shares the site's values: the palette (`color-2`
+  #2596be, `color-3` #b8e2f2, `color-4` #e98a3a), the title weights (460,
+  560, 640), the tighter letter spacing (-0.035 and -0.015 em for XS and S),
+  and Allo at roundness 0 (ADR 009). Body text keeps 400, 500 and 600, and
+  the app keeps its own display sizes, smaller than the site's.
+- The dark neutrals are a little lighter than the site's and their edge
+  darker (`neutral-1` #141416 to `neutral-4` #2b2b2f), at Téo's request: a
+  pure black read too black, and the gray edges of cards too light.
+- A later change of the site's palette or type is carried to the app through
+  `graphical/themes/graphical.json`, as any theme change.
