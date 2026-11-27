@@ -16,8 +16,8 @@ export interface BillingOptions {
   readonly webhookSecret: string;
   /** Where Stripe sends the browser back: this server's public address. */
   readonly publicUrl: string;
-  /** The Cloud's terms, linked from Checkout's consent. */
-  readonly termsUrl: string;
+  /** The Cloud's terms in each language, linked from Checkout's consent. */
+  readonly termsUrl: Readonly<Record<BillingLocale, string>>;
   /** A customer portal configuration (`bpc_…`); Stripe's default without it. */
   readonly portalConfiguration?: string;
   readonly log?: ServerLog;
@@ -34,11 +34,21 @@ export type PageResult = { readonly url: string } | { readonly refused: RefusalC
  * What the buyer accepts in Checkout (ADR 047): an immediate start, and the
  * share already provided if they withdraw (Code de la consommation, L.221-25).
  */
-export const CONSENT: Readonly<Record<BillingLocale, (terms: string) => string>> = {
-  fr: (terms) =>
-    `J’accepte les [conditions du Cloud Sondine](${terms}) et je demande que le service commence tout de suite. Si je me rétracte dans les 14 jours, je paierai la part du service déjà fournie.`,
-  en: (terms) =>
-    `I accept the [Sondine Cloud terms](${terms}) and ask for the service to start right away. If I withdraw within 14 days, I will pay for the share of the service already provided.`,
+export const CONSENT: Readonly<
+  Record<BillingLocale, Readonly<Record<BillingItem, (terms: string) => string>>>
+> = {
+  fr: {
+    subscription: (terms) =>
+      `J’accepte les [conditions](${terms}) et je demande que le service commence tout de suite, avant la fin du délai de rétractation de 14 jours. Si je me rétracte dans ce délai, je paierai la part du service fournie jusqu’à ce que je vous en informe.`,
+    topup: (terms) =>
+      `J’accepte les [conditions](${terms}) et je demande que les 10 heures soient créditées tout de suite, avant la fin du délai de rétractation de 14 jours. Si je me rétracte dans ce délai, je paierai les heures utilisées jusqu’à ce que je vous en informe.`,
+  },
+  en: {
+    subscription: (terms) =>
+      `I accept the [terms](${terms}) and ask for the service to start right away, before the 14-day withdrawal period ends. If I withdraw within that period, I will pay for the part of the service provided until I tell you.`,
+    topup: (terms) =>
+      `I accept the [terms](${terms}) and ask for the 10 hours to be credited right away, before the 14-day withdrawal period ends. If I withdraw within that period, I will pay for the hours used until I tell you.`,
+  },
 };
 
 const Id = z.string().min(1).max(255);
@@ -334,7 +344,9 @@ export class BillingService {
         tax_id_collection: { enabled: true },
         consent_collection: { terms_of_service: "required" },
         custom_text: {
-          terms_of_service_acceptance: { message: CONSENT[locale](this.options.termsUrl) },
+          terms_of_service_acceptance: {
+            message: CONSENT[locale][item](this.options.termsUrl[locale]),
+          },
         },
       },
       // Two clicks in the same minute open the same page.
