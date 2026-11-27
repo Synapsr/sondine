@@ -19,7 +19,7 @@ const TEXT = {
     lead: "Le Cloud Sondine ouvre par petites vagues pour les Mac qui n’ont pas assez de mémoire pour le modèle local (60 min d’essai gratuit sans carte, puis tarif Fondateur 19 € TTC/mois pour 40 h/mois). Laissez votre e-mail pour recevoir une invitation.",
     noticeTitle: "Transparence bêta (Vague 1)",
     notice:
-      "La Vague 1 tourne sur un serveur dédié de Synapsr (file partagée, sans garantie de disponibilité). L’audio des conversations terminées y part chiffré jusqu’au programme, reste en mémoire le temps du calcul puis est effacé — mais ce n’est pas une ZDR (zéro rétention garantie) vis-à-vis de ses administrateurs. Nous nous engageons sur l’honneur à ne rien lire ni écouter, et vos données n’entraînent aucun modèle.",
+      "La Vague 1 tourne sur un serveur ordinaire de Synapsr, qui fait aussi tourner d’autres services (file partagée, sans garantie de disponibilité). L’audio des conversations terminées y part chiffré jusqu’au programme, reste en mémoire le temps du calcul puis est effacé — mais ce n’est pas une ZDR (zéro rétention garantie) vis-à-vis de ses administrateurs. Nous nous engageons sur l’honneur à ne rien lire ni écouter, et vos données n’entraînent aucun modèle.",
     email: "Votre e-mail",
     send: "Me prévenir",
     use: "Votre e-mail arrive dans un salon Discord privé de notre équipe et sert seulement à vous prévenir. Il y reste jusqu’à ce que nous l’effacions ; demandez-le quand vous voulez.",
@@ -35,7 +35,7 @@ const TEXT = {
     lead: "Sondine Cloud opens in small waves for Macs without enough memory for the local model (60-minute free trial with no card, then €19/month incl. VAT Founder rate for 40 h/month). Leave your e-mail to receive an invite.",
     noticeTitle: "Wave 1 beta transparency",
     notice:
-      "Wave 1 runs on a dedicated Synapsr server (shared queue, no availability guarantee). Audio of finished conversations goes encrypted up to the program, stays in memory only while transcribing, and is then erased — but it is not zero data retention (ZDR) towards its administrators. We give our word never to read or listen to it, and your data trains no model.",
+      "Wave 1 runs on an ordinary Synapsr server that also runs other services (shared queue, no availability guarantee). Audio of finished conversations goes encrypted up to the program, stays in memory only while transcribing, and is then erased — but it is not zero data retention (ZDR) towards its administrators. We give our word never to read or listen to it, and your data trains no model.",
     email: "Your e-mail",
     send: "Tell me",
     use: "Your e-mail reaches a private Discord channel of our team and is only used to tell you. It stays there until we delete it; ask whenever you want.",
