@@ -16,27 +16,35 @@ type Lang = "fr" | "en";
 const TEXT = {
   fr: {
     title: "Soyez prévenu quand le cloud ouvre",
-    lead: "Une transcription dans le cloud est en bêta, avec quelques places, pour les Mac qui n’ont pas assez de mémoire pour le modèle local. Laissez votre e-mail : nous vous écrirons quand elle ouvrira plus largement.",
+    lead: "Le Cloud Sondine ouvre par petites vagues pour les Mac qui n’ont pas assez de mémoire pour le modèle local (60 min d’essai gratuit sans carte, puis tarif Fondateur 19 € TTC/mois pour 40 h/mois). Laissez votre e-mail pour recevoir une invitation.",
+    noticeTitle: "Transparence bêta (Vague 1)",
+    notice:
+      "La Vague 1 tourne sur un serveur dédié de Synapsr (file partagée, sans garantie de disponibilité). L’audio des conversations terminées y part chiffré jusqu’au programme, reste en mémoire le temps du calcul puis est effacé — mais ce n’est pas une ZDR (zéro rétention garantie) vis-à-vis de ses administrateurs. Nous nous engageons sur l’honneur à ne rien lire ni écouter, et vos données n’entraînent aucun modèle.",
     email: "Votre e-mail",
     send: "Me prévenir",
     use: "Votre e-mail arrive dans un salon Discord privé de notre équipe et sert seulement à vous prévenir. Il y reste jusqu’à ce que nous l’effacions ; demandez-le quand vous voulez.",
     invalid: "Cette adresse ne semble pas valide.",
     failed: "L’envoi n’a pas abouti. Réessayez dans un moment.",
     policy: "Politique de confidentialité",
+    terms: "Conditions",
     thanks: "C’est noté",
-    thanksLead: "Nous vous écrirons quand la transcription dans le cloud ouvrira plus largement.",
+    thanksLead: "Nous vous écrirons dès qu’une place s’ouvre dans la prochaine vague.",
   },
   en: {
     title: "Be told when the cloud opens",
-    lead: "A cloud transcription is in beta, with a few places, for Macs without enough memory for the local model. Leave your e-mail: we will write when it opens more widely.",
+    lead: "Sondine Cloud opens in small waves for Macs without enough memory for the local model (60-minute free trial with no card, then €19/month incl. VAT Founder rate for 40 h/month). Leave your e-mail to receive an invite.",
+    noticeTitle: "Wave 1 beta transparency",
+    notice:
+      "Wave 1 runs on a dedicated Synapsr server (shared queue, no availability guarantee). Audio of finished conversations goes encrypted up to the program, stays in memory only while transcribing, and is then erased — but it is not zero data retention (ZDR) towards its administrators. We give our word never to read or listen to it, and your data trains no model.",
     email: "Your e-mail",
     send: "Tell me",
     use: "Your e-mail reaches a private Discord channel of our team and is only used to tell you. It stays there until we delete it; ask whenever you want.",
     invalid: "This address does not look valid.",
     failed: "It did not go through. Try again in a moment.",
     policy: "Privacy policy",
+    terms: "Terms",
     thanks: "Noted",
-    thanksLead: "We will write when the cloud transcription opens more widely.",
+    thanksLead: "We will write as soon as a spot opens in the next wave.",
   },
 } as const satisfies Record<Lang, Record<string, string>>;
 
@@ -91,11 +99,16 @@ const escape = (value: string) => value.replace(/[&<>"']/gu, (char) => `&#${char
 
 function page(lang: Lang, view: View, status = 200): Response {
   const t = TEXT[lang];
+  const prefix = lang === "fr" ? "/fr" : "";
   const body =
     view.kind === "thanks"
       ? `<h1>${t.thanks}</h1><p class="muted">${t.thanksLead}</p>`
       : `<h1>${t.title}</h1>
 <p class="muted">${t.lead}</p>
+<aside class="notice" aria-label="${t.noticeTitle}">
+  <strong>${t.noticeTitle}</strong>
+  <p class="small muted">${t.notice}</p>
+</aside>
 <form method="post" action="/cloud?lang=${lang}">
   <label for="email">${t.email}</label>
   <input id="email" name="email" type="email" required autocomplete="email" maxlength="${MAX_EMAIL}" value="${escape(view.email ?? "")}">
@@ -103,7 +116,7 @@ function page(lang: Lang, view: View, status = 200): Response {
   ${view.error === undefined ? "" : `<p class="error" role="alert">${t[view.error]}</p>`}
   <button type="submit">${t.send}</button>
 </form>
-<p class="small muted">${t.use} <a href="${lang === "fr" ? "/fr" : ""}/privacy-policy">${t.policy}</a></p>`;
+<p class="small muted">${t.use} <a href="${prefix}/privacy-policy">${t.policy}</a> · <a href="${prefix}/terms">${t.terms}</a></p>`;
   const html = `<!doctype html>
 <html lang="${lang}">
 <head>
@@ -122,8 +135,10 @@ function page(lang: Lang, view: View, status = 200): Response {
   p { margin: 0; }
   .muted { color: var(--muted); }
   .small { font-size: 13px; }
+  .notice { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); }
+  .notice strong { font-size: 13px; font-weight: 600; }
   a { color: inherit; }
-  form { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+  form { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
   label { font-weight: 500; font-size: 14px; }
   input { font: inherit; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line);
     background: transparent; color: inherit; }
