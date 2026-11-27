@@ -1692,5 +1692,9 @@
   "cloud_waiting_stop": "Ne plus attendre",
   "cloud_not_allowed": "Ce n’est pas possible pour votre place en ce moment.",
   "cloud_unavailable": "Le paiement ne répond pas. Réessayez dans un moment.",
-  "cloud_closed": "Ce serveur ne prend pas de paiement."
+  "cloud_closed": "Ce serveur ne prend pas de paiement.",
+  "cloud_reference": "Référence de la place :",
+  "cloud_reference_copy": "Copier",
+  "cloud_reference_copied": "Copiée",
+  "cloud_reference_detail": "Donnez-la pour toute demande sur votre place, un effacement par exemple. Elle ne permet pas de l’utiliser."
 }

@@ -74,6 +74,7 @@ export function CloudSection() {
     refetchInterval: waiting === null ? false : POLL_MS,
   });
   const open = useMutation(orpc.compute.openBilling.mutationOptions());
+  const reference = useQuery(orpc.compute.get.queryOptions()).data?.beta.reference ?? null;
   const snapshot = quota.data == null ? null : JSON.stringify(quota.data);
 
   useEffect(() => {
@@ -123,6 +124,28 @@ export function CloudSection() {
           {problem}
         </p>
       )}
+      {reference === null ? null : <PlaceReference reference={reference} />}
+    </div>
+  );
+}
+
+/** The place's name for the operator (ADR 047): to give with a request, an erasure say. */
+function PlaceReference({ reference }: { reference: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <div className="flex flex-col gap-xs">
+      <div className="flex flex-wrap items-center gap-s">
+        <span className="text-body-s">
+          {m.cloud_reference()} <span className="font-data select-all">{reference}</span>
+        </span>
+        <Button
+          variant="ghost"
+          onClick={() => void navigator.clipboard.writeText(reference).then(() => setCopied(true))}
+        >
+          {copied ? m.cloud_reference_copied() : m.cloud_reference_copy()}
+        </Button>
+      </div>
+      <p className="text-body-xs text-cte-text-muted">{m.cloud_reference_detail()}</p>
     </div>
   );
 }

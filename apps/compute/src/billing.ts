@@ -39,13 +39,13 @@ export const CONSENT: Readonly<
 > = {
   fr: {
     subscription: (terms) =>
-      `J’accepte les [conditions](${terms}) et je demande que le service commence tout de suite, avant la fin du délai de rétractation de 14 jours. Si je me rétracte dans ce délai, je paierai la part du service fournie jusqu’à ce que je vous en informe.`,
+      `J’accepte les [conditions](${terms}) et je demande que le service commence tout de suite, avant la fin du délai de rétractation de 14 jours. Si je me rétracte dans ce délai, je paierai les heures déjà utilisées, au prorata du prix.`,
     topup: (terms) =>
       `J’accepte les [conditions](${terms}) et je demande que les 10 heures soient créditées tout de suite, avant la fin du délai de rétractation de 14 jours. Si je me rétracte dans ce délai, je paierai les heures utilisées jusqu’à ce que je vous en informe.`,
   },
   en: {
     subscription: (terms) =>
-      `I accept the [terms](${terms}) and ask for the service to start right away, before the 14-day withdrawal period ends. If I withdraw within that period, I will pay for the part of the service provided until I tell you.`,
+      `I accept the [terms](${terms}) and ask for the service to start right away, before the 14-day withdrawal period ends. If I withdraw within that period, I will pay for the hours already used, in proportion to the price.`,
     topup: (terms) =>
       `I accept the [terms](${terms}) and ask for the 10 hours to be credited right away, before the 14-day withdrawal period ends. If I withdraw within that period, I will pay for the hours used until I tell you.`,
   },
@@ -117,6 +117,20 @@ function statusOf(status: string): "active" | "past_due" | "ended" | null {
   if (status === "incomplete") return null;
   return "ended";
 }
+
+/**
+ * The top-up invoice's footer, its confirmation on a durable medium
+ * (L.221-13): the terms accepted, on which day, and what withdrawing costs.
+ * A subscription's invoices take the account's default footer instead.
+ */
+export const INVOICE_FOOTER: Readonly<
+  Record<BillingLocale, (terms: string, day: string) => string>
+> = {
+  fr: (terms, day) =>
+    `Conditions du Cloud Sondine acceptées le ${day} : ${terms}. Service commencé à votre demande ; en cas de rétractation dans les 14 jours, les heures utilisées restent dues au prorata du prix.`,
+  en: (terms, day) =>
+    `Sondine Cloud terms accepted on ${day}: ${terms}. Service started at your request; if you withdraw within 14 days, the hours used remain due in proportion to the price.`,
+};
 
 export class BillingService {
   private readonly clients: ClientStore;
@@ -332,7 +346,19 @@ export class BillingService {
         metadata,
         ...(item === "subscription"
           ? { subscription_data: { metadata } }
-          : { payment_intent_data: { metadata }, invoice_creation: { enabled: true } }),
+          : {
+              payment_intent_data: { metadata },
+              invoice_creation: {
+                enabled: true,
+                invoice_data: {
+                  footer: INVOICE_FOOTER[locale](
+                    this.options.termsUrl[locale],
+                    new Date(this.now()).toISOString().slice(0, 10),
+                  ),
+                  metadata,
+                },
+              },
+            }),
         ...(customer === undefined
           ? {}
           : { customer, customer_update: { address: "auto", name: "auto" } }),

@@ -25,7 +25,12 @@ const core = vi.hoisted(() => ({
     return {
       destination: this.destination,
       own: null,
-      beta: { available: true, joined: this.destination === "beta", invited: false },
+      beta: {
+        available: true,
+        joined: this.destination === "beta",
+        invited: false,
+        reference: null,
+      },
     };
   },
 }));

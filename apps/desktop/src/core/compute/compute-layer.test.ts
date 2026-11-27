@@ -55,7 +55,7 @@ describe("where transcription runs", () => {
     expect(service.status()).toEqual({
       destination: "device",
       own: null,
-      beta: { available: true, joined: false, invited: false },
+      beta: { available: true, joined: false, invited: false, reference: null },
     });
     expect(service.engine()).toBeNull();
     expect(service.choose("own")).toBe(false);
