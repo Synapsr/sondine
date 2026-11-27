@@ -58,6 +58,9 @@ interface Decision {
   readonly session?: { readonly id: string; readonly clientId: string; readonly job: AsrJob };
 }
 
+/** A Stripe page is asked of Stripe: its answer comes later. Everything else is decided at once. */
+type Decided = Decision | { readonly later: Promise<Decision> };
+
 class HttpError extends Error {
   readonly status: number;
   constructor(status: number) {
@@ -112,7 +115,12 @@ export function createComputeServer(options: ComputeServerOptions): Server {
   }
 
   /** The answer, and for a session what to hold for it. */
-  async function decide(request: IncomingMessage, received: Responded): Promise<Decision> {
+  /**
+   * Synchronous for all that admits work: a session's quota and room are
+   * checked and the session registered with no turn of the event loop between,
+   * so two requests at once cannot both pass on the same hours.
+   */
+  function decide(request: IncomingMessage, received: Responded): Decided {
     const refuse = (code: RefusalCode): Decision => ({ reply: { kind: "refused", code } });
     let parsed: unknown;
     try {
@@ -168,7 +176,8 @@ export function createComputeServer(options: ComputeServerOptions): Server {
     if (known === null) return refuse("unauthorized");
     if (!first()) return refuse("bad_request");
     // The open beta is closed: self-claimed beta places wait, while invited plans keep running.
-    if (planOf(known.client) === "beta" && beta === null && message.kind !== "leave") {
+    const knownPlan = planOf(known.client, clients.billing(known.id));
+    if (knownPlan === "beta" && beta === null && message.kind !== "leave") {
       return refuse("closed");
     }
     switch (message.kind) {
@@ -189,20 +198,27 @@ export function createComputeServer(options: ComputeServerOptions): Server {
       case "checkout":
       case "portal": {
         if (billing === null) return refuse("closed");
-        const page = await billing.page(
+        const asked = billing.page(
           known,
           message.kind === "checkout"
             ? { kind: "checkout", item: message.item, locale: message.locale }
             : { kind: "portal", locale: message.locale },
         );
-        return "url" in page ? { reply: { kind: "page", url: page.url } } : refuse(page.refused);
+        return {
+          later: asked.then((page) =>
+            "url" in page ? { reply: { kind: "page", url: page.url } } : refuse(page.refused),
+          ),
+        };
       }
       case "leave": {
         // Invited and paid plans cannot be deleted by a client click; only the operator removes
         // them. A trial nobody used yet may be given back: the Mac took it, then changed its mind.
-        const plan = planOf(known.client, clients.billing(known.id));
-        const unused = plan === "trial" && clients.usage(known.id).lastUsedAt === 0;
-        if (isInvitedPlan(plan) && !unused) return refuse("bad_request");
+        // Nor one that opened a Checkout page: it could still be paid.
+        const unused =
+          knownPlan === "trial" &&
+          clients.usage(known.id).lastUsedAt === 0 &&
+          clients.billing(known.id) === null;
+        if (isInvitedPlan(knownPlan) && !unused) return refuse("bad_request");
         sessions.dropClient(known.id);
         clients.remove(known.id);
         return { reply: { kind: "left" } };
@@ -238,7 +254,8 @@ export function createComputeServer(options: ComputeServerOptions): Server {
     slowDown();
     const body = await readBody(request, MAX_OPEN_BYTES);
     const received = respond(key, body, PROLOGUE);
-    const { reply, session } = await decide(request, received);
+    const decided = decide(request, received);
+    const { reply, session } = "later" in decided ? await decided.later : decided;
     const { message, ...channel } = received.answer(Buffer.from(JSON.stringify(reply)));
     if (session !== undefined) sessions.add(session.id, session.clientId, channel, session.job);
     send(response, 200, message);

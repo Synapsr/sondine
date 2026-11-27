@@ -228,16 +228,21 @@ export const computeLayer = (options: ComputeOptions = {}) =>
         },
         leaveBeta: async () => {
           const { destination, beta: place } = computeSettings(db);
-          save({ beta: null, destination: destination === "beta" ? "device" : destination });
-          // Only self-claimed open-beta places are given back; invited plans stay intact on the server.
-          if (place !== null && place.invited !== true) {
-            await leavePlace(place, network).catch(() => undefined);
-          }
+          const away = destination === "beta" ? "device" : destination;
+          // The server erases the place only if nothing binds it (a beta place, a trial never
+          // used). One it keeps (paid, used, given) keeps its link here too, or nobody could
+          // ever reach its plan again: this Mac only stops sending to it.
+          const left =
+            place === null ||
+            (await leavePlace(place, network).then(
+              () => true,
+              () => false,
+            ));
+          save(left ? { beta: null, destination: away } : { destination: away });
         },
+        // The Cloud place's, wherever transcription runs now: its plan and its pages go with it.
         quota: async () => {
-          const settings = computeSettings(db);
-          if (settings.destination === "device") return null;
-          const link = settings[settings.destination];
+          const link = computeSettings(db).beta;
           if (link === null) return null;
           const quota = await readQuota(link, network).catch(() => null);
           const left =

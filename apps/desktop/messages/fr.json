@@ -1554,7 +1554,6 @@
   "compute_beta_honour": "Nous nous engageons sur l’honneur à ne pas lire ni écouter vos données, et elles ne servent à entraîner aucun modèle.",
   "compute_beta_invite_label": "Lien ou code d’invitation (optionnel)",
   "compute_beta_later": "Pas maintenant",
-  "compute_beta_leave": "Rendre ma place dans la bêta",
   "compute_beta_others": "L’audio contient aussi la voix de vos interlocuteurs. Ce serveur n’est pas réservé à Sondine : des agents logiciels de Synapsr y ont un accès administrateur et pourraient, eux aussi, techniquement accéder à l’audio et au texte pendant la transcription. Le serveur garde la date du dernier usage, la durée transcrite et, si vous vous abonnez, vos identifiants de client et d’abonnement chez Stripe. Cloudflare transporte la connexion et voit votre adresse IP, pas l’audio.",
   "compute_beta_secure": "Vous voulez un cloud sécurisé, auquel même nous n’avons pas accès ?",
   "compute_beta_title": "Cloud Sondine",

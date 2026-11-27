@@ -64,9 +64,8 @@ function useFormat() {
 export function CloudSection() {
   const format = useFormat();
   // The plan as it was when a Stripe page opened; null when nothing is awaited.
-  const [waiting, setWaiting] = useState<{ readonly since: number; readonly was: string } | null>(
-    null,
-  );
+  // What the plan said when a Stripe page opened; null when nothing is awaited.
+  const [waiting, setWaiting] = useState<string | null>(null);
   const quota = useQuery({
     ...orpc.compute.quota.queryOptions(),
     retry: false,
@@ -75,12 +74,20 @@ export function CloudSection() {
   });
   const open = useMutation(orpc.compute.openBilling.mutationOptions());
   const reference = useQuery(orpc.compute.get.queryOptions()).data?.beta.reference ?? null;
-  const snapshot = quota.data == null ? null : JSON.stringify(quota.data);
+  // What a payment changes: the plan, the top-ups, the subscription; not the hours used.
+  const paid =
+    quota.data == null
+      ? null
+      : JSON.stringify([quota.data.plan, quota.data.extraSeconds, quota.data.subscription]);
 
   useEffect(() => {
+    if (waiting !== null && paid !== waiting) setWaiting(null);
+  }, [paid, waiting]);
+  useEffect(() => {
     if (waiting === null) return;
-    if (snapshot !== waiting.was || Date.now() - waiting.since > WAIT_MS) setWaiting(null);
-  }, [snapshot, waiting]);
+    const deadline = setTimeout(() => setWaiting(null), WAIT_MS);
+    return () => clearTimeout(deadline);
+  }, [waiting]);
 
   if (quota.data == null) {
     return quota.isError ? (
@@ -93,7 +100,7 @@ export function CloudSection() {
       { page, locale: format.locale === "fr" ? "fr" : "en" },
       {
         onSuccess: ({ outcome }) => {
-          if (outcome === "opened") setWaiting({ since: Date.now(), was: snapshot ?? "" });
+          if (outcome === "opened") setWaiting(paid ?? "");
         },
       },
     );

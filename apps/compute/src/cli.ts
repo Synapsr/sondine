@@ -15,7 +15,7 @@ import {
 } from "@sondine/engines";
 import { formatServerLink, parseEndpoint, QuotaPlan } from "@sondine/engines/remote";
 import { BillingService } from "./billing.ts";
-import { ClientStore, planOf, TOPUP_SECONDS } from "./clients.ts";
+import { ClientStore, planOf, SERVING_BEAT_MS, TOPUP_SECONDS } from "./clients.ts";
 import { createComputeServer } from "./server.ts";
 import { Sessions } from "./sessions.ts";
 import { createStripeHttp } from "./stripe.ts";
@@ -53,8 +53,8 @@ Payment, for a server that sells its Cloud (ADR 047); all three, or none:
   SONDINE_COMPUTE_STRIPE_WEBHOOK_SECRET  the webhook's signing secret; Stripe calls PUBLIC_URL/v1/stripe
   SONDINE_COMPUTE_PUBLIC_URL             this server's public address, where Stripe sends the browser back
   SONDINE_COMPUTE_STRIPE_PORTAL          a customer portal configuration (bpc_…), optional
-  SONDINE_COMPUTE_TERMS_URL              the terms Checkout links to, in English (default https://sondine.app/terms)
-  SONDINE_COMPUTE_TERMS_URL_FR           the same in French (default https://sondine.app/fr/terms)
+  SONDINE_COMPUTE_TERMS_URL              the dated terms Checkout links to, in English (default https://sondine.app/terms/2026-11-27)
+  SONDINE_COMPUTE_TERMS_URL_FR           the same in French (default https://sondine.app/fr/terms/2026-11-27)
 `;
 
 export interface CliIo {
@@ -150,8 +150,9 @@ function billingFrom(
     webhookSecret,
     publicUrl,
     termsUrl: {
-      en: env["SONDINE_COMPUTE_TERMS_URL"] ?? "https://sondine.app/terms",
-      fr: env["SONDINE_COMPUTE_TERMS_URL_FR"] ?? "https://sondine.app/fr/terms",
+      // A fixed version: what a buyer accepts never changes under them.
+      en: env["SONDINE_COMPUTE_TERMS_URL"] ?? "https://sondine.app/terms/2026-11-27",
+      fr: env["SONDINE_COMPUTE_TERMS_URL_FR"] ?? "https://sondine.app/fr/terms/2026-11-27",
     },
     ...(portal === undefined || portal === "" ? {} : { portalConfiguration: portal }),
     log,
@@ -250,6 +251,10 @@ export async function runCli(args: readonly string[], io: CliIo = {}): Promise<n
         const listen = /^(.*):(\d+)$/.exec(env("LISTEN", "127.0.0.1:8443"));
         if (listen?.[1] === undefined)
           throw new CliError("SONDINE_COMPUTE_LISTEN is not address:port");
+        // `rekey` moves a place's files: it waits for no server to run on them.
+        clients.beat();
+        const beat = setInterval(() => clients.beat(), SERVING_BEAT_MS);
+        beat.unref();
         server.listen(Number(listen[2]), listen[1], () =>
           log("listening", { places, wave: clients.wave().places, billing: billing ? 1 : 0 }),
         );
@@ -257,6 +262,8 @@ export async function runCli(args: readonly string[], io: CliIo = {}): Promise<n
         const stop = () => {
           if (stopping) return;
           stopping = true;
+          clearInterval(beat);
+          clients.stopped();
           server.close();
           server.closeAllConnections();
           void sessions.stop().finally(() => process.exit(0));
@@ -361,6 +368,11 @@ export async function runCli(args: readonly string[], io: CliIo = {}): Promise<n
         const endpoint = parseEndpoint(values.endpoint ?? "");
         if (endpoint === null) {
           throw new CliError("sondine-compute rekey ID --endpoint https://address");
+        }
+        if (clients.serving()) {
+          throw new CliError(
+            "stop the server first (docker compose stop compute): it writes the files rekey moves",
+          );
         }
         const moved = clients.rekey(resolveId(clients, argument));
         if (moved === null) throw new CliError("no such Mac (see list)");
