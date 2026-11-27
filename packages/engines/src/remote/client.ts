@@ -8,6 +8,8 @@ import {
   PROLOGUE,
   PROTOCOL_VERSION,
   type AsrJob,
+  type BillingItem,
+  type BillingLocale,
   type QuotaSnapshot,
   type RefusalCode,
   type ServerLink,
@@ -34,6 +36,8 @@ const refusals: Readonly<Record<RefusalCode, EngineErrorCode>> = {
   busy: "server_busy",
   quota: "quota_exhausted",
   clock: "server_mismatch",
+  not_allowed: "server_mismatch",
+  billing_unavailable: "network_unavailable",
   bad_request: "server_mismatch",
 };
 
@@ -80,6 +84,15 @@ export async function exchange(
 
 export type OpenRequest =
   | { readonly kind: "claim" }
+  | { readonly kind: "wave" }
+  | { readonly kind: "trial" }
+  | {
+      readonly kind: "checkout";
+      readonly token: string;
+      readonly item: BillingItem;
+      readonly locale: BillingLocale;
+    }
+  | { readonly kind: "portal"; readonly token: string; readonly locale: BillingLocale }
   | { readonly kind: "hello"; readonly token: string }
   | { readonly kind: "quota"; readonly token: string }
   | { readonly kind: "leave"; readonly token: string }
@@ -160,8 +173,56 @@ export async function readQuota(
 ): Promise<QuotaSnapshot> {
   const { reply } = await open(link, { kind: "quota", token: link.token }, options);
   if (reply.kind !== "quota") throw new EngineError("server_mismatch", "not a quota");
-  const { plan, period, usedSeconds, limitSeconds, extraSeconds } = reply;
-  return { plan, period, usedSeconds, limitSeconds, extraSeconds };
+  const { kind: _kind, ...snapshot } = reply;
+  return snapshot;
+}
+
+/** How full the server's wave is (ADR 047); `RefusedError("closed")` when it has none. */
+export async function readWave(
+  server: ServerAddress,
+  options: Parameters<typeof open>[2] = {},
+): Promise<{ readonly percent: number; readonly full: boolean }> {
+  const { reply } = await open(server, { kind: "wave" }, options);
+  if (reply.kind !== "wave") throw new EngineError("server_mismatch", "not a wave");
+  return { percent: reply.percent, full: reply.full };
+}
+
+/** Takes a place of the wave with its trial; `RefusedError("full")` when none is left. */
+export async function startTrial(
+  server: ServerAddress,
+  options: Parameters<typeof open>[2] = {},
+): Promise<string> {
+  const { reply } = await open(server, { kind: "trial" }, options);
+  if (reply.kind !== "claimed") throw new EngineError("server_mismatch", "not a place");
+  return reply.token;
+}
+
+/** Only Stripe's own pages: anything else a server answers is refused. */
+export function isStripePage(url: string): boolean {
+  if (!URL.canParse(url)) return false;
+  const parsed = new URL(url);
+  return (
+    parsed.protocol === "https:" &&
+    (parsed.hostname === "checkout.stripe.com" || parsed.hostname === "billing.stripe.com") &&
+    parsed.username === "" &&
+    parsed.password === "" &&
+    parsed.port === ""
+  );
+}
+
+/** The Stripe page that buys `item` for this place, or its customer portal. */
+export async function billingPage(
+  link: ServerLink,
+  page:
+    | { readonly kind: "checkout"; readonly item: BillingItem; readonly locale: BillingLocale }
+    | { readonly kind: "portal"; readonly locale: BillingLocale },
+  options: Parameters<typeof open>[2] = {},
+): Promise<string> {
+  const { reply } = await open(link, { ...page, token: link.token }, options);
+  if (reply.kind !== "page" || !isStripePage(reply.url)) {
+    throw new EngineError("server_mismatch", "not a Stripe page");
+  }
+  return reply.url;
 }
 
 /** Takes one of the beta's places; `RefusedError("full")` when none is left. */
