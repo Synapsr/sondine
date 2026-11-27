@@ -33,7 +33,7 @@ The card needs about 3.7 GB free, plus 0.72 GB for each expert layer it keeps; t
 
 ## Install the server (Linux)
 
-You need Linux x86-64 (glibc 2.34 or later), Node 24, the NVIDIA driver, `libvulkan1` and 25 GB of disk. The exact commands (engine, model, service at startup) are in [`apps/compute/README.md`](../../../apps/compute/README.md). The server checks the model's fingerprint at each start and refuses any other file.
+You need Linux x86-64 (glibc 2.34 or later), Node 24, the NVIDIA driver, `libvulkan1` and 25 GB of disk. The exact commands (engine, model, service at startup, or a Docker container with the NVIDIA Container Toolkit) are in [`apps/compute/README.md`](../../../apps/compute/README.md). The server checks the model's fingerprint at each start and refuses any other file.
 
 Have it listen on its **Tailscale** address (`tailscale ip -4`): nothing is exposed to the internet. On a local network, its local address works too.
 
@@ -41,7 +41,7 @@ Have it listen on its **Tailscale** address (`tailscale ip -4`): nothing is expo
 
 1. On the machine: `node sondine-compute.js add "Marie's Mac" --endpoint http://100.x.y.z:8443`.
 2. Copy the line it prints. It holds that Mac's token: send it as you would a password.
-3. In Sondine: **Settings ▸ Transcription ▸ Your machine**, paste the line, **Connect**.
+3. In Sondine: **Settings ▸ Transcription ▸ Your machine** (or **Your machine** at the first run), paste the line, **Connect**.
 
 `list` shows the Macs and their hours this month; `remove` takes access away at once. In Sondine, **This Mac** stops what is leaving, and **Forget this machine** erases the link.
 
@@ -55,4 +55,4 @@ The same program, with the macOS archive of `speech.cpp` 0.9.3. **Not tried yet.
 - **Several Macs:** one request at a time, each in turn.
 - **Deletion:** what is leaving stops within about a second. What already left cannot be called back; the server forgets it on cancellation, or ten minutes after it last heard from your Mac or finished transcribing.
 - **Network:** audio leaves uncompressed, about 115 MB per hour (1 min 30 s at 10 Mbps).
-- **Card:** the model frees it after three minutes without work (`SONDINE_COMPUTE_IDLE_UNLOAD_SEC` on the server).
+- **Card:** the model frees it after three minutes without work. `SONDINE_COMPUTE_IDLE_UNLOAD_SEC` on the server changes that delay, and `0` keeps the model loaded, so a conversation starts at once.

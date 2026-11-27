@@ -33,7 +33,7 @@ La carte a besoin d'environ 3,7 Go libres, plus 0,72 Go par couche d'experts qu'
 
 ## Installer le serveur (Linux)
 
-Il faut Linux x86-64 (glibc 2.34 ou plus), Node 24, le pilote NVIDIA, `libvulkan1` et 25 Go de disque. Les commandes exactes (moteur, modèle, service au démarrage) sont dans [`apps/compute/README.md`](../../../apps/compute/README.md). Le serveur vérifie l'empreinte du modèle à chaque démarrage et refuse un autre fichier.
+Il faut Linux x86-64 (glibc 2.34 ou plus), Node 24, le pilote NVIDIA, `libvulkan1` et 25 Go de disque. Les commandes exactes (moteur, modèle, service au démarrage, ou conteneur Docker avec le NVIDIA Container Toolkit) sont dans [`apps/compute/README.md`](../../../apps/compute/README.md). Le serveur vérifie l'empreinte du modèle à chaque démarrage et refuse un autre fichier.
 
 Faites-le écouter sur son adresse **Tailscale** (`tailscale ip -4`) : rien n'est exposé sur Internet. Sur un réseau local, son adresse locale convient aussi.
 
@@ -41,7 +41,7 @@ Faites-le écouter sur son adresse **Tailscale** (`tailscale ip -4`) : rien n'es
 
 1. Sur la machine : `node sondine-compute.js add "Mac de Marie" --endpoint http://100.x.y.z:8443`.
 2. Copiez la ligne affichée. Elle contient le jeton de ce Mac : envoyez-la comme un mot de passe.
-3. Dans Sondine : **Réglages ▸ Transcription ▸ Votre machine**, collez la ligne, **Connecter**.
+3. Dans Sondine : **Réglages ▸ Transcription ▸ Votre machine** (ou **Votre machine** au premier lancement), collez la ligne, **Connecter**.
 
 `list` montre les Mac et leurs heures du mois ; `remove` retire un accès aussitôt. Dans Sondine, **Ce Mac** arrête ce qui part, et **Oublier cette machine** efface le lien.
 
@@ -55,4 +55,4 @@ Le même programme, avec l'archive macOS de `speech.cpp` 0.9.3. **Pas encore ess
 - **Plusieurs Mac :** une demande à la fois, chacun son tour.
 - **Suppression :** ce qui part s'arrête en une seconde environ. Ce qui est déjà parti ne se rappelle pas ; le serveur l'oublie à l'annulation, ou dix minutes après avoir entendu votre Mac ou fini de transcrire.
 - **Réseau :** l'audio part sans compression, environ 115 Mo par heure (1 min 30 à 10 Mbit/s).
-- **Carte :** le modèle la libère après trois minutes sans demande (`SONDINE_COMPUTE_IDLE_UNLOAD_SEC` sur le serveur).
+- **Carte :** le modèle la libère après trois minutes sans demande. `SONDINE_COMPUTE_IDLE_UNLOAD_SEC` sur le serveur change ce délai, et `0` garde le modèle chargé, pour qu'une conversation démarre tout de suite.
