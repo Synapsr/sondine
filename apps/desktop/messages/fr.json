@@ -451,6 +451,7 @@
     }
   ],
   "search_reset": "Réinitialiser",
+  "search_clear": "Vider la recherche",
   "search_results": "Résultats",
   "search_size": "Taille",
   "search_size_conversations": "Conversations",
