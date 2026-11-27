@@ -1543,6 +1543,8 @@
   "backup_restored_download": "Télécharger",
   "backup_restored_later": "Plus tard",
   "backup_restored_resume": "Reprendre l’écoute",
+  "backup_swap_failed_title": "La restauration n’a pas pu se terminer",
+  "backup_swap_failed_detail": "Sondine s’arrête pour ne rien perdre : les données sont restées telles quelles dans {folder}. Écrivez-nous avant de relancer Sondine.",
   "settings_tab_statistics": "Statistiques",
   "stats_week_speech": "Parole, 7 jours",
   "stats_week_conversations": "Conversations, 7 jours",

@@ -33,7 +33,7 @@ import { Models } from "../models/models-layer";
 import { Retention } from "../retention/retention";
 import { CoreState } from "../status/core-state";
 import { WrongPassphrase } from "./backup-crypto";
-import { BackupNoSpace, BackupStale, writeExport } from "./backup-export";
+import { BackupNoSpace, BackupStale, cleanInterruptedExport, writeExport } from "./backup-export";
 import {
   BACKUP_EXTENSION,
   BackupFormatError,
@@ -62,6 +62,12 @@ export interface BackupService {
   cancel(): void;
   deletePrevious(): BackupStatus;
   closeNote(): BackupStatus;
+  /**
+   * Something the backup holds was deleted (a person, a discussion, a tag, a
+   * word, an added item, the voice read): an export under way stops, as for
+   * `Status.deletions`.
+   */
+  noteRemoval(): void;
   /** Main's answer to `backup-save`. */
   receiveSavePath(requestId: string, path: string | null): void;
 }
@@ -143,10 +149,8 @@ export const backupLayer = Layer.effect(
     const operation = yield* SubscriptionRef.make<BackupOperation>(idle);
     const dataDir = config.dataDir;
 
-    // A copy of the database a stopped export left behind goes at each start.
-    if (dataDir !== "" && config.databasePath !== ":memory:") {
-      rmSync(join(dataDir, DATA_LAYOUT.backupWorkDir), { recursive: true, force: true });
-    }
+    // What an export left when core died (its `.partial`, the database's copy) goes at each start.
+    if (dataDir !== "" && config.databasePath !== ":memory:") cleanInterruptedExport(dataDir);
 
     let migrations: readonly Migration[] | null = null;
     const knownMigrations = () => (migrations ??= readMigrations(config.migrationsDir));
@@ -259,7 +263,8 @@ export const backupLayer = Layer.effect(
         main.post({ type: "backup-save", requestId, fileName: backupFileName(Date.now()) });
       });
 
-    const deletions = () => Effect.runSync(SubscriptionRef.get(state.status)).deletions;
+    let removals = 0;
+    const deletions = () => Effect.runSync(SubscriptionRef.get(state.status)).deletions + removals;
 
     const installedModels = () =>
       Effect.runSync(SubscriptionRef.get(models.status))
@@ -442,6 +447,9 @@ export const backupLayer = Layer.effect(
       closeNote: () => {
         dismissRestoredNote(db);
         return status();
+      },
+      noteRemoval: () => {
+        removals += 1;
       },
       receiveSavePath: (requestId, path) => pending.get(requestId)?.(path),
     });

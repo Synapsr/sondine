@@ -1,5 +1,14 @@
 import { randomUUID } from "node:crypto";
-import { existsSync, mkdirSync, readdirSync, rmSync, statfsSync, statSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statfsSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
 import { open, rename, rm } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import {
@@ -23,6 +32,31 @@ import { LAN_FILES, RENDERER_FILE } from "./backup-names";
 // one after another, each archive file with only the bytes of the chunks the
 // copy still holds. The file is written beside its destination and renamed
 // once complete.
+
+/** In `backup-work/`: the `.partial` file an export is writing, outside the data folder. */
+export const PARTIAL_RECORD = "partial.json";
+
+/**
+ * At core's start: removes the `.partial` file an export left when core
+ * died, then the work folder (the database's copy).
+ */
+export function cleanInterruptedExport(dataDir: string): void {
+  const workDir = join(dataDir, DATA_LAYOUT.backupWorkDir);
+  try {
+    const record: unknown = JSON.parse(readFileSync(join(workDir, PARTIAL_RECORD), "utf8"));
+    const partial =
+      typeof record === "object" && record !== null
+        ? (record as { partial?: unknown }).partial
+        : null;
+    // Only a file this code names: `<…>.sondine.partial`.
+    if (typeof partial === "string" && partial.endsWith(".sondine.partial")) {
+      rmSync(partial, { force: true });
+    }
+  } catch {
+    // No export was under way.
+  }
+  rmSync(workDir, { recursive: true, force: true });
+}
 
 export class BackupStale extends Error {
   override readonly name = "BackupStale";
@@ -145,6 +179,7 @@ export async function writeExport(input: ExportInput): Promise<{ readonly bytes:
   mkdirSync(workDir, { recursive: true, mode: 0o700 });
   const copyPath = join(workDir, `${randomUUID()}.db`);
   const partial = `${input.path}.partial`;
+  const recordPath = join(workDir, PARTIAL_RECORD);
   let writer: BackupWriter | null = null;
   try {
     await snapshotDatabase(input.db, copyPath);
@@ -202,6 +237,8 @@ export async function writeExport(input: ExportInput): Promise<{ readonly bytes:
     if (free < needed) throw new BackupNoSpace(needed, free);
 
     await rm(partial, { force: true });
+    // Should core die while it writes, its next start removes this file.
+    writeFileSync(recordPath, JSON.stringify({ partial }), { mode: 0o600 });
     writer = await BackupWriter.create({
       path: partial,
       passphrase: input.passphrase,
@@ -225,15 +262,22 @@ export async function writeExport(input: ExportInput): Promise<{ readonly bytes:
       await writer.addFile(entry.name, entry.size, entry.read(), entry.mtimeMs);
     }
     await writer.finish();
+    input.signal?.throwIfAborted();
     if (!input.stillCurrent()) throw new BackupStale("something was deleted");
     await rename(partial, input.path);
     writer = null;
+    // A deletion during the rename: the file just published goes.
+    if (!input.stillCurrent()) {
+      await rm(input.path, { force: true });
+      throw new BackupStale("something was deleted");
+    }
     return { bytes: statSync(input.path).size };
   } catch (error) {
     await writer?.abort();
     await rm(partial, { force: true });
     throw error;
   } finally {
+    rmSync(recordPath, { force: true });
     for (const suffix of ["", "-wal", "-shm", "-journal"]) {
       rmSync(`${copyPath}${suffix}`, { force: true });
     }

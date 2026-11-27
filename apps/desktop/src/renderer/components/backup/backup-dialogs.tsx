@@ -32,7 +32,9 @@ import { generatePassphrase, readRendererPrefs } from "./backup-prefs";
 // without one; then a save panel, and the progress with « Annuler ».
 // « Restaurer une sauvegarde »: an open panel, the passphrase if it has one,
 // what it holds, then « Remplacer » (in Settings, after saying what is kept
-// aside) and the progress; Sondine relaunches on it.
+// aside) and the progress; Sondine relaunches on it. The passphrase lives in
+// the dialog's state and its calls' variables only: closing the dialog drops
+// both (gcTime 0).
 
 const MIN_PASSPHRASE = 12;
 const popupClassName = "w-[min(32rem,calc(100vw-var(--space-xl)))]";
@@ -87,7 +89,7 @@ function ExportForm({ onClose }: { onClose: () => void }) {
   const [passphrase, setPassphrase] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [shown, setShown] = useState(false);
-  const run = useMutation(orpc.backup.export.mutationOptions());
+  const run = useMutation(orpc.backup.export.mutationOptions({ gcTime: 0 }));
   const cancel = useMutation(orpc.backup.cancel.mutationOptions());
   const estimate = status.data?.estimate;
   const operation = status.data?.operation ?? { kind: "idle" };
@@ -334,8 +336,8 @@ function RestoreFlow({ replaces }: { replaces: boolean }) {
   const { locale } = useLocale();
   const status = useBackupStatus();
   const choose = useMutation(orpc.backup.choose.mutationOptions());
-  const inspect = useMutation(orpc.backup.inspect.mutationOptions());
-  const restore = useMutation(orpc.backup.restore.mutationOptions());
+  const inspect = useMutation(orpc.backup.inspect.mutationOptions({ gcTime: 0 }));
+  const restore = useMutation(orpc.backup.restore.mutationOptions({ gcTime: 0 }));
   const cancel = useMutation(orpc.backup.cancel.mutationOptions());
   const [passphrase, setPassphrase] = useState("");
   const operation = status.data?.operation ?? { kind: "idle" };

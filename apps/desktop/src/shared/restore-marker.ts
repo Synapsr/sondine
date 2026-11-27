@@ -22,6 +22,11 @@ export const RestoreMarker = z.strictObject({
   stamp: z.string().regex(/^\d{8}-\d{6}$/),
   /** `staged`: nothing moved yet; `out`: the current data is moving aside; `in`: the staging is moving in. */
   phase: z.enum(["staged", "out", "in"]),
+  /** What the staging holds, written by core: every one of them must end in the data folder. */
+  items: z
+    .array(z.enum(RESTORED_ITEMS))
+    .min(1)
+    .refine((items) => new Set(items).size === items.length),
 });
 export type RestoreMarker = z.output<typeof RestoreMarker>;
 

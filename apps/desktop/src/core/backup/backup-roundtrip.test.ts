@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import {
+  appendFileSync,
   existsSync,
   mkdirSync,
   mkdtempSync,
@@ -28,8 +29,14 @@ import {
 } from "@sondine/db";
 import { afterEach, describe, expect, it } from "vitest";
 import { DATA_LAYOUT } from "../../shared/data-layout";
-import { applyStagedRestore } from "../../main/restore-swap";
-import { BackupStale, writeExport, zeroOutside } from "./backup-export";
+import { applyStagedRestore, RestoreSwapError } from "../../main/restore-swap";
+import {
+  BackupStale,
+  cleanInterruptedExport,
+  PARTIAL_RECORD,
+  writeExport,
+  zeroOutside,
+} from "./backup-export";
 import { RestoreRefused, stageRestore } from "./backup-restore";
 import { WrongPassphrase } from "./backup-crypto";
 
@@ -291,19 +298,134 @@ describe("a backup's round trip", () => {
     // The crash: the old database was moved aside, the marker said « out », nothing moved in.
     const marker = JSON.parse(readFileSync(join(target, DATA_LAYOUT.restoreMarker), "utf8")) as {
       stamp: string;
+      items: string[];
     };
     const aside = join(target, DATA_LAYOUT.beforeRestoreDir, marker.stamp);
     mkdirSync(aside, { recursive: true });
     renameSync(join(target, DATA_LAYOUT.database), join(aside, DATA_LAYOUT.database));
     writeFileSync(
       join(target, DATA_LAYOUT.restoreMarker),
-      JSON.stringify({ stamp: marker.stamp, phase: "out" }),
+      JSON.stringify({ ...marker, phase: "out" }),
     );
     expect(applyStagedRestore(target)).toMatchObject({ kind: "swapped" });
     expect(readFileSync(join(aside, DATA_LAYOUT.database), "utf8")).toBe("old database");
     const db = openDatabase(join(target, DATA_LAYOUT.database));
     expect(restoredNote(db)).not.toBeNull();
     db.close();
+  });
+
+  /** A staged restore over a data folder holding an « old database ». */
+  async function stagedOver(): Promise<{ target: string; marker: Record<string, unknown> }> {
+    const source = tempDir("source");
+    const seeded = seed(source);
+    const path = join(tempDir("out"), "Sondine.sondine");
+    await exportTo(seeded, source, path, null);
+    seeded.db.close();
+    const target = tempDir("target");
+    writeFileSync(join(target, DATA_LAYOUT.database), "old database");
+    await stageRestore({
+      path,
+      passphrase: null,
+      dataDir: target,
+      migrations,
+      nowMs: t0,
+      freeBytes: () => 1e12,
+    });
+    const marker = JSON.parse(
+      readFileSync(join(target, DATA_LAYOUT.restoreMarker), "utf8"),
+    ) as Record<string, unknown>;
+    return { target, marker };
+  }
+
+  it("stops, moving nothing more, when the data it would replace was not set aside", async () => {
+    const { target, marker } = await stagedOver();
+    // « in » while the old database is still in place: replacing it would lose it.
+    writeFileSync(
+      join(target, DATA_LAYOUT.restoreMarker),
+      JSON.stringify({ ...marker, phase: "in" }),
+    );
+    expect(() => applyStagedRestore(target)).toThrow(RestoreSwapError);
+    expect(readFileSync(join(target, DATA_LAYOUT.database), "utf8")).toBe("old database");
+    expect(existsSync(join(target, DATA_LAYOUT.restoreStagingDir, DATA_LAYOUT.database))).toBe(
+      true,
+    );
+  });
+
+  it("never replaces what an earlier attempt set aside", async () => {
+    const { target, marker } = await stagedOver();
+    const aside = join(target, DATA_LAYOUT.beforeRestoreDir, String(marker["stamp"]));
+    mkdirSync(aside, { recursive: true });
+    writeFileSync(join(aside, DATA_LAYOUT.database), "set aside before");
+    expect(() => applyStagedRestore(target)).toThrow(RestoreSwapError);
+    expect(readFileSync(join(aside, DATA_LAYOUT.database), "utf8")).toBe("set aside before");
+    expect(readFileSync(join(target, DATA_LAYOUT.database), "utf8")).toBe("old database");
+  });
+
+  it("keeps everything as it is when the marker is unreadable", async () => {
+    const { target } = await stagedOver();
+    writeFileSync(join(target, DATA_LAYOUT.restoreMarker), "{ not json");
+    expect(() => applyStagedRestore(target)).toThrow(RestoreSwapError);
+    expect(existsSync(join(target, DATA_LAYOUT.restoreStagingDir, DATA_LAYOUT.database))).toBe(
+      true,
+    );
+    expect(readFileSync(join(target, DATA_LAYOUT.database), "utf8")).toBe("old database");
+  });
+
+  it("lets a late cancel win: no marker, no staging", async () => {
+    const source = tempDir("source");
+    const seeded = seed(source);
+    const path = join(tempDir("out"), "Sondine.sondine");
+    await exportTo(seeded, source, path, null);
+    seeded.db.close();
+    const target = tempDir("target");
+    const abort = new AbortController();
+    await expect(
+      stageRestore({
+        path,
+        passphrase: null,
+        dataDir: target,
+        migrations,
+        nowMs: t0,
+        freeBytes: () => 1e12,
+        signal: abort.signal,
+        // Cancelled as the last frame is read.
+        onProgress: (done, total) => (done === total ? abort.abort() : undefined),
+      }),
+    ).rejects.toThrow();
+    expect(existsSync(join(target, DATA_LAYOUT.restoreStagingDir))).toBe(false);
+  });
+
+  it("refuses bytes appended after the last frame", async () => {
+    const source = tempDir("source");
+    const seeded = seed(source);
+    const path = join(tempDir("out"), "Sondine.sondine");
+    await exportTo(seeded, source, path, PASSPHRASE);
+    seeded.db.close();
+    appendFileSync(path, "trailing");
+    await expect(
+      stageRestore({
+        path,
+        passphrase: PASSPHRASE,
+        dataDir: tempDir("target"),
+        migrations,
+        nowMs: t0,
+        freeBytes: () => 1e12,
+      }),
+    ).rejects.toMatchObject({ reason: "damaged" });
+  });
+
+  it("removes at start the partial file of an export core did not finish", () => {
+    const data = tempDir("data");
+    const partial = join(tempDir("out"), "Sondine.sondine.partial");
+    writeFileSync(partial, "half a backup");
+    mkdirSync(join(data, DATA_LAYOUT.backupWorkDir), { recursive: true });
+    writeFileSync(
+      join(data, DATA_LAYOUT.backupWorkDir, PARTIAL_RECORD),
+      JSON.stringify({ partial }),
+    );
+    cleanInterruptedExport(data);
+    expect(existsSync(partial)).toBe(false);
+    expect(existsSync(join(data, DATA_LAYOUT.backupWorkDir))).toBe(false);
   });
 
   it("discards a staging no marker vouches for", () => {

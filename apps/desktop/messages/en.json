@@ -1552,6 +1552,8 @@
   "backup_restored_download": "Download",
   "backup_restored_later": "Later",
   "backup_restored_resume": "Resume listening",
+  "backup_swap_failed_title": "The restore could not finish",
+  "backup_swap_failed_detail": "Sondine stops so that nothing is lost: the data stayed as it is in {folder}. Write to us before opening Sondine again.",
   "settings_tab_statistics": "Statistics",
   "stats_week_speech": "Speech, 7 days",
   "stats_week_conversations": "Conversations, 7 days",
