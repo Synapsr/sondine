@@ -39,7 +39,7 @@ const radioClassName = cn(
 
 const dotClassName = cn(
   "pointer-events-none absolute inset-[30%] corner-full",
-  "bg-neutral-1 dark:bg-neutral-10 ring-none ring-neutral-4-transparent",
+  "bg-neutral-1 ring-none ring-neutral-4-transparent",
   "data-disabled:bg-neutral-6",
   "transition-[opacity,background-color] duration-motion ease-motion motion-reduce:transition-none",
   "data-starting-style:opacity-0 data-ending-style:opacity-0",
