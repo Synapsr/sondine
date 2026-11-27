@@ -64,7 +64,7 @@ bubble. The values are Simple Icons' (CC0). They live as brand tokens in
 color stays a theme role, and the theme's red stays for errors and
 recording. White fills YouTube's triangle and Twitch's bubble so each mark
 reads the same on both grounds. The marks are decorative, the site's name
-always beside them; their contrast with the canvas and its tiles is 3.6 to
+always beside them; their contrast with the canvas and its tiles is 3.4 to
 4.6:1 for YouTube and Twitch, and 2.1 to 2.3:1 for Vimeo's blue in light
 (7.9:1 in dark).
 
