@@ -154,6 +154,20 @@ const launcherLayer = Layer.effect(
  * runtime runs every finalizer: the helper socket, the span file and the
  * database close in reverse order.
  */
+/**
+ * A development build only (`SONDINE_DEV_CLOUD`, `endpoint key`): the Cloud of
+ * a local `sondine-compute` instead of `cloud.sondine.app`, for the captures
+ * (`ux:shots --cloud`) and for trying the Cloud's payment in Stripe's test
+ * mode. A packaged app never reads it.
+ */
+function developmentCompute(config: CoreConfigShape): ComputeOptions | undefined {
+  const given = process.env["SONDINE_DEV_CLOUD"];
+  if (config.updates.blocked !== "development" || given === undefined) return undefined;
+  const [endpoint, serverKey] = given.split(" ");
+  if (endpoint === undefined || serverKey === undefined) return undefined;
+  return { beta: { endpoint, serverKey } };
+}
+
 export function coreLayer(
   config: CoreConfigShape,
   main: MainChannelService,
@@ -175,7 +189,7 @@ export function coreLayer(
     importerLayer,
     statusProjectionLayer,
     modelsLayer(options.models),
-    computeLayer(options.compute),
+    computeLayer(options.compute ?? developmentCompute(config)),
     agentAccessLayer,
     chatKeysLayer,
   ).pipe(Layer.provideMerge(infrastructure));

@@ -19,6 +19,7 @@
     "messages": "node scripts/compile-messages.mjs",
     "icons:tray": "node scripts/generate-tray-icons.mjs",
     "ux:shots": "node scripts/ux/shots.ts",
+    "ux:cloud-shots": "node scripts/ux/cloud-shots.ts",
     "ux:header": "node scripts/ux/header-geometry.ts",
     "typecheck": "node scripts/compile-messages.mjs && tsc -p tsconfig.json && tsc -p src/renderer/tsconfig.json",
     "test": "node scripts/compile-messages.mjs && vitest run && vitest run --config vitest.build.config.ts",
