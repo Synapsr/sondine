@@ -1,12 +1,12 @@
 /*
- * Allo, a variable font (opsz 9–32, wght 100–900, ROND 0–100). License and
- * provenance: ../fonts/. The file has no oblique; italics are synthesized
- * (see base.css).
+ * Allo at roundness 0, as on the site: a variable font (opsz 9–32, wght
+ * 100–900), its ROND axis set to 0. License and provenance: ../fonts/. The
+ * file has no oblique; italics are synthesized (see base.css).
  */
 
 @font-face {
   font-family: "Allo";
-  src: url("../fonts/AlloVariable.woff2") format("woff2");
+  src: url("../fonts/AlloRound0.woff2") format("woff2");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;

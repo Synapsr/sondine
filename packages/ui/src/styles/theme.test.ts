@@ -103,7 +103,7 @@ describe("Tailwind mapping", () => {
       '--font-body: "Allo", sans-serif',
       "--tracking-xl: 0.02em",
       "--radius-full: 9999px",
-      "--neutral-1: #000000",
+      "--neutral-1: #141416",
     ]) {
       expect(output).toContain(declaration);
     }
