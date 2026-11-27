@@ -1,4 +1,10 @@
-import type { EpisodeContext, EpisodeSize, SearchEpisode, SearchHit } from "@sondine/api";
+import type {
+  EpisodeContext,
+  EpisodeSize,
+  SearchEpisode,
+  SearchHit,
+  SearchInput,
+} from "@sondine/api";
 import { ImportedList } from "../imports/imported-list";
 import { cn } from "@sondine/ui";
 import { Button } from "@sondine/ui/components/button";
@@ -16,7 +22,7 @@ import {
   MenuSeparator,
   MenuTrigger,
 } from "@sondine/ui/components/menu";
-import { ChevronDownIcon, ChevronRightIcon, InfoIcon } from "@sondine/ui/icon";
+import { ChevronDownIcon, ChevronRightIcon, InfoIcon, XIcon } from "@sondine/ui/icon";
 import { tagKey } from "@sondine/core/tags";
 import { TagManager } from "./tag-manager";
 import { SearchMenu } from "./search-menu";
@@ -30,7 +36,7 @@ import { clock, contextLabel, dayTitle, sizeLabel, timeRange, voiceName } from "
 import { isRecognized, voiceOf } from "../../lib/voices";
 import { m } from "../../paraglide/messages.js";
 import { filtersOf, type SearchPeriod, type SearchScreenSearch } from "../../routes/search-params";
-import { SEARCH_FIELD_ID } from "./search-field";
+import { focusSearchField, SEARCH_FIELD_ID } from "./search-field";
 import { groupByDay, isFiltered, nextOffset, searchInput } from "./search-view";
 import { AppIcon, EpisodeAppIcon } from "../shell/app-icon";
 import { screenClassName, titleClassName } from "../shell/screen";
@@ -91,24 +97,63 @@ export function SearchScreen() {
   const setFilters = (patch: Partial<SearchScreenSearch>) =>
     void navigate({ search: (previous) => ({ ...previous, ...patch }), replace: true });
 
+  const first = searchInput(params, dayOf(Date.now()), 0);
+  const results = useSearchResults(first);
+  const total = first === null ? 0 : (results.data?.pages[0]?.total ?? 0);
   return (
     <div className={screenClassName}>
-      <h1 className={titleClassName}>{m.nav_search()}</h1>
+      <div className="flex items-center gap-s">
+        <h1 className={cn(titleClassName, "min-w-0 flex-1")}>{m.nav_search()}</h1>
+        {first === null || total === 0 ? null : <SearchMenu input={first} />}
+      </div>
       <div className="flex flex-col gap-s">
-        <Input
-          id={SEARCH_FIELD_ID}
-          type="search"
-          autoFocus
-          aria-label={m.search_label()}
-          placeholder={m.search_placeholder()}
-          // The field's own clear button, in the interface's greys rather than WebKit's blue.
-          className="[&::-webkit-search-cancel-button]:[filter:grayscale(1)]"
-          value={text}
-          onValueChange={(value) => setText(value)}
-        />
+        {/* How many it found, at the field's end before the button that clears it
+            (Téo, 2026-11-27); the results' status says it to a screen reader. */}
+        <div className="relative">
+          <Input
+            id={SEARCH_FIELD_ID}
+            type="search"
+            autoFocus
+            aria-label={m.search_label()}
+            placeholder={m.search_placeholder()}
+            // WebKit's own clear button gives way to ours, after the count;
+            // long words stop before both.
+            className={cn(
+              "[&::-webkit-search-cancel-button]:appearance-none",
+              total > 0 ? "pe-[16rem]" : text === "" ? null : "pe-xxl",
+            )}
+            value={text}
+            onValueChange={(value) => setText(value)}
+          />
+          <div className="absolute inset-y-zero end-xs flex items-center gap-xs">
+            {total === 0 ? null : (
+              <span aria-hidden className="text-body-s text-cte-text-muted">
+                {m.search_total({ count: total })}
+              </span>
+            )}
+            {text === "" ? null : (
+              <Button
+                variant="ghost"
+                size="icon-s"
+                aria-label={m.search_clear()}
+                onClick={() => {
+                  setText("");
+                  focusSearchField();
+                }}
+              >
+                <XIcon />
+              </Button>
+            )}
+          </div>
+        </div>
         <SearchFilters params={params} onChange={setFilters} />
       </div>
-      <Results params={params} onClearFilters={() => setFilters(noFilters)} />
+      <Results
+        params={params}
+        first={first}
+        results={results}
+        onClearFilters={() => setFilters(noFilters)}
+      />
     </div>
   );
 }
@@ -340,16 +385,9 @@ function AppFilter({
   );
 }
 
-function Results({
-  params,
-  onClearFilters,
-}: {
-  params: SearchScreenSearch;
-  onClearFilters: () => void;
-}) {
-  const today = dayOf(Date.now());
-  const first = searchInput(params, today, 0);
-  const results = useInfiniteQuery(
+/** The search's pages, loaded as the list scrolls; nothing before a word. */
+function useSearchResults(first: SearchInput | null) {
+  return useInfiniteQuery(
     orpc.search.query.infiniteOptions({
       input: first === null ? skipToken : (offset: number) => ({ ...first, offset }),
       initialPageParam: 0,
@@ -361,6 +399,20 @@ function Results({
       placeholderData: keepPreviousData,
     }),
   );
+}
+
+function Results({
+  params,
+  first,
+  results,
+  onClearFilters,
+}: {
+  params: SearchScreenSearch;
+  first: SearchInput | null;
+  results: ReturnType<typeof useSearchResults>;
+  onClearFilters: () => void;
+}) {
+  const today = dayOf(Date.now());
   if (first === null) {
     // Before a word: what the search does; with one letter: that it needs one more.
     const typed = params.q?.trim() ?? "";
@@ -388,21 +440,19 @@ function Results({
     <section
       aria-label={m.search_results()}
       aria-busy={results.isFetching}
-      className="flex flex-col gap-l"
+      className="-mt-xs flex flex-col gap-l"
     >
       {total === 0 ? (
         <NoMatch params={params} onClearFilters={onClearFilters} />
       ) : (
-        <div className="flex items-center gap-s">
-          <p role="status" className="min-w-0 flex-1 text-cte-text-muted">
-            {m.search_total({ count: total })}
-          </p>
-          <SearchMenu input={first} />
-        </div>
+        // The count shows at the field's end; a screen reader hears it here.
+        <p role="status" className="sr-only">
+          {m.search_total({ count: total })}
+        </p>
       )}
       {/* What the search cannot see yet, next to what it found. */}
       {untranscribed === 0 ? null : (
-        <p className="-mt-m flex items-center gap-xs text-body-s text-cte-text-muted">
+        <p className="flex items-center gap-xs text-body-s text-cte-text-muted">
           <InfoIcon aria-hidden className="shrink-0" />
           {m.search_untranscribed({ count: untranscribed })}
         </p>
