@@ -149,6 +149,7 @@ vi.mock("@sondine/ui/components/alert-dialog", () => ({
 }));
 
 vi.mock("@sondine/ui/components/field", () => ({ Field: plain, FieldLabel: plain }));
+vi.mock("../../i18n/locale", () => ({ useLocale: () => ({ locale: "fr" }) }));
 vi.mock("@sondine/ui/components/meter", () => {
   const meter = ({ children }: { children?: ReactNode | (() => ReactNode) }) =>
     typeof children === "function" ? children() : children;
@@ -238,8 +239,10 @@ describe("the first run's transcription step", () => {
     await render();
     await open("beta");
     await vi.waitFor(() => expect(title()).toBe(m.compute_beta_title()));
-    expect(document.body.textContent).toContain(m.compute_beta_what());
-    expect(document.body.textContent).toContain(m.compute_beta_honour());
+    // The short version: one paragraph, the price, and the rest on the site.
+    expect(document.body.textContent).toContain(m.compute_trial_summary());
+    expect(document.body.textContent).toContain(m.compute_trial_privacy());
+    expect(document.body.textContent).not.toContain(m.compute_beta_others());
     await vi.waitFor(() =>
       expect(document.body.textContent).toContain(m.cloud_wave_taken({ percent: "30" })),
     );
@@ -295,6 +298,11 @@ describe("the first run's transcription step", () => {
     await render();
     await open("beta");
     await vi.waitFor(() => expect(title()).toBe(m.compute_beta_title()));
+    // The field hides behind its link.
+    [...document.querySelectorAll("button")]
+      .find((button) => button.textContent === m.compute_beta_invite_open())
+      ?.click();
+    await new Promise((resolve) => setTimeout(resolve, 20));
     const input = document.querySelector<HTMLInputElement>("input");
     expect(input).not.toBeNull();
     input!.value = "wave1-invite-token";

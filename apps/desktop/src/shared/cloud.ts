@@ -19,3 +19,13 @@ export const CLOUD_WAITLIST_URL = "https://sondine.app/cloud";
 export function isCloudWaitlist(url: string): boolean {
   return url === CLOUD_WAITLIST_URL;
 }
+
+/** What the Cloud's server keeps, in full, on the site (ADR 047): the first run links to it. */
+export const CLOUD_PRIVACY_URL = {
+  fr: "https://sondine.app/fr/privacy-policy",
+  en: "https://sondine.app/privacy-policy",
+} as const;
+
+export function isCloudPrivacy(url: string): boolean {
+  return url === CLOUD_PRIVACY_URL.fr || url === CLOUD_PRIVACY_URL.en;
+}

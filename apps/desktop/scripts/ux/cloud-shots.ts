@@ -91,7 +91,7 @@ async function scenario(name: string): Promise<void> {
 process.env["SONDINE_DEV_CLOUD"] = `${ready[1]} ${ready[2]}`;
 process.env["SONDINE_DEV_NO_BROWSER"] = "1";
 const data = mkdtempSync(join(tmpdir(), "sux-"));
-const { page, stop } = await launch({ data, locale: values.locale, height: 1000 });
+const { page, stop } = await launch({ data, locale: values.locale, height: 720 });
 
 try {
   await sleep(1500);
@@ -180,10 +180,11 @@ try {
   await shot("first-run-wave-full");
 
   // A place for this Mac: back to the choice, then the trial's button, with places left.
+  // A reload reads the wave again: a full one keeps the trial's button off.
   await scenario("wave-70");
-  await page.click(values.locale === "fr" ? "Retour" : "Back");
-  await sleep(600);
-  await pickCloud();
+  await page.eval("location.reload()");
+  await sleep(1500);
+  await toCloudStep();
   const trialLabel = values.locale === "fr" ? "Essayer 60 min gratuites" : "Try 60 minutes free";
   await page.waitFor(
     `[...document.querySelectorAll("button")].some((b) => b.textContent.trim() === ${JSON.stringify(trialLabel)})`,

@@ -26,9 +26,27 @@ const billingText: Record<Exclude<ComputeBillingOutcome, "opened">, () => string
   mismatch: () => m.compute_mismatch(),
 };
 
+/**
+ * The wave, asked of the server only on a screen the user opened by choosing
+ * the Cloud (ADR 047): never on a page that merely could show it.
+ */
+function useWave(enabled = true) {
+  return useQuery({
+    ...orpc.compute.wave.queryOptions(),
+    retry: false,
+    staleTime: 60_000,
+    enabled,
+  });
+}
+
+/** Whether the wave is full: its trial's button waits for the next one. */
+export function useWaveFull(enabled: boolean): boolean {
+  return useWave(enabled).data?.full === true;
+}
+
 /** How full the wave is, as a share of its real places; nothing when there is none. */
 export function WaveGauge() {
-  const wave = useQuery({ ...orpc.compute.wave.queryOptions(), retry: false, staleTime: 60_000 });
+  const wave = useWave();
   if (wave.data == null) return null;
   const { percent, full } = wave.data;
   return (

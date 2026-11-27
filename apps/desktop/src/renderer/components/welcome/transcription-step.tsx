@@ -17,9 +17,11 @@ import { m } from "../../paraglide/messages.js";
 import { ModelPanel, useModels } from "../models/model-panel";
 import { modelsBusy, modelsReady, modelsTooBig } from "../models/model-view";
 import { setSmallMac, useSmallMac } from "../models/small-mac";
+import { useWaveFull } from "../settings/cloud-section";
 import {
   BetaInviteField,
   BetaTerms,
+  TrialTerms,
   destinationOption,
   OwnLinkForm,
   useChoose,
@@ -242,6 +244,7 @@ function BetaScreen({
 }) {
   const join = useJoinBeta(status.destination);
   const [invite, setInvite] = useState("");
+  const full = useWaveFull(!status.beta.joined);
   const action = serverAction("beta", status.destination, status.own !== null);
   return (
     <Step
@@ -257,6 +260,7 @@ function BetaScreen({
         ) : (
           <Button
             isPending={join.pending}
+            disabled={!status.beta.joined && invite.trim() === "" && full}
             onClick={() =>
               join.take(() => {
                 setInvite("");
@@ -272,7 +276,7 @@ function BetaScreen({
         )
       }
     >
-      <BetaTerms joined={status.beta.joined} />
+      {status.beta.joined ? <BetaTerms joined /> : <TrialTerms />}
       {status.beta.joined ? null : <BetaInviteField value={invite} onChange={setInvite} />}
       {join.problem === null ? null : (
         <p role="alert" className="text-body-s text-error">

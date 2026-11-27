@@ -18,8 +18,9 @@ import { Input } from "@sondine/ui/components/input";
 import { Radio, RadioGroup, RadioLabel } from "@sondine/ui/components/radio-group";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type ElementType } from "react";
-import { CLOUD_WAITLIST_URL } from "../../../shared/cloud";
-import { WaveGauge } from "./cloud-section";
+import { CLOUD_PRIVACY_URL, CLOUD_WAITLIST_URL } from "../../../shared/cloud";
+import { useLocale } from "../../i18n/locale";
+import { useWaveFull, WaveGauge } from "./cloud-section";
 import { errorMessage, orpc } from "../../core/orpc";
 import { m } from "../../paraglide/messages.js";
 
@@ -390,7 +391,37 @@ export function BetaTerms({ Lead = "p", joined }: { Lead?: ElementType; joined: 
   );
 }
 
-/** Optional invite link or raw token for invite-only Cloud waves (Settings and first run). */
+/**
+ * The first run's short version, before a place is taken (ADR 047; Téo,
+ * 2026-11-27: a sober page, its button in view): who could read the audio and
+ * the word given in one paragraph, the wave, the price, and the rest on the
+ * site. Settings' dialog keeps the whole text.
+ */
+export function TrialTerms() {
+  const { locale } = useLocale();
+  return (
+    <>
+      <p>{m.compute_trial_summary()}</p>
+      <WaveGauge />
+      <p className="text-body-s">
+        {m.compute_trial_terms()}{" "}
+        <a
+          className="text-cte-text-muted underline"
+          href={locale === "fr" ? CLOUD_PRIVACY_URL.fr : CLOUD_PRIVACY_URL.en}
+          target="_blank"
+          rel="noreferrer"
+        >
+          {m.compute_trial_privacy()}
+        </a>
+      </p>
+    </>
+  );
+}
+
+/**
+ * Optional invite link or raw token for invite-only Cloud waves (Settings and
+ * first run), behind a link: most people take the trial, and have none.
+ */
 export function BetaInviteField({
   value,
   onChange,
@@ -398,6 +429,14 @@ export function BetaInviteField({
   value: string;
   onChange: (value: string) => void;
 }) {
+  const [open, setOpen] = useState(value !== "");
+  if (!open) {
+    return (
+      <Button variant="ghost" className="-ms-s self-start" onClick={() => setOpen(true)}>
+        {m.compute_beta_invite_open()}
+      </Button>
+    );
+  }
   return (
     <Field className="items-stretch">
       <FieldLabel>{m.compute_beta_invite_label()}</FieldLabel>
@@ -426,6 +465,7 @@ export function BetaDialog({
 }) {
   const join = useJoinBeta(current);
   const [invite, setInvite] = useState("");
+  const full = useWaveFull(open && !joined);
   const close = () => {
     setInvite("");
     join.finish();
@@ -452,7 +492,11 @@ export function BetaDialog({
         )}
         <AlertDialogFooter>
           <AlertDialogClose>{m.compute_beta_later()}</AlertDialogClose>
-          <Button isPending={join.pending} onClick={() => join.take(close, invite)}>
+          <Button
+            isPending={join.pending}
+            disabled={!joined && invite.trim() === "" && full}
+            onClick={() => join.take(close, invite)}
+          >
             {joined || invite.trim() !== "" ? m.compute_beta_use() : m.compute_trial_start()}
           </Button>
         </AlertDialogFooter>

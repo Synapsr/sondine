@@ -1704,5 +1704,8 @@
   "cloud_reference": "Place reference:",
   "cloud_reference_copy": "Copy",
   "cloud_reference_copied": "Copied",
-  "cloud_reference_detail": "Give it with any request about your place, an erasure for instance. It cannot be used to transcribe."
+  "cloud_reference_detail": "Give it with any request about your place, an erasure for instance. It cannot be used to transcribe.",
+  "compute_trial_summary": "The audio of your finished conversations goes encrypted to a Synapsr server, which transcribes it, then erases it. During transcription, its administrators, software agents included, could technically access it. We commit to reading and listening to nothing, and nothing trains a model.",
+  "compute_trial_privacy": "What the server keeps",
+  "compute_beta_invite_open": "I have an invite link"
 }

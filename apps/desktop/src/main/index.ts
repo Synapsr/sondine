@@ -51,7 +51,7 @@ import {
 } from "../shared/updates";
 import { statsEndpoint } from "../shared/stats";
 import { isContactMail, ISSUES_PAGE } from "../shared/contact";
-import { isCloudWaitlist } from "../shared/cloud";
+import { isCloudPrivacy, isCloudWaitlist } from "../shared/cloud";
 import type { CoreToMain, HelperProcessInfo, PrivacyPane } from "../shared/core-messages";
 import { DATA_LAYOUT } from "../shared/data-layout";
 import { isGraphicalSignIn } from "../shared/graphical";
@@ -220,7 +220,7 @@ function start(): void {
   const isAppUrl = appUrlGuard(devServerUrl);
   const licenses = externalLinkGuard(MODEL_CATALOG.map((artifact) => artifact.license.url));
   // Model licenses, the release pages the update check points to, the cloud's
-  // sign-up page (shared/cloud.ts), and in development the sign-in page of
+  // sign-up page and its privacy (shared/cloud.ts), and in development the sign-in page of
   // Graphical's theme editor (ADR 033).
   const isExternalLink = (url: string) =>
     licenses(url) ||
@@ -228,6 +228,7 @@ function start(): void {
     isContactMail(url) ||
     url === ISSUES_PAGE ||
     isCloudWaitlist(url) ||
+    isCloudPrivacy(url) ||
     (import.meta.env.DEV && devServerUrl !== undefined && isGraphicalSignIn(url));
   hardenSession(session.defaultSession, requestGuard(devServerUrl));
   app.on("web-contents-created", (_event, contents) =>
