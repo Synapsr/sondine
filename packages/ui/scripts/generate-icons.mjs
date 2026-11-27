@@ -4,12 +4,14 @@
 // Usage: node scripts/generate-icons.mjs <path/to/licensed/node_modules>
 //
 // The node_modules directory lives outside the repository and must contain
-// nucleo-ui-fill-18 and nucleo-micro-bold (with their react peer). Only the
-// SVG paths are copied; generated files have no runtime dependency on Nucleo.
+// nucleo-ui-fill-18, nucleo-micro-bold and nucleo-social-media (with their
+// react peer). Only the SVG paths are copied; generated files have no runtime
+// dependency on Nucleo.
 
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { registerHooks } from "node:module";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -22,6 +24,8 @@ const MAX_GLYPHS = 100;
 const SETS = {
   "ui-fill-18": { pkg: "nucleo-ui-fill-18", version: "1.5.1", stroke: false },
   "micro-bold": { pkg: "nucleo-micro-bold", version: "1.2.1", stroke: true },
+  // Brand marks, for a site Sondine recognizes (ADR 009).
+  "social-media": { pkg: "nucleo-social-media", version: "1.0.3", stroke: false },
 };
 
 function fail(message) {
@@ -124,7 +128,23 @@ ${body}
 `;
 }
 
+/**
+ * nucleo-social-media's components import "./Icon" without its extension,
+ * which Node's ESM loader refuses; the other packages write "./Icon.js".
+ */
+function resolveExtensionless() {
+  registerHooks({
+    resolve(specifier, context, next) {
+      const inNucleo = context.parentURL?.includes("/nucleo-") ?? false;
+      return inNucleo && specifier.startsWith("./") && path.extname(specifier) === ""
+        ? next(`${specifier}.js`, context)
+        : next(specifier, context);
+    },
+  });
+}
+
 async function main() {
+  resolveExtensionless();
   const nodeModules = process.argv[2] ?? process.env.NUCLEO_NODE_MODULES;
   if (!nodeModules) fail("pass the path to the licensed node_modules directory");
   const resolvedModules = path.resolve(nodeModules);

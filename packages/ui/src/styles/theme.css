@@ -20,6 +20,11 @@
   --color-cte-danger: var(--cte-danger);
   --color-cte-focus: var(--cte-focus);
   --color-border-default: var(--border-default-color);
+  /* The sites' marks (BrandMark), in their owners' colors. */
+  --color-brand-youtube: var(--brand-youtube);
+  --color-brand-vimeo: var(--brand-vimeo);
+  --color-brand-twitch: var(--brand-twitch);
+  --color-brand-inside: var(--brand-inside);
   --color-option-badge-background: var(--option-badge-background);
   --color-option-badge-foreground: var(--option-badge-foreground);
   --color-navigation-active-background: var(--navigation-active-background);

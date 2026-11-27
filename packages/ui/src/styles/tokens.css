@@ -6,7 +6,7 @@
  * variables, light at :root and dark under [data-theme="dark"]). Change them
  * in the Graphical editor or graphical/themes/graphical.json, never here.
  * This file keeps only what Sondine adds: the mode each scope is in, which
- * the dark: variant reads.
+ * the dark: variant reads, and the colors of the sites' marks.
  */
 
 @layer theme {
@@ -22,5 +22,18 @@
   [data-theme="dark"] {
     color-scheme: dark;
     --theme-mode: dark;
+  }
+
+  /*
+   * A site's mark keeps its owner's colors in both modes (ADR 009): they are
+   * part of the mark, not theme roles, and only BrandMark uses them. Values
+   * from Simple Icons (CC0). The theme's red stays for errors and recording.
+   */
+  :root {
+    --brand-youtube: #ff0000;
+    --brand-vimeo: #1ab7ea;
+    --brand-twitch: #9146ff;
+    /* What the mark draws inside: YouTube's play triangle, Twitch's bubble. */
+    --brand-inside: #ffffff;
   }
 }

@@ -60,6 +60,19 @@ describe("confidence label", () => {
 });
 
 describe("context label", () => {
+  it("names YouTube, not the browser that played it, and any other site's browser", () => {
+    const safari = { bundleId: "com.apple.Safari", name: "Safari" };
+    const page = (site: string, name: string) => ({ site, name, title: "", url: "", video: false });
+    const media = { ...episode(1, []), context: "media" as const, apps: [safari] };
+    expect(contextLabel({ ...media, page: page("youtube.com", "YouTube") })).toBe(
+      "Media · YouTube",
+    );
+    expect(contextLabel({ ...media, page: page("netflix.com", "Netflix") })).toBe("Media · Safari");
+    expect(contextLabel({ ...media, page: page("music.youtube.com", "YouTube Music") })).toBe(
+      "Media · Safari",
+    );
+  });
+
   it("marks a phone recording, says when its time is uncertain, and gives its name", () => {
     expect(contextLabel(episode(1, []))).toBe("In person");
     expect(contextLabel({ ...episode(1, []), phone: { timeUncertain: false, name: null } })).toBe(

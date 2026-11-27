@@ -69,6 +69,13 @@ the theme, never in a component. Utility names are Graphical's:
 | Motion            | `duration-motion ease-motion` (small), `duration-motion-large ease-motion-large` (large); `transition-*` defaults to the small curve                                                                                                                                                                                                                                     |
 | Other tokens      | arbitrary variable syntax: `size-(--line-s)`, `translate-y-(--motion-press-distance)`, `scale-(--motion-popup-scale)`                                                                                                                                                                                                                                                    |
 
+One exception to theme roles: a site's mark (`BrandMark`, from
+`packages/ui/src/icon`) keeps its owner's colors in both modes, through the
+brand tokens `brand-youtube`, `brand-vimeo`, `brand-twitch` and
+`brand-inside` (`src/styles/tokens.css`). Only `BrandMark` uses them; they
+never color anything else, and the theme's red stays for errors and
+recording (ADR 009).
+
 Tailwind's default scales are removed: `p-4`, `w-64`, `text-sm`,
 `rounded-md`, `shadow-lg`, `font-semibold`, `bg-white`, `max-w-md` generate
 nothing. `src/styles/theme.test.ts` fails on any class in `src/` that

@@ -1,7 +1,9 @@
-import type { EpisodeApp, EpisodeSummary } from "@sondine/api";
+import type { EpisodeApp, EpisodeSummary, EpisodeWebPage } from "@sondine/api";
 import { cn } from "@sondine/ui";
+import { BrandMark } from "@sondine/ui/icon";
 import { useQuery } from "@tanstack/react-query";
 import type { AppIconRef } from "../../../shared/bridge";
+import { siteMark } from "../../lib/site-mark";
 
 // An app's icon, wherever the window names an app (calls, media, the
 // memory bar), so it is recognized at a glance. Main finds it on this Mac;
@@ -66,7 +68,22 @@ export function AppIcons({
   );
 }
 
-/** The icon of the app an episode heard most (its call app, what played it); none in person. */
+/**
+ * The mark of the site a page belongs to (YouTube, Vimeo, Twitch), in its
+ * owner's colors, embedded in the app: no favicon is fetched. Nothing for a
+ * site without one.
+ */
+export function PageMark({ page, className }: { page: EpisodeWebPage | null; className?: string }) {
+  const brand = siteMark(page);
+  if (brand === null) return null;
+  return <BrandMark brand={brand} className={cn("size-s shrink-0", className)} />;
+}
+
+/**
+ * The icon of what an episode heard most: its call app, the app that played
+ * it, or the site's mark (YouTube, Vimeo, Twitch) for a page that has one;
+ * none in person.
+ */
 export function EpisodeAppIcon({
   episode,
   className,
@@ -74,6 +91,9 @@ export function EpisodeAppIcon({
   episode: EpisodeSummary;
   className?: string;
 }) {
+  if (siteMark(episode.page) !== null) {
+    return <PageMark page={episode.page} {...(className === undefined ? {} : { className })} />;
+  }
   const [app] = episode.apps;
   if (app === undefined) return null;
   return (

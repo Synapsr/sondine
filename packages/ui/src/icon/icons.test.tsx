@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { checkIcons, MAX_GLYPHS } from "../../scripts/check-icons";
 import * as icons from "./index";
-import { CheckIcon, MicrophoneIcon } from "./index";
+import { BrandMark, CheckIcon, MicrophoneIcon } from "./index";
 
 describe("Nucleo subset (ADR 009)", () => {
   it("stays within budget, carries the notice, and is never imported from nucleo-*", async () => {
@@ -47,5 +47,22 @@ describe("icon components", () => {
     const markup = renderToStaticMarkup(<CheckIcon size={20} strokeWidth={1.5} />);
     expect(markup).toContain('width="20"');
     expect(markup).toContain('stroke-width="1.5"');
+  });
+});
+
+describe("brand marks (ADR 009)", () => {
+  it("keep their owner's color from the brand tokens, and stay decorative", () => {
+    for (const brand of ["youtube", "vimeo", "twitch"] as const) {
+      const markup = renderToStaticMarkup(<BrandMark brand={brand} className="size-s" />);
+      expect(markup).toContain(`text-brand-${brand}`);
+      expect(markup).toContain('aria-hidden="true"');
+      expect(markup).toContain('fill="currentColor"');
+    }
+  });
+
+  it("fill YouTube's triangle and Twitch's bubble, so they read the same in both modes", () => {
+    expect(renderToStaticMarkup(<BrandMark brand="youtube" />)).toContain("fill-brand-inside");
+    expect(renderToStaticMarkup(<BrandMark brand="twitch" />)).toContain("fill-brand-inside");
+    expect(renderToStaticMarkup(<BrandMark brand="vimeo" />)).not.toContain("fill-brand-inside");
   });
 });
