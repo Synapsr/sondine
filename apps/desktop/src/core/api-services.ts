@@ -192,6 +192,7 @@ import { Models } from "./models/models-layer";
 import { Onboarding } from "./onboarding";
 import { readDisplaySettings, updateDisplaySettings } from "./display-settings";
 import { VoiceRead } from "./voices/voice-read";
+import { Backup } from "./backup/backup-layer";
 import { Privacy, episodePrivacyView } from "./privacy/privacy";
 import { CallOffers, type CallOfferGone } from "./call-offers/call-offers";
 import { Retention } from "./retention/retention";
@@ -882,6 +883,7 @@ export const apiLayer = Layer.effect(
     const compute = yield* Compute;
     const onboarding = yield* Onboarding;
     const voiceRead = yield* VoiceRead;
+    const backup = yield* Backup;
     const retention = yield* Retention;
     const builder = yield* EpisodeBuilder;
     const exports = yield* Exports;
@@ -2808,6 +2810,59 @@ export const apiLayer = Layer.effect(
           log.info("api.call", { procedure: "models.cancel" });
           return modelCall(() => models.cancel(input.artifactId, input.discard));
         },
+      },
+      backup: {
+        status: () =>
+          call(
+            "backup.status",
+            Effect.sync(() => backup.status()),
+          ),
+        watch: (signal) => {
+          log.info("api.call", { procedure: "backup.watch" });
+          return Stream.toAsyncIterableWith(
+            backup.changes.pipe(Stream.interruptWhen(untilAborted(signal))),
+            context,
+          );
+        },
+        // Neither the passphrase nor a path is logged.
+        export: (input) =>
+          call(
+            "backup.export",
+            Effect.promise(() => backup.export(input)),
+          ),
+        choose: () =>
+          call(
+            "backup.choose",
+            Effect.promise(() => backup.choose()),
+          ),
+        inspect: (input) =>
+          call(
+            "backup.inspect",
+            Effect.promise(() => backup.inspect(input.passphrase)),
+          ),
+        restore: (input) =>
+          call(
+            "backup.restore",
+            Effect.promise(() => backup.restore(input.passphrase)),
+          ),
+        cancel: () =>
+          call(
+            "backup.cancel",
+            Effect.sync(() => {
+              backup.cancel();
+              return {};
+            }),
+          ),
+        deletePrevious: () =>
+          call(
+            "backup.deletePrevious",
+            Effect.sync(() => backup.deletePrevious()),
+          ),
+        closeNote: () =>
+          call(
+            "backup.closeNote",
+            Effect.sync(() => backup.closeNote()),
+          ),
       },
       voiceRead: {
         get: () =>

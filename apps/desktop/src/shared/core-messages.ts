@@ -1,7 +1,7 @@
 import * as z from "zod";
 
 /** What an open panel is for: its message and starting folder. */
-export const PickPurpose = z.enum(["model", "audio"]);
+export const PickPurpose = z.enum(["model", "audio", "backup"]);
 export type PickPurpose = z.output<typeof PickPurpose>;
 import { MEDIA_SLICE_BYTES } from "./byte-range";
 import { STATS_ENDPOINT } from "./stats";
@@ -149,6 +149,12 @@ export const MainToCore = z.discriminatedUnion("type", [
     requestId: z.string().min(1).max(64),
     content: ClipboardContent.nullable(),
   }),
+  /** Answer to `backup-save`: where the user chose to save the backup, or null. */
+  z.strictObject({
+    type: z.literal("backup-save-picked"),
+    requestId: z.string().min(1).max(64),
+    path: z.string().min(1).max(4096).nullable(),
+  }),
   /** Answer to `pick-file`: the chosen file, or null when the panel was closed. */
   z.strictObject({
     type: z.literal("file-picked"),
@@ -263,6 +269,20 @@ export const CoreToMain = z.discriminatedUnion("type", [
       .min(1)
       .max(16),
   }),
+  /**
+   * `backup.export` (ADR 048): a save panel for the backup; core writes the
+   * file itself at the path main answers (`backup-save-picked`).
+   */
+  z.strictObject({
+    type: z.literal("backup-save"),
+    requestId: z.string().min(1).max(64),
+    fileName: z.string().regex(/^[\w .-]{1,120}\.sondine$/),
+  }),
+  /**
+   * A restore is staged (ADR 048): main quits and relaunches Sondine, and
+   * swaps the data before it starts the helper and core again.
+   */
+  z.strictObject({ type: z.literal("backup-restart") }),
   /**
    * `episodes.exportAudio`: a save panel, then main writes the episode's WAV
    * by reading it slice by slice, as playback does (audio never crosses oRPC).

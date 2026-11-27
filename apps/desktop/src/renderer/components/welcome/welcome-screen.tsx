@@ -27,6 +27,7 @@ import { UpdateAnswers, useUpdates } from "../updates/updates";
 import { SentReports, UsageAnswers } from "../usage/usage";
 import { VoiceReadPanel } from "../voice-read/voice-read-panel";
 import { useCompute } from "../settings/compute-section";
+import { RestoreDialog } from "../backup/backup-dialogs";
 import { modelsReady } from "../models/model-view";
 import { Step } from "./step";
 import { TranscriptionStep } from "./transcription-step";
@@ -188,6 +189,7 @@ function GoalStep({
   goal: OnboardingGoal | null;
   onPick: (goal: OnboardingGoal) => void;
 }) {
+  const [restoring, setRestoring] = useState(false);
   return (
     <section aria-labelledby="welcome-title" className="sondine-stagger flex flex-col gap-l">
       <h1 id="welcome-title" className="font-display font-heavy text-display-m">
@@ -221,6 +223,11 @@ function GoalStep({
           </li>
         ))}
       </ul>
+      {/* A Mac reinstalled, or a new one (ADR 048): everything back from one file. */}
+      <Button variant="ghost" className="self-start" onClick={() => setRestoring(true)}>
+        {m.backup_welcome_restore()}
+      </Button>
+      <RestoreDialog open={restoring} replaces={false} onClose={() => setRestoring(false)} />
     </section>
   );
 }

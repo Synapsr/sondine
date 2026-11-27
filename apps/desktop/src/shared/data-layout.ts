@@ -32,6 +32,14 @@ export const DATA_LAYOUT = {
   voiceReadDir: "voice-read",
   /** An update being downloaded, unpacked, or ready (ADR 045): 0700, one folder per archive. */
   updatesDir: "updates",
+  /** A backup's database copy while it is written (ADR 048): 0700, emptied at each start. */
+  backupWorkDir: "backup-work",
+  /** A restore being unpacked, then staged (ADR 048); main swaps it in at launch. */
+  restoreStagingDir: "restore-staging",
+  /** Written last by core: the staging is complete and verified. */
+  restoreMarker: "restore-staging/READY.json",
+  /** The data a restore replaced, one folder per restore, until the user deletes it. */
+  beforeRestoreDir: "before-restore",
   diagnosticsDir: "diagnostics",
   spansFile: "diagnostics/spans.jsonl",
   /** The browser link's trace (ADR 023): links, reads and plays, never a page. */

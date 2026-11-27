@@ -53,6 +53,12 @@ export interface RetentionService {
    */
   exclusive<A>(work: () => A, archiveBytes: number): Effect.Effect<A>;
   /**
+   * Runs `work` after startup recovery, alone with passes, scrubs and expiry:
+   * a backup (ADR 048) copies the archive while no file of it moves. `work`
+   * must not throw; a scrub waits for it, so it stops when a deletion comes.
+   */
+  hold<A>(work: () => Promise<A>): Effect.Effect<A>;
+  /**
    * Lets the audio whose time is up go, then the oldest while the archive is
    * over its cap (ADR 015, ADR 029); text stays. Kept audio never goes.
    */
@@ -230,6 +236,9 @@ export const retentionLayer = Layer.effect(
         lock.withPermits(1),
       );
 
+    const hold = <A>(work: () => Promise<A>) =>
+      recover.pipe(Effect.andThen(Effect.promise(work)), lock.withPermits(1));
+
     const expireAudio = recover.pipe(
       Effect.andThen(
         Effect.sync((): AudioExpiryReport => {
@@ -254,6 +263,6 @@ export const retentionLayer = Layer.effect(
       Effect.withSpan("retention.expire-audio"),
     );
 
-    return Retention.of({ runPass: pass, scrub, exclusive, expireAudio });
+    return Retention.of({ runPass: pass, scrub, exclusive, hold, expireAudio });
   }),
 );

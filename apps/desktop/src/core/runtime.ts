@@ -15,6 +15,7 @@ import {
 import { agentAccessLayer } from "./agents/agent-access";
 import { agentHostLayer } from "./agents/agent-host";
 import { apiLayer } from "./api-services";
+import { backupLayer } from "./backup/backup-layer";
 import { chatKeysLayer } from "./chat/chat-keys";
 import { chatLayer } from "./chat/chat-layer";
 import { browserLinkLayer } from "./browser/browser-link";
@@ -229,6 +230,7 @@ export function coreLayer(
     phoneSyncLayer(options.phone),
     voiceReadLayer,
     goingOnActionsLayer,
+    backupLayer,
   ).pipe(Layer.provideMerge(media));
   // After everything an update would cut (ADR 045).
   const updates = updatesLayer(options.updates).pipe(Layer.provideMerge(assistants));

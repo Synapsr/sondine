@@ -6,6 +6,7 @@ import { PlayerBar } from "../player/player-bar";
 import { focusSearchField } from "../search/search-field";
 import { AgentPanelProvider, useAgentPanel } from "../chat/agent-panel-state";
 import { ChatPanel } from "../chat/chat-panel";
+import { RestoredNote } from "../backup/restored-note";
 import { useMediaQuery } from "../../lib/media-query";
 import { useImportDrop } from "../imports/import-actions";
 import { m } from "../../paraglide/messages.js";
@@ -54,6 +55,7 @@ function ShellLayout() {
     // The window's ground is the sidebar's; the screen sits on it in a rounded card (ADR 037).
     // The top band (window buttons, back and forward, listening) is the title bar.
     <div className="relative flex h-dvh flex-col bg-neutral-2 text-cte-text" {...drop.handlers}>
+      <RestoredNote />
       <WindowBar />
       <div className="flex min-h-0 flex-1">
         <AppSidebar />

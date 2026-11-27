@@ -6,6 +6,7 @@ import {
   ChevronRightIcon,
   ChipIcon,
   ClockIcon,
+  FolderIcon,
   MicrophoneIcon,
   PenIcon,
   PhoneIcon,
@@ -35,6 +36,7 @@ import { ChatSection } from "./chat-section";
 import { CloudSection } from "./cloud-section";
 import { ComputeSection, useCompute } from "./compute-section";
 import { DiagnosticSection } from "./diagnostic-section";
+import { DataSection } from "./data-section";
 import { DictationSection } from "./dictation-section";
 import { DictationVoiceSwitch } from "./dictation-voice-switch";
 import { JournalSection } from "./journal-section";
@@ -60,8 +62,9 @@ import { UpdatesSection } from "../updates/updates";
 // zones, ADR 029), dictation apps, the sites a browser plays. « Voix »:
 // recognition, the user's voice read (ADR 034), dictations, the notch.
 // « iPhone » (ADR 008). « Agents »: the agents that read Sondine and the
-// discussion with one (ADR 027). « Statistiques ». « Avancé »: capture
-// health, as the Status screen showed it.
+// discussion with one (ADR 027). « Statistiques ». « Données »: a whole
+// backup and its restore (ADR 048). « Avancé »: capture health, as the
+// Status screen showed it.
 
 interface Page {
   readonly id: SettingsPage;
@@ -206,6 +209,12 @@ const PAGES: Record<SettingsPage, Page> = {
     title: () => m.settings_tab_statistics(),
     content: () => <StatisticsSection />,
   },
+  data: {
+    id: "data",
+    icon: <FolderIcon />,
+    title: () => m.settings_data_title(),
+    content: () => <DataSection />,
+  },
   advanced: {
     id: "advanced",
     icon: <ChipIcon />,
@@ -225,7 +234,7 @@ const GROUPS: readonly (readonly SettingsPage[])[] = [
   ["general", "transcription", "vocabulary", "journal"],
   ["listening", "privacy", "voices"],
   ["phone", "agents"],
-  ["statistics", "advanced"],
+  ["statistics", "data", "advanced"],
 ];
 
 /** A titled part of a section's page. */

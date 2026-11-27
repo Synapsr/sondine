@@ -114,7 +114,14 @@ import {
   serveEpisodeMedia,
   serveRenderer,
 } from "./security";
-import { ExportConfirmations, exportEpisodeAudio, exportText, removeSharedFiles } from "./exports";
+import {
+  askSavePath,
+  ExportConfirmations,
+  exportEpisodeAudio,
+  exportText,
+  removeSharedFiles,
+} from "./exports";
+import { applyStagedRestore } from "./restore-swap";
 import { confirmAndForget } from "./forget";
 import { createSondineTray, trayLabel } from "./tray";
 import { PASTE_CONTEXT_SHORTCUT, pasteFeedback } from "./paste-context";
@@ -216,6 +223,14 @@ function start(): void {
   });
   const paths = dataPaths(dataDirectory.path);
   mkdirSync(paths.runDir, { recursive: true, mode: 0o700 });
+  // A restore core staged before the relaunch (ADR 048): the data is swapped
+  // now, before the helper or core opens any of it.
+  try {
+    const swap = applyStagedRestore(paths.root);
+    if (swap.kind !== "none") log.info("backup.swap", { ...swap });
+  } catch (error) {
+    logFailure("backup.swap")(error);
+  }
 
   const isAppUrl = appUrlGuard(devServerUrl);
   const licenses = externalLinkGuard(MODEL_CATALOG.map((artifact) => artifact.license.url));
@@ -699,6 +714,25 @@ function start(): void {
             core.post({ type: "exported", requestId: message.requestId, outcome }),
           );
         return;
+      case "backup-save":
+        void askSavePath(window, {
+          defaultPath: join(app.getPath("documents"), message.fileName),
+          filters: [{ name: "Sondine", extensions: ["sondine"] }],
+          message: m.backup_save_message({}, { locale }),
+        }).then(
+          (path) => core.post({ type: "backup-save-picked", requestId: message.requestId, path }),
+          (error: unknown) => {
+            logFailure("backup.save-panel")(error);
+            core.post({ type: "backup-save-picked", requestId: message.requestId, path: null });
+          },
+        );
+        return;
+      // A restore is staged: Sondine opens again on it (the swap comes first at launch).
+      case "backup-restart":
+        log.info("backup.relaunch");
+        app.relaunch();
+        app.quit();
+        return;
       case "pick-file":
         void pickFile(message, locale, window).then(
           (path) => core.post({ type: "file-picked", requestId: message.requestId, path }),
@@ -1139,7 +1173,9 @@ async function pickFile(
     message:
       request.purpose === "model"
         ? m.model_pick_message({ name: request.label }, { locale })
-        : m.imports_pick_message({}, { locale }),
+        : request.purpose === "backup"
+          ? m.backup_pick_message({}, { locale })
+          : m.imports_pick_message({}, { locale }),
     filters: [{ name: request.label, extensions: request.extensions }],
     defaultPath: app.getPath("downloads"),
   };
