@@ -154,7 +154,8 @@ The Cloud sells its hours from the app ([ADR 047](../../docs/decisions/047-cloud
 `node sondine-compute.js places 10` opens a wave of ten places, without a
 restart: anyone takes a place and its 60-minute trial in one click, the app
 shows the share of places taken, and the old beta `claim` is refused while a
-wave is open (the beta's places already taken keep working). `places` alone
+wave is open. The beta's places already taken keep working as long as
+`SONDINE_COMPUTE_BETA_PLACES` stays above 0: set to 0, it closes them too. `places` alone
 shows how many are taken; `places 0` closes the wave. A place unused for 14 days
 stops counting, without being erased.
 
