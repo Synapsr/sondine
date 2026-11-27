@@ -4,6 +4,7 @@
 // the user's data folder or real hardware.
 
 import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
 import { connect, type Page } from "./cdp.ts";
@@ -40,9 +41,12 @@ export async function launch({
   await run("node", ["scripts/compile-messages.mjs"]);
   if (preview) await run("npx", ["electron-vite", "build"]);
   const port = 9300 + Math.floor(Math.random() * 600);
+  // The Swift helper on fake hardware when it is built; otherwise the
+  // protocol fake, which takes no --hal.
+  const helperBuilt = existsSync(resolve(app, "../../native/.build/release/sondine-audio"));
   const env: NodeJS.ProcessEnv = {
     ...process.env,
-    SONDINE_HELPER_HAL: "fake",
+    ...(helperBuilt ? { SONDINE_HELPER_HAL: "fake" } : { SONDINE_FAKE_HELPER: "1" }),
     SONDINE_DATA_DIR: data,
     VITE_SONDINE_NO_EDITOR: "1",
   };
