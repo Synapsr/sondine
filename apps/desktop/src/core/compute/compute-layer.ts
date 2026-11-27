@@ -1,20 +1,26 @@
 import type {
+  ComputeBillingInput,
+  ComputeBillingOutcome,
   ComputeConnectOutcome,
   ComputeDestination,
   ComputeJoinOutcome,
   ComputeQuota,
   ComputeStatus,
+  ComputeWave,
 } from "@sondine/api";
 import { computeSettings, setComputeSettings, type ComputeSettings } from "@sondine/db";
 import { EngineError, type AsrEngine } from "@sondine/engines";
 import {
+  billingPage,
   claimPlace,
   createRemoteAsrEngine,
   hello,
   leavePlace,
   parseServerLink,
   readQuota,
+  readWave,
   RefusedError,
+  startTrial,
   Token,
   type Fetch,
   type RemoteLocality,
@@ -47,8 +53,16 @@ export interface ComputeService {
   leaveBeta(): Promise<void>;
   /** Reads the active remote destination's quota; null on this Mac or when unavailable. */
   quota(): Promise<ComputeQuota | null>;
+  /** How full the Cloud's wave is (ADR 047); null without one, or when it does not answer. */
+  wave(): Promise<ComputeWave | null>;
+  /** A Stripe page for this Mac's place, for the browser; the app never calls Stripe itself. */
+  billing(
+    input: ComputeBillingInput,
+  ): Promise<{ readonly url: string } | { readonly outcome: ComputeBillingOutcome }>;
   /** Called after each change of where transcription runs. */
   onChanged(listener: () => void): void;
+  /** Called when the server says this place has hours to transcribe with. */
+  onHoursLeft(listener: () => void): void;
 }
 
 export class Compute extends Context.Service<Compute, ComputeService>()("sondine/core/Compute") {}
@@ -71,6 +85,7 @@ export const computeLayer = (options: ComputeOptions = {}) =>
       const now = options.now ?? Date.now;
       const network = options.fetch === undefined ? {} : { fetch: options.fetch };
       const listeners: (() => void)[] = [];
+      const hoursListeners: (() => void)[] = [];
       let engine: { readonly key: string; readonly engine: AsrEngine } | null = null;
 
       // Counts every choice: one made while a server was answering wins over its answer.
@@ -182,7 +197,14 @@ export const computeLayer = (options: ComputeOptions = {}) =>
           }
           const asked = ++choice;
           try {
-            const token = await claimPlace(beta, network);
+            // A place of the wave with its trial (ADR 047); a server without a wave keeps the beta.
+            const token = await startTrial(beta, network).catch((error: unknown) => {
+              const refusal = error instanceof RefusedError ? error.refusal : null;
+              if (refusal === "closed" || failed(error) === "server_mismatch") {
+                return claimPlace(beta, network);
+              }
+              throw error;
+            });
             if (choice !== asked) {
               // Nobody wants this place any more: it goes to someone else.
               await leavePlace({ ...beta, token }, network).catch(() => undefined);
@@ -210,10 +232,47 @@ export const computeLayer = (options: ComputeOptions = {}) =>
           if (settings.destination === "device") return null;
           const link = settings[settings.destination];
           if (link === null) return null;
-          return readQuota(link, network).catch(() => null);
+          const quota = await readQuota(link, network).catch(() => null);
+          const left =
+            quota === null || quota.limitSeconds === null
+              ? quota !== null
+              : quota.limitSeconds - quota.usedSeconds + quota.extraSeconds > 0;
+          // Paid, renewed or topped up: what waited for hours may go now.
+          if (left) for (const listener of hoursListeners) listener();
+          return quota;
+        },
+        wave: async () => {
+          if (beta === null) return null;
+          return readWave(beta, network).catch(() => null);
+        },
+        billing: async ({ page, locale }) => {
+          const { beta: place } = computeSettings(db);
+          if (place === null) return { outcome: "closed" };
+          try {
+            const url = await billingPage(
+              place,
+              page === "portal"
+                ? { kind: "portal", locale }
+                : { kind: "checkout", item: page, locale },
+              network,
+            );
+            return { url };
+          } catch (error) {
+            const refusal = error instanceof RefusedError ? error.refusal : null;
+            log.warn("compute.billing-failed", { code: failed(error) });
+            if (refusal === "not_allowed") return { outcome: "not-allowed" };
+            if (refusal === "closed" || refusal === "unauthorized") return { outcome: "closed" };
+            if (refusal === "billing_unavailable" || failed(error) === "network_unavailable") {
+              return { outcome: "unavailable" };
+            }
+            return { outcome: "mismatch" };
+          }
         },
         onChanged: (listener) => {
           listeners.push(listener);
+        },
+        onHoursLeft: (listener) => {
+          hoursListeners.push(listener);
         },
       });
     }),

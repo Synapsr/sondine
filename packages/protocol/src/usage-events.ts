@@ -54,6 +54,9 @@ export const USAGE_RULES = {
   compute_connected: "action",
   compute_disconnected: "action",
   compute_quota_viewed: "never",
+  // The wave has a handful of places: its people would be recognized (ADR 047).
+  compute_wave_viewed: "never",
+  compute_billing_opened: "never",
   compute_viewed: "never",
   context_added: "action",
   context_edited: "action",

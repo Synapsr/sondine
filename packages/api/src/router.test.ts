@@ -618,6 +618,11 @@ function fakeServices(overrides: Partial<ApiServices> = {}) {
       joinBeta: async () => ({ outcome: "joined", status: computeStatus }),
       leaveBeta: async () => computeStatus,
       quota: async () => null,
+      wave: async () => null,
+      openBilling: async (input) => {
+        calls.push({ method: "compute.openBilling", input });
+        return { outcome: "opened" };
+      },
     },
     live: {
       setEnabled: async (input) => {
@@ -976,7 +981,9 @@ describe("contract metadata", () => {
       "compute.get",
       "compute.joinBeta",
       "compute.leaveBeta",
+      "compute.openBilling",
       "compute.quota",
+      "compute.wave",
       "context.add",
       "context.edit",
       "context.get",

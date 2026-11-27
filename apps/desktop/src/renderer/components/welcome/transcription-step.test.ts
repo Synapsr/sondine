@@ -62,6 +62,7 @@ vi.mock("../../core/orpc", () => {
         disconnect: mutation("disconnect", () => core.status()),
         leaveBeta: mutation("leaveBeta", () => core.status()),
         quota: query("compute-quota", () => null),
+        wave: query("compute-wave", () => ({ percent: 30, full: false })),
       },
       onboarding: {
         get: query("onboarding", () => ({ step: "model", cloudNotify: false })),
@@ -143,6 +144,11 @@ vi.mock("@sondine/ui/components/alert-dialog", () => ({
 }));
 
 vi.mock("@sondine/ui/components/field", () => ({ Field: plain, FieldLabel: plain }));
+vi.mock("@sondine/ui/components/meter", () => {
+  const meter = ({ children }: { children?: ReactNode | (() => ReactNode) }) =>
+    typeof children === "function" ? children() : children;
+  return { Meter: meter, MeterLabel: meter, MeterValue: meter };
+});
 vi.mock("@sondine/ui/components/input", () => ({
   Input: (props: { value?: string; onChange?: (event: { target: { value: string } }) => void }) =>
     createElement("input", {
@@ -223,14 +229,17 @@ describe("the first run's transcription step", () => {
     expect(core.calls).toEqual([]);
   });
 
-  it("shows the beta's terms in the page, and sends nothing before « Utiliser le cloud »", async () => {
+  it("shows the wave and the Cloud's terms in the page, and takes nothing before the trial's button", async () => {
     await render();
     await open("beta");
     await vi.waitFor(() => expect(title()).toBe(m.compute_beta_title()));
     expect(document.body.textContent).toContain(m.compute_beta_what());
     expect(document.body.textContent).toContain(m.compute_beta_honour());
+    await vi.waitFor(() =>
+      expect(document.body.textContent).toContain(m.cloud_wave_taken({ percent: "30" })),
+    );
     expect(core.calls).toEqual([]);
-    press(m.compute_beta_use());
+    press(m.compute_trial_start());
     await vi.waitFor(() => expect(steps).toEqual(["next"]));
     expect(core.calls).toEqual(["joinBeta"]);
   });

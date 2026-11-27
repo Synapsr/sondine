@@ -568,6 +568,11 @@ export class AnalysisScheduler {
     this.wake();
   }
 
+  /** The server has hours for this Mac again (ADR 047): a wait for them ends now. */
+  hoursLeft(): void {
+    if (this.remotePause?.reason === "server-quota") this.resumeRemote();
+  }
+
   /** The user changed where transcription runs: what leaves for the old place stops now. */
   placeChanged(): void {
     this.stopSending?.();

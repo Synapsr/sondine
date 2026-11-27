@@ -43,6 +43,9 @@ import {
   ComputeJoinInput,
   ComputeJoinResult,
   ComputeQuota,
+  ComputeBillingInput,
+  ComputeBillingResult,
+  ComputeWave,
   ComputeStatus,
   ContextAddInput,
   ContextAddResult,
@@ -683,6 +686,14 @@ export const contract = {
       .meta({ event: "compute_quota_viewed", mcp: null })
       .input(NoInput)
       .output(ComputeQuota.nullable()),
+    wave: base
+      .meta({ event: "compute_wave_viewed", mcp: null })
+      .input(NoInput)
+      .output(ComputeWave.nullable()),
+    openBilling: base
+      .meta({ event: "compute_billing_opened", mcp: null })
+      .input(ComputeBillingInput)
+      .output(ComputeBillingResult),
   },
   // Near-live text: the user's switch; its state comes with the status.
   live: {

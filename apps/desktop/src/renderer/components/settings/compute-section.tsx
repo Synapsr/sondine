@@ -2,7 +2,6 @@ import type {
   ComputeConnectOutcome,
   ComputeDestination,
   ComputeJoinOutcome,
-  ComputeQuota,
   ComputeStatus,
 } from "@sondine/api";
 import {
@@ -20,6 +19,7 @@ import { Radio, RadioGroup, RadioLabel } from "@sondine/ui/components/radio-grou
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type ElementType } from "react";
 import { CLOUD_WAITLIST_URL } from "../../../shared/cloud";
+import { WaveGauge } from "./cloud-section";
 import { errorMessage, orpc } from "../../core/orpc";
 import { m } from "../../paraglide/messages.js";
 
@@ -49,20 +49,6 @@ const joinText: Record<Exclude<ComputeJoinOutcome, "joined" | "cancelled">, () =
   offline: () => m.compute_offline(),
   mismatch: () => m.compute_mismatch(),
 };
-
-function formatQuotaLine(quota: ComputeQuota): string | null {
-  if (quota.limitSeconds === null) return null;
-  if (quota.period === "total") {
-    const leftMin = Math.max(0, Math.ceil((quota.limitSeconds - quota.usedSeconds) / 60));
-    const totalMin = Math.round(quota.limitSeconds / 60);
-    return m.compute_quota_trial({ left: String(leftMin), total: String(totalMin) });
-  }
-  const used = (quota.usedSeconds / 3_600).toFixed(1);
-  const limit = (quota.limitSeconds / 3_600).toFixed(1);
-  const base = m.compute_quota_month({ used, limit });
-  if (quota.extraSeconds <= 0) return base;
-  return `${base} · ${m.compute_quota_extra({ hours: (quota.extraSeconds / 3_600).toFixed(1) })}`;
-}
 
 export function useCompute() {
   return useQuery(orpc.compute.get.queryOptions());
@@ -120,11 +106,6 @@ export function ComputeSection() {
   const disconnect = useMutation(orpc.compute.disconnect.mutationOptions({ onSuccess: store }));
   const leave = useMutation(orpc.compute.leaveBeta.mutationOptions({ onSuccess: store }));
   const status = compute.data;
-  const quota = useQuery({
-    ...orpc.compute.quota.queryOptions(),
-    enabled: status !== undefined && status.destination === "beta" && status.beta.joined,
-    retry: false,
-  });
   if (status === undefined) {
     return (
       <p className={compute.isError ? "text-error" : "text-cte-text-muted"}>
@@ -133,7 +114,6 @@ export function ComputeSection() {
     );
   }
   const { destination, own, beta } = status;
-  const quotaLine = quota.data == null ? null : formatQuotaLine(quota.data);
   const error = choose.error ?? disconnect.error ?? leave.error;
   return (
     <div className="flex max-w-[40rem] flex-col gap-s">
@@ -169,7 +149,6 @@ export function ComputeSection() {
           {m.compute_own_forget()}
         </Button>
       )}
-      {quotaLine === null ? null : <p className="text-body-s text-cte-text-muted">{quotaLine}</p>}
       {beta.joined ? (
         <Button
           variant="ghost"
@@ -388,16 +367,19 @@ export function useJoinBeta(current: ComputeDestination) {
 }
 
 /**
- * The beta's warning, in Téo's words (2026-11-24): who could read the audio,
- * the word given that nobody does, and whom to write to for more. `Lead`
- * holds the first paragraph: the dialog's description, or a plain paragraph.
+ * The Cloud's warning, in Téo's words (2026-11-24): who could read the audio,
+ * the word given that nobody does, and whom to write to for more. Before a
+ * place is taken, the wave's gauge and the trial's terms come first (ADR 047).
+ * `Lead` holds the first paragraph: the dialog's description, or a plain one.
  */
-export function BetaTerms({ Lead = "p" }: { Lead?: ElementType }) {
+export function BetaTerms({ Lead = "p", joined }: { Lead?: ElementType; joined: boolean }) {
   return (
     <>
+      {joined ? null : <WaveGauge />}
       <Lead>{m.compute_beta_what()}</Lead>
       <p className="text-body-s font-medium">{m.compute_beta_honour()}</p>
       <p className="text-body-s text-cte-text-muted">{m.compute_beta_others()}</p>
+      {joined ? null : <p className="text-body-s font-medium">{m.compute_trial_terms()}</p>}
       <p className="text-body-s text-cte-text-muted">
         {m.compute_beta_secure()}{" "}
         <a className="underline" href={CLOUD_WAITLIST_URL} target="_blank" rel="noreferrer">
@@ -461,7 +443,7 @@ export function BetaDialog({
     >
       <AlertDialogPopup>
         <AlertDialogTitle>{m.compute_beta_title()}</AlertDialogTitle>
-        <BetaTerms Lead={AlertDialogDescription} />
+        <BetaTerms Lead={AlertDialogDescription} joined={joined} />
         {joined ? null : <BetaInviteField value={invite} onChange={setInvite} />}
         {join.problem === null ? null : (
           <p role="alert" className="text-body-s text-error">
@@ -471,7 +453,7 @@ export function BetaDialog({
         <AlertDialogFooter>
           <AlertDialogClose>{m.compute_beta_later()}</AlertDialogClose>
           <Button isPending={join.pending} onClick={() => join.take(close, invite)}>
-            {m.compute_beta_use()}
+            {joined || invite.trim() !== "" ? m.compute_beta_use() : m.compute_trial_start()}
           </Button>
         </AlertDialogFooter>
       </AlertDialogPopup>

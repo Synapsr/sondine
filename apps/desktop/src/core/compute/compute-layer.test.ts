@@ -129,7 +129,7 @@ describe("where transcription runs", () => {
     expect(await joining).toBe("cancelled");
     expect(beta.status().beta.joined).toBe(false);
     // The place nobody wants any more is given back.
-    expect(place.asked).toMatchObject([{ kind: "claim" }, { kind: "leave" }]);
+    expect(place.asked).toMatchObject([{ kind: "trial" }, { kind: "leave" }]);
   });
 
   it("takes a beta place in one call, keeps it, and gives it back", async () => {
@@ -247,5 +247,94 @@ describe("where transcription runs", () => {
       temp.db.statement("UPDATE settings SET value = ? WHERE key = 'compute'").run(value);
       expect(computeSettings(temp.db).destination).toBe("device");
     }
+  });
+});
+
+describe("the Cloud's wave and payment (ADR 047)", () => {
+  /** A server whose answer the test changes between calls. */
+  function switching(first: OpenReply) {
+    let reply = first;
+    const server = answering(null);
+    const fetch: Fetch = async (_url, init) => {
+      const received = respond(key, init.body as Uint8Array, PROLOGUE);
+      server.asked.push(JSON.parse(received.payload.toString()));
+      const { message } = received.answer(Buffer.from(JSON.stringify(reply)));
+      return new Response(new Uint8Array(message));
+    };
+    return { asked: server.asked, fetch, answer: (next: OpenReply) => (reply = next) };
+  }
+
+  it("reads how full the wave is, and nothing in a build without the Cloud", async () => {
+    const server = switching({ kind: "wave", percent: 70, full: false });
+    const service = await compute({ beta: { endpoint, serverKey }, fetch: server.fetch });
+    expect(await service.wave()).toEqual({ percent: 70, full: false });
+    expect(server.asked).toMatchObject([{ kind: "wave" }]);
+    const none = await compute({ beta: null, fetch: server.fetch });
+    expect(await none.wave()).toBeNull();
+    expect(server.asked).toHaveLength(1);
+  });
+
+  it("takes a trial, then keeps the beta for a server without a wave", async () => {
+    const server = switching({ kind: "claimed", token });
+    const service = await compute({ beta: { endpoint, serverKey }, fetch: server.fetch });
+    expect(await service.joinBeta()).toBe("joined");
+    expect(server.asked).toMatchObject([{ kind: "trial" }]);
+
+    await service.leaveBeta();
+    server.answer({ kind: "refused", code: "closed" });
+    const asked = server.asked.length;
+    // The server refuses the trial: the Mac asks for the beta's place, refused too here.
+    expect(await service.joinBeta()).toBe("closed");
+    expect(server.asked.slice(asked)).toMatchObject([{ kind: "trial" }, { kind: "claim" }]);
+  });
+
+  it("asks for a Stripe page only with a place, and takes only Stripe's", async () => {
+    const server = switching({ kind: "claimed", token });
+    const service = await compute({ beta: { endpoint, serverKey }, fetch: server.fetch });
+    expect(await service.billing({ page: "subscription", locale: "fr" })).toEqual({
+      outcome: "closed",
+    });
+    expect(server.asked).toEqual([]);
+    await service.joinBeta();
+    server.answer({ kind: "page", url: "https://checkout.stripe.com/c/pay/cs_test_1" });
+    expect(await service.billing({ page: "subscription", locale: "fr" })).toEqual({
+      url: "https://checkout.stripe.com/c/pay/cs_test_1",
+    });
+    expect(server.asked.at(-1)).toMatchObject({
+      kind: "checkout",
+      item: "subscription",
+      locale: "fr",
+      token,
+    });
+    server.answer({ kind: "page", url: "https://example.com/pay" });
+    expect(await service.billing({ page: "portal", locale: "en" })).toEqual({
+      outcome: "mismatch",
+    });
+    server.answer({ kind: "refused", code: "not_allowed" });
+    expect(await service.billing({ page: "topup", locale: "en" })).toEqual({
+      outcome: "not-allowed",
+    });
+  });
+
+  it("lets what waited for hours go once the server has some again", async () => {
+    const server = switching({ kind: "claimed", token });
+    const service = await compute({ beta: { endpoint, serverKey }, fetch: server.fetch });
+    await service.joinBeta();
+    let woken = 0;
+    service.onHoursLeft(() => (woken += 1));
+    const quota = (usedSeconds: number, extraSeconds = 0): OpenReply => ({
+      kind: "quota",
+      plan: "trial",
+      period: "total",
+      usedSeconds,
+      limitSeconds: 3_600,
+      extraSeconds,
+    });
+    server.answer(quota(3_600));
+    await service.quota();
+    expect(woken).toBe(0);
+    server.answer(quota(3_600, 36_000));
+    await service.quota();
+    expect(woken).toBe(1);
   });
 });

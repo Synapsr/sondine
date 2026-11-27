@@ -20,14 +20,9 @@ const core = vi.hoisted(() => {
     chosen: [] as string[],
     /** Last invite link passed to `joinBeta`. */
     lastInvite: undefined as string | undefined,
-    quotaData: null as {
-      plan: "own" | "beta" | "trial" | "cloud";
-      period: "total" | "month" | "unlimited";
-      usedSeconds: number;
-      limitSeconds: number | null;
-      extraSeconds: number;
-    } | null,
     givenBack: 0,
+    /** How full the wave is; null: the server has none. */
+    waveData: null as { percent: number; full: boolean } | null,
     outcome: "joined",
     /** Resolves when the server answers. */
     answer: Promise.resolve(),
@@ -36,8 +31,8 @@ const core = vi.hoisted(() => {
       this.choices = 0;
       this.chosen = [];
       this.lastInvite = undefined;
-      this.quotaData = null;
       this.givenBack = 0;
+      this.waveData = null;
       this.outcome = "joined";
       this.answer = Promise.resolve();
     },
@@ -116,7 +111,13 @@ vi.mock("../../core/orpc", () => {
           queryKey: () => ["compute", "quota"],
           queryOptions: () => ({
             queryKey: ["compute", "quota"],
-            queryFn: () => Promise.resolve(core.quotaData),
+            queryFn: () => Promise.resolve(null),
+          }),
+        },
+        wave: {
+          queryOptions: () => ({
+            queryKey: ["compute", "wave"],
+            queryFn: () => Promise.resolve(core.waveData),
           }),
         },
       },
@@ -185,6 +186,12 @@ vi.mock("@sondine/ui/components/button", () => ({
       props.children,
     ),
 }));
+
+vi.mock("@sondine/ui/components/meter", () => {
+  const plain = ({ children }: { children?: ReactNode | (() => ReactNode) }) =>
+    typeof children === "function" ? children() : children;
+  return { Meter: plain, MeterLabel: plain, MeterValue: plain };
+});
 
 vi.mock("@sondine/ui/components/field", () => {
   const plain = ({ children }: { children?: ReactNode }) => children;
@@ -336,14 +343,23 @@ describe("choosing where transcription runs", () => {
     expect(await reread()).toBe("device");
   });
 
-  it("sends the invite code typed in Settings, shows quota, and offers Disconnect instead of Leave", async () => {
-    core.quotaData = {
-      plan: "cloud",
-      period: "month",
-      usedSeconds: 36_000,
-      limitSeconds: 144_000,
-      extraSeconds: 36_000,
-    };
+  it("shows how full the wave is before a place is taken, and the trial's button", async () => {
+    core.waveData = { percent: 70, full: false };
+    click("#radio-beta");
+    await vi.waitFor(() =>
+      expect(dialog()?.textContent).toContain(m.cloud_wave_taken({ percent: "70" })),
+    );
+    expect(dialog()?.textContent).toContain(m.compute_trial_start());
+    expect(dialog()?.textContent).toContain(m.compute_trial_terms());
+  });
+
+  it("says a full wave is full, and where to be told of the next one", async () => {
+    core.waveData = { percent: 100, full: true };
+    click("#radio-beta");
+    await vi.waitFor(() => expect(dialog()?.textContent).toContain(m.cloud_wave_full_detail()));
+  });
+
+  it("sends the invite code typed in Settings, and offers Disconnect instead of Leave", async () => {
     click("#radio-beta");
     await vi.waitFor(() => expect(dialog()).not.toBeNull());
     const input = document.querySelector<HTMLInputElement>("[role=alertdialog] input");
@@ -354,8 +370,8 @@ describe("choosing where transcription runs", () => {
     click("[role=alertdialog] button:not(#dismiss)");
     await vi.waitFor(() => expect(dialog()).toBeNull());
     expect(core.lastInvite).toBe("invite-token-123");
-    await vi.waitFor(() => expect(document.body.textContent).toContain("10.0 / 40.0 h"));
-    expect(document.body.textContent).toContain("+10.0 h");
-    expect(document.body.textContent).toContain(m.compute_cloud_disconnect());
+    await vi.waitFor(() =>
+      expect(document.body.textContent).toContain(m.compute_cloud_disconnect()),
+    );
   });
 });

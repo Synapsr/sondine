@@ -32,6 +32,7 @@ import { AgentsSection } from "./agents-section";
 import { BrowserSection } from "./browser-section";
 import { CallOffersSection } from "./call-offers-section";
 import { ChatSection } from "./chat-section";
+import { CloudSection } from "./cloud-section";
 import { ComputeSection, useCompute } from "./compute-section";
 import { DiagnosticSection } from "./diagnostic-section";
 import { DictationSection } from "./dictation-section";
@@ -52,7 +53,8 @@ import { UpdatesSection } from "../updates/updates";
 // something, its current state; a row opens the section's own page
 // (`/settings/$page`), with the way back. « Général »: language,
 // appearance, opening at login, updates. « Transcription »: where it runs
-// (ADR 040) and this Mac's model (as in the first run). « Vocabulaire »: the
+// (ADR 040), the Cloud's plan once this Mac has a place (ADR 047) and this
+// Mac's model (as in the first run). « Vocabulaire »: the
 // words Sondine writes the user's way (ADR 046). « Journal du jour » (ADR 028). « Écoute »: call offers
 // and near-live text. « Confidentialité »: what Sondine keeps (private
 // zones, ADR 029), dictation apps, the sites a browser plays. « Voix »:
@@ -66,6 +68,16 @@ interface Page {
   readonly icon: ReactNode;
   readonly title: () => string;
   readonly content: () => ReactNode;
+}
+
+/** The Cloud's plan, once this Mac has a place there (ADR 047). */
+function CloudPlan() {
+  const compute = useCompute();
+  return compute.data?.beta.joined === true ? (
+    <Part title={m.cloud_title()}>
+      <CloudSection />
+    </Part>
+  ) : null;
 }
 
 /** This Mac's model, only while it transcribes: elsewhere it has nothing to download. */
@@ -105,6 +117,7 @@ const PAGES: Record<SettingsPage, Page> = {
         <Part title={m.compute_title()}>
           <ComputeSection />
         </Part>
+        <CloudPlan />
         <LocalModel />
       </>
     ),
