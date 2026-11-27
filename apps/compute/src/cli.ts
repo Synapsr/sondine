@@ -53,7 +53,8 @@ Payment, for a server that sells its Cloud (ADR 047); all three, or none:
   SONDINE_COMPUTE_STRIPE_WEBHOOK_SECRET  the webhook's signing secret; Stripe calls PUBLIC_URL/v1/stripe
   SONDINE_COMPUTE_PUBLIC_URL             this server's public address, where Stripe sends the browser back
   SONDINE_COMPUTE_STRIPE_PORTAL          a customer portal configuration (bpc_…), optional
-  SONDINE_COMPUTE_TERMS_URL              the terms Checkout links to (default https://sondine.app/terms)
+  SONDINE_COMPUTE_TERMS_URL              the terms Checkout links to, in English (default https://sondine.app/terms)
+  SONDINE_COMPUTE_TERMS_URL_FR           the same in French (default https://sondine.app/fr/terms)
 `;
 
 export interface CliIo {
@@ -148,7 +149,10 @@ function billingFrom(
     }),
     webhookSecret,
     publicUrl,
-    termsUrl: env["SONDINE_COMPUTE_TERMS_URL"] ?? "https://sondine.app/terms",
+    termsUrl: {
+      en: env["SONDINE_COMPUTE_TERMS_URL"] ?? "https://sondine.app/terms",
+      fr: env["SONDINE_COMPUTE_TERMS_URL_FR"] ?? "https://sondine.app/fr/terms",
+    },
     ...(portal === undefined || portal === "" ? {} : { portalConfiguration: portal }),
     log,
   });

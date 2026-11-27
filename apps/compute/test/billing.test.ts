@@ -167,7 +167,7 @@ async function serve(options: { places?: number; billing?: boolean; now?: () => 
           stripe,
           webhookSecret: SECRET,
           publicUrl: "https://cloud.example",
-          termsUrl: "https://sondine.app/terms",
+          termsUrl: { en: "https://sondine.app/terms", fr: "https://sondine.app/fr/terms" },
           log: (event) => logged.push(event),
         });
   const sessions = new Sessions({ engine: silentEngine, known: (id) => clients.has(id) });
@@ -308,7 +308,9 @@ describe("paying from the app", () => {
       automatic_tax: { enabled: true },
       consent_collection: { terms_of_service: "required" },
       custom_text: {
-        terms_of_service_acceptance: { message: CONSENT.en("https://sondine.app/terms") },
+        terms_of_service_acceptance: {
+          message: CONSENT.en.subscription("https://sondine.app/terms"),
+        },
       },
     });
     expect(asked?.key).toMatch(/^checkout-/);
