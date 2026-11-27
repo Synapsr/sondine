@@ -147,3 +147,37 @@ Invited clients (`trial`, `cloud`) stay active while open claims are closed,
 are never evicted by idle beta recycling, and cannot be removed by a client's
 `leave` request (only `sondine-compute remove` deletes them). Downgrading a
 `cloud` or `own` client to `trial`, or adding top-ups to `trial`/`own`, is refused.
+
+## The Cloud's wave and payment
+
+The Cloud sells its hours from the app ([ADR 047](../../docs/decisions/047-cloud-billing.md)).
+`node sondine-compute.js places 10` opens a wave of ten places, without a
+restart: anyone takes a place and its 60-minute trial in one click, the app
+shows the share of places taken, and the old beta `claim` is refused while a
+wave is open (the beta's places already taken keep working). `places` alone
+shows how many are taken; `places 0` closes the wave. A place unused for 14 days
+stops counting, without being erased.
+
+With these three settings, a place pays from the app; with none, the server
+takes no payment:
+
+```bash
+SONDINE_COMPUTE_STRIPE_KEY=rk_…               # restricted: Checkout Sessions write, Customer portal write,
+                                              # Subscriptions read, Prices read
+SONDINE_COMPUTE_STRIPE_WEBHOOK_SECRET=whsec_… # the endpoint PUBLIC_URL/v1/stripe
+SONDINE_COMPUTE_PUBLIC_URL=https://cloud.sondine.app
+SONDINE_COMPUTE_STRIPE_PORTAL=bpc_…           # optional: the portal's settings
+```
+
+`scripts/stripe-setup.ts` makes the product, its prices, the portal's settings
+and, with `--webhook`, the endpoint (its secret goes to `--secret-file`, never to
+the screen); it refuses a live key without `--live`. In Stripe's dashboard, set
+the terms' URL in the public details (Checkout's consent needs it) and the tax
+registrations. The server writes, beside the places, `billing/` (a random
+reference Stripe knows the place by, its customer and subscription),
+`stripe-events.json` and `wave.json`. `rekey ID --endpoint URL` gives a lost
+Mac's place a new link; the old one stops working.
+
+On Synapsr's server the service runs in Docker Compose (project `sondine`,
+service `compute`): copy `state/` aside, replace the bundle, set the variables
+in `compose.yaml`, then `docker compose up -d --force-recreate compute`.
