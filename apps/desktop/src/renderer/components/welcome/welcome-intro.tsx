@@ -7,10 +7,10 @@ import { SkySurface } from "./sky-surface";
 // launch): on the window's own background, the site's moving sky
 // (sky-surface.tsx) comes in; Sondine's wordmark arrives, « Bienvenue » under it, then a
 // quiet line says to click. A click anywhere, or Return or Space, fades it
-// all out onto the first question. Hovered, the wordmark catches a band of
-// light and its disc turns, and the line to click shimmers; a glint, once
-// started, runs to its end and does not start again before (Téo,
-// 2026-11-28), and the line shimmers by itself after 5 s without a click.
+// all out onto the first question. Hovered, the wordmark's disc turns, and
+// the line to click shimmers; its shimmer, once started, runs to its end and
+// does not start again before (Téo, 2026-11-28), and it shimmers by itself
+// after 5 s without a click.
 // Shown each time the first run opens before anything is chosen; nothing is
 // saved. Reduced motion keeps it still (renderer/styles.css).
 
@@ -19,8 +19,8 @@ const LEAVE_MS = 600;
 const BEGIN_SHOWN_MS = 3100;
 const IDLE_MS = 5000;
 
-/** A glint that, once started, plays to its end: starting it again meanwhile does nothing. */
-function useGlint() {
+/** A shimmer that, once started, plays to its end: starting it again meanwhile does nothing. */
+function useShimmer() {
   const [playing, setPlaying] = useState(false);
   return {
     playing,
@@ -35,11 +35,10 @@ function useGlint() {
 export function WelcomeIntro({ onDone }: { onDone: () => void }) {
   const [leaving, setLeaving] = useState(false);
   const begin = useRef<HTMLButtonElement>(null);
-  const logoGlint = useGlint();
-  const beginGlint = useGlint();
+  const beginShimmer = useShimmer();
   const shimmered = useRef(false);
   // Unclicked, the line shimmers 5 s after it shows, then 5 s after each shimmer.
-  const { playing: shimmering, play: shimmer } = beginGlint;
+  const { playing: shimmering, play: shimmer } = beginShimmer;
   useEffect(() => {
     if (shimmering) return;
     const wait = shimmered.current ? IDLE_MS : BEGIN_SHOWN_MS + IDLE_MS;
@@ -71,25 +70,8 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
       />
       <h1 className="sr-only">{m.welcome_intro_title()}</h1>
       <div aria-hidden className="relative flex flex-col items-center gap-l px-l text-center">
-        {/* Hovered, a band of the sky's colors glides over the wordmark and its disc turns. */}
-        <span
-          className="sondine-intro-logo relative block w-[18rem]"
-          onPointerEnter={logoGlint.play}
-        >
-          <SondineLogo className="block w-full" />
-          <span className="sondine-intro-shine absolute inset-zero" {...logoGlint.props}>
-            <SondineLogo className="block w-full" />
-          </span>
-          <svg width={0} height={0} className="absolute">
-            <defs>
-              <linearGradient id="sondine-intro-shine" x1="0" x2="1" y1="0" y2="0">
-                <stop offset="0" stopColor="var(--color-4)" />
-                <stop offset="0.5" stopColor="var(--color-3)" />
-                <stop offset="1" stopColor="var(--color-2)" />
-              </linearGradient>
-            </defs>
-          </svg>
-        </span>
+        {/* Hovered, the disc turns. */}
+        <SondineLogo className="sondine-intro-logo w-[18rem]" />
         <p className="sondine-intro-welcome font-display font-medium text-display-xs">
           {m.welcome_intro_welcome()}
         </p>
@@ -100,7 +82,7 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
         className="sondine-intro-begin absolute bottom-xxl corner-full px-m py-xs text-body-m focus-ring"
         onPointerEnter={shimmer}
       >
-        <span className="sondine-intro-shimmer" {...beginGlint.props}>
+        <span className="sondine-intro-shimmer" {...beginShimmer.props}>
           {m.welcome_intro_begin()}
         </span>
       </button>
