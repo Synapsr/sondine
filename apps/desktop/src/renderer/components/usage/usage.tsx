@@ -21,7 +21,8 @@ import { errorMessage, orpc } from "../../core/orpc";
 import { m } from "../../paraglide/messages.js";
 
 // The anonymous statistics (ADR 042): the question, asked once (the first
-// run, or the sidebar on an install that had none), with two equal buttons;
+// run, or the sidebar on an install that had none), with two answers, yes
+// the primary one, as on the other steps (ADR 042, amended 2026-11-28);
 // the switch in Settings; and the report exactly as it leaves.
 
 export function useUsage() {
@@ -109,7 +110,7 @@ function Report({ report }: { report: UsageReport }) {
   );
 }
 
-/** The two answers, the same size and weight. */
+/** The two answers, the same size; yes is the primary one, as on the other steps. */
 export function UsageAnswers({
   onAnswered,
   className,
@@ -126,7 +127,7 @@ export function UsageAnswers({
         <Button variant="secondary" disabled={share.isPending} onClick={() => answer(false)}>
           {m.usage_no()}
         </Button>
-        <Button variant="secondary" disabled={share.isPending} onClick={() => answer(true)}>
+        <Button variant="primary" disabled={share.isPending} onClick={() => answer(true)}>
           {m.usage_yes()}
         </Button>
       </div>
