@@ -164,14 +164,19 @@ function DeviceScreen({ onBack, onNext }: { onBack: () => void; onNext: () => vo
       title={m.compute_device()}
       onBack={onBack}
       next={
-        <Button variant={continues === "continue" ? "primary" : "secondary"} onClick={onNext}>
-          {continues === "continue" ? m.welcome_continue() : m.welcome_without_model()}
-        </Button>
+        <>
+          {/* Beside the button that leaves, not under the panel: nothing moves once it starts. */}
+          {busy ? (
+            <span className="text-body-s text-cte-text-muted">{m.welcome_model_continues()}</span>
+          ) : null}
+          <Button variant={continues === "continue" ? "primary" : "secondary"} onClick={onNext}>
+            {continues === "continue" ? m.welcome_continue() : m.welcome_without_model()}
+          </Button>
+        </>
       }
     >
       <p className="text-cte-text-muted">{m.welcome_model_intro()}</p>
-      <ModelPanel />
-      {busy ? <p className="text-cte-text-muted">{m.welcome_model_continues()}</p> : null}
+      <ModelPanel compact />
     </Step>
   );
 }
