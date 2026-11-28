@@ -142,6 +142,8 @@ vi.mock("@sondine/ui/components/dialog", () => ({
   DialogTrigger: plain,
 }));
 vi.mock("@sondine/ui/components/badge", () => ({ Badge: plain }));
+// The sky draws with WebGL, which a test document has not.
+vi.mock("./sky-surface", () => ({ SkySurface: () => null }));
 
 vi.mock("@sondine/ui/components/alert-dialog", () => ({
   AlertDialog: () => null,
@@ -243,8 +245,9 @@ describe("the first run's transcription step", () => {
     await render();
     await open("beta");
     await vi.waitFor(() => expect(title()).toBe(m.compute_beta_title()));
-    // The short version: one paragraph, the price, and the rest on the site.
-    expect(document.body.textContent).toContain(m.compute_trial_summary());
+    // The short version: the offer, what leaves and who could read it, and the rest on the site.
+    expect(document.body.textContent).toContain(m.welcome_cloud_offer());
+    expect(document.body.textContent).toContain(m.welcome_cloud_point_access());
     expect(document.body.textContent).toContain(m.compute_trial_privacy());
     expect(document.body.textContent).not.toContain(m.compute_beta_others());
     await vi.waitFor(() =>

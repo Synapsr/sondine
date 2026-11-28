@@ -1581,6 +1581,10 @@
   "welcome_device_why_detail": "Un modèle de transcription assez bon pour s’y fier demande {needed} Go de mémoire, et ce Mac en a {memory}. Les modèles s’allègent vite : dès qu’un modèle tournera bien sur un Mac comme celui-ci, une mise à jour vous le proposera.",
   "welcome_cloud_free": "60 min offertes",
   "welcome_cloud_detail": "Un serveur de Synapsr transcrit l’audio, puis l’efface.",
+  "welcome_cloud_offer": "60 minutes offertes",
+  "welcome_cloud_point_sent": "L’audio de vos conversations terminées part chiffré vers un serveur de Synapsr, qui l’efface une fois transcrit.",
+  "welcome_cloud_point_access": "Pendant la transcription, ses administrateurs, dont des agents logiciels, pourraient techniquement y accéder.",
+  "welcome_cloud_point_word": "Nous nous engageons à ne rien lire ni écouter, et rien n’entraîne de modèle.",
   "welcome_others": "Les voix autour de vous sont aussi enregistrées ; prévenez-les si la loi le demande.",
   "voice_confirm": "Confirmer : c’est {name}",
   "voice_listen": "Écouter",
@@ -1786,7 +1790,6 @@
   "cloud_reference_copy": "Copier",
   "cloud_reference_copied": "Copiée",
   "cloud_reference_detail": "Donnez-la pour toute demande sur votre place, un effacement par exemple. Elle ne permet pas de l’utiliser.",
-  "compute_trial_summary": "L’audio de vos conversations terminées part chiffré vers un serveur de Synapsr, qui le transcrit puis l’efface. Pendant la transcription, ses administrateurs, dont des agents logiciels, pourraient techniquement y accéder. Nous nous engageons à ne rien lire ni écouter, et rien n’entraîne de modèle.",
   "compute_trial_privacy": "Ce que le serveur garde",
   "compute_beta_invite_open": "J’ai un lien d’invitation"
 }

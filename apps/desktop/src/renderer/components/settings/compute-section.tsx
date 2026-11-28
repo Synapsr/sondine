@@ -18,8 +18,7 @@ import { Input } from "@sondine/ui/components/input";
 import { Radio, RadioGroup, RadioLabel } from "@sondine/ui/components/radio-group";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type ElementType } from "react";
-import { CLOUD_PRIVACY_URL, CLOUD_WAITLIST_URL } from "../../../shared/cloud";
-import { useLocale } from "../../i18n/locale";
+import { CLOUD_WAITLIST_URL } from "../../../shared/cloud";
 import { useWaveFull, WaveGauge } from "./cloud-section";
 import { errorMessage, orpc } from "../../core/orpc";
 import { m } from "../../paraglide/messages.js";
@@ -392,45 +391,21 @@ export function BetaTerms({ Lead = "p", joined }: { Lead?: ElementType; joined: 
 }
 
 /**
- * The first run's short version, before a place is taken (ADR 047; Téo,
- * 2026-11-27: a sober page, its button in view): who could read the audio and
- * the word given in one paragraph, the wave, the price, and the rest on the
- * site. Settings' dialog keeps the whole text.
- */
-export function TrialTerms() {
-  const { locale } = useLocale();
-  return (
-    <>
-      <p>{m.compute_trial_summary()}</p>
-      <WaveGauge />
-      <p className="text-body-s">
-        {m.compute_trial_terms()}{" "}
-        <a
-          className="text-cte-text-muted underline"
-          href={locale === "fr" ? CLOUD_PRIVACY_URL.fr : CLOUD_PRIVACY_URL.en}
-          target="_blank"
-          rel="noreferrer"
-        >
-          {m.compute_trial_privacy()}
-        </a>
-      </p>
-    </>
-  );
-}
-
-/**
  * Optional invite link or raw token for invite-only Cloud waves (Settings and
  * first run), behind a link: most people take the trial, and have none.
+ * `opened`: the link is elsewhere (the first run's, beside its button).
  */
 export function BetaInviteField({
   value,
   onChange,
+  opened = false,
 }: {
   value: string;
   onChange: (value: string) => void;
+  opened?: boolean;
 }) {
   const [open, setOpen] = useState(value !== "");
-  if (!open) {
+  if (!open && !opened) {
     return (
       <Button variant="ghost" className="-ms-s self-start" onClick={() => setOpen(true)}>
         {m.compute_beta_invite_open()}
