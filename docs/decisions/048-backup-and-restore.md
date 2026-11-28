@@ -116,7 +116,7 @@ crosses oRPC or JSON.
 
 - Settings ▸ « Données »: the sizes, « Exporter une sauvegarde… »,
   « Restaurer une sauvegarde… », the data from before a restore. The first
-  run offers « Restaurer une sauvegarde… » under its first step.
+  run offers « Restaurer une sauvegarde… » in the top corner of its first step.
 - `backup.*` procedures, all `mcp: null`: an agent never exports the memory
   or replaces it; no phone reaches them. Their events are `never` in
   `USAGE_RULES`: counting them needs a new version of the question
