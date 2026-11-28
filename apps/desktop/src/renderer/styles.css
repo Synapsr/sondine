@@ -223,6 +223,74 @@
   }
 }
 
+/* Hover: a band of the sky's colors over the wordmark, the disc turning, the line shimmering. */
+.sondine-intro-shine {
+  opacity: 0;
+  mask-image: linear-gradient(105deg, transparent 40%, #000 50%, transparent 60%);
+  mask-size: 300% 100%;
+  mask-position: 100% 0;
+  mask-repeat: no-repeat;
+}
+.sondine-intro-shine path {
+  fill: url(#sondine-intro-shine);
+}
+.sondine-intro-logo [data-part="disc"] {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    rotate 900ms cubic-bezier(0.34, 1.4, 0.64, 1),
+    scale 900ms cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+.sondine-intro-shimmer {
+  --shimmer-ink: rgb(11 34 48 / 0.72);
+  --shimmer-light: #ffffff;
+  background-image: linear-gradient(
+    105deg,
+    var(--shimmer-ink) 40%,
+    var(--shimmer-light) 50%,
+    var(--shimmer-ink) 60%
+  );
+  background-size: 300% 100%;
+  background-position: 100% 0;
+  background-clip: text;
+  color: transparent;
+}
+.dark .sondine-intro-shimmer,
+[data-theme="dark"] .sondine-intro-shimmer {
+  --shimmer-ink: rgb(255 255 255 / 0.72);
+  --shimmer-light: var(--color-3);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sondine-intro-logo:hover .sondine-intro-shine {
+    animation: sondine-intro-glint 1200ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+  .sondine-intro-logo:hover [data-part="disc"] {
+    rotate: -35deg;
+    scale: 1.08;
+  }
+  .sondine-intro-begin:hover .sondine-intro-shimmer {
+    animation: sondine-intro-shimmer 1600ms linear infinite;
+  }
+}
+
+@keyframes sondine-intro-glint {
+  0% {
+    opacity: 1;
+    mask-position: 100% 0;
+  }
+  100% {
+    opacity: 1;
+    mask-position: 0% 0;
+  }
+}
+@keyframes sondine-intro-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0% 0;
+  }
+}
 @keyframes sondine-intro-sky-in {
   from {
     opacity: 0;
