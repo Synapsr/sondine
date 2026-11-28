@@ -3427,10 +3427,13 @@ export type VocabularyRemoveInput = z.input<typeof VocabularyRemoveInput>;
 
 /**
  * What the window keeps in its own storage and a backup carries: the
- * language, the appearance, the shortcuts. Nothing else of it travels.
+ * language (Paraglide's `localStorageKey`, `apps/desktop/scripts/paraglide-options.mjs`),
+ * the appearance (`THEME_STORAGE_KEY`, `@sondine/ui`), the shortcuts
+ * (`SHORTCUTS_STORAGE_KEY`, the window's shortcut registry). Nothing else of
+ * it travels. A test of the window holds these to their sources.
  */
 export const BACKUP_RENDERER_KEYS = [
-  "PARAGLIDE_LOCALE",
+  "sondine.locale",
   "sondine.theme",
   "sondine.shortcuts",
 ] as const;

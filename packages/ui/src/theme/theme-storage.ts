@@ -11,8 +11,11 @@ export function createMemoryThemeStorage(initial: Theme | null = null): ThemeSto
   };
 }
 
+/** Where the app keeps the chosen theme (a backup carries it, ADR 048). */
+export const THEME_STORAGE_KEY = "sondine.theme";
+
 /** Persists the theme in localStorage and follows changes from other windows. */
-export function createLocalStorageThemeStorage(key = "sondine.theme"): ThemeStorage {
+export function createLocalStorageThemeStorage(key = THEME_STORAGE_KEY): ThemeStorage {
   return {
     load() {
       try {
