@@ -21,8 +21,8 @@
 //      entitlements (App Sandbox and the app group), and sondine-lan, the
 //      relay for paired iPhones (ADR 008: the same, plus network.server),
 //   4. compiles the group container addon (native/group-container.m), the
-//      notification settings addon (native/notification-settings.m) and the
-//      updates addon (native/update.m) into
+//      notification settings addon (native/notification-settings.m), the
+//      updates addon (native/update.m) and the haptic addon (native/haptic.m) into
 //      build/stage/native/,
 //   5. builds the app (electron-vite) and the browser extension
 //      (apps/browser-extension/dist/chrome-mv3, shipped unpacked for the user to load),
@@ -647,6 +647,25 @@ run("clang", [
   "-o",
   `${stage}native/update.node`,
   "native/update.m",
+]);
+run("clang", [
+  "-bundle",
+  "-undefined",
+  "dynamic_lookup",
+  "-fobjc-arc",
+  "-O2",
+  "-Wall",
+  "-Werror",
+  "-arch",
+  "arm64",
+  "-mmacosx-version-min=27.0",
+  "-I",
+  nodeHeaders,
+  "-framework",
+  "AppKit",
+  "-o",
+  `${stage}native/haptic.node`,
+  "native/haptic.m",
 ]);
 
 run("pnpm", ["run", "build"]);

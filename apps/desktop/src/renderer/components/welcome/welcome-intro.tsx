@@ -7,10 +7,10 @@ import { SkySurface } from "./sky-surface";
 // launch): on the window's own background, the site's moving sky
 // (sky-surface.tsx) comes in; Sondine's wordmark arrives, « Bienvenue » under it, then a
 // quiet line says to click. A click anywhere, or Return or Space, fades it
-// all out onto the first question. Hovered, the wordmark's disc turns, and
-// the line to click shimmers; its shimmer, once started, runs to its end and
-// does not start again before (Téo, 2026-11-28), and it shimmers by itself
-// after 5 s without a click.
+// all out onto the first question, with a light tap of the trackpad.
+// Hovered, the wordmark's disc turns, and the line to click shimmers; its
+// shimmer, once started, runs to its end and does not start again before
+// (Téo, 2026-11-28), and it shimmers by itself after 5 s without a click.
 // Shown each time the first run opens before anything is chosen; nothing is
 // saved. Reduced motion keeps it still (renderer/styles.css).
 
@@ -50,6 +50,8 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
   useEffect(() => begin.current?.focus({ focusVisible: false }), []);
   const leave = () => {
     if (leaving) return;
+    // Felt on the trackpad as it fades (native/haptic.m).
+    window.sondine.haptic();
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) onDone();
     else {
       setLeaving(true);

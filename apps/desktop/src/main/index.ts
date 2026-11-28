@@ -35,6 +35,7 @@ import {
   LOGIN_ITEM_CHANNEL,
   NOTIFICATION_PERMISSION_CHANNEL,
   NOTIFICATION_SETTINGS_CHANNEL,
+  HAPTIC_CHANNEL,
   PORT_REQUEST_CHANNEL,
   type AppInfo,
   type EditCommand,
@@ -80,6 +81,7 @@ import { log } from "./log";
 import { createMediaRelay, handleMediaRequest } from "./media-protocol";
 import { createIslandIcons } from "./island-icons";
 import { createNotch } from "./notch";
+import { loadHaptic } from "./haptic";
 import { loadNotificationPermission } from "./notification-permission";
 import {
   createCallOfferNotice,
@@ -927,6 +929,11 @@ function start(): void {
         "x-apple.systempreferences:com.apple.Notifications-Settings.extension?id=app.sondine",
       )
       .catch(logFailure("notification-settings.open"));
+  });
+
+  const tap = loadHaptic();
+  ipcMain.handle(HAPTIC_CHANNEL, (event) => {
+    if (fromWindow(event)) tap();
   });
 
   // Development only, left out of production builds: the notch lab.

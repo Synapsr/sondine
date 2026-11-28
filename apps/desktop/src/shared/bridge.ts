@@ -39,6 +39,9 @@ export const NOTIFICATION_PERMISSION_CHANNEL = "sondine:notification-permission"
 /** Preload ⇄ main (invoke): System Settings ▸ Notifications, where macOS allows Sondine's. */
 export const NOTIFICATION_SETTINGS_CHANNEL = "sondine:notification-settings";
 
+/** Preload → main (invoke): a light tap of the trackpad (native/haptic.m). */
+export const HAPTIC_CHANNEL = "sondine:haptic";
+
 /**
  * Sondine's notifications as macOS lets them through: on screen (`allowed`),
  * kept in Notification Center only (`silent`), refused or never allowed
@@ -120,6 +123,8 @@ export interface SondineBridge {
   notificationPermission(): Promise<NotificationPermission>;
   /** Opens System Settings ▸ Notifications. */
   openNotificationSettings(): void;
+  /** A light tap of the trackpad, felt with a finger on it; nothing in development. */
+  haptic(): void;
   /** Development only: the notch lab. */
   readonly notchLab?: NotchLabBridge;
   /** Development only: the flow lab. */
