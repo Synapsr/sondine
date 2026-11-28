@@ -1590,6 +1590,10 @@
   "welcome_device_why_detail": "A transcription model good enough to rely on needs {needed} GB of memory, and this Mac has {memory} GB. Models get lighter quickly: as soon as one runs well on a Mac like this, an update will offer it to you.",
   "welcome_cloud_free": "60 min free",
   "welcome_cloud_detail": "A Synapsr server transcribes the audio, then erases it.",
+  "welcome_cloud_offer": "60 minutes free",
+  "welcome_cloud_point_sent": "The audio of your finished conversations goes encrypted to a Synapsr server, which erases it once transcribed.",
+  "welcome_cloud_point_access": "During transcription, its administrators, software agents included, could technically access it.",
+  "welcome_cloud_point_word": "We commit to reading and listening to nothing, and nothing trains a model.",
   "welcome_others": "The voices around you are recorded too; tell people when the law asks you to.",
   "voice_confirm": "Confirm: this is {name}",
   "voice_listen": "Listen",
@@ -1795,7 +1799,6 @@
   "cloud_reference_copy": "Copy",
   "cloud_reference_copied": "Copied",
   "cloud_reference_detail": "Give it with any request about your place, an erasure for instance. It cannot be used to transcribe.",
-  "compute_trial_summary": "The audio of your finished conversations goes encrypted to a Synapsr server, which transcribes it, then erases it. During transcription, its administrators, software agents included, could technically access it. We commit to reading and listening to nothing, and nothing trains a model.",
   "compute_trial_privacy": "What the server keeps",
   "compute_beta_invite_open": "I have an invite link"
 }
