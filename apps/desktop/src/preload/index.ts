@@ -3,6 +3,7 @@ import {
   APP_INFO_ARGUMENT,
   NOTIFICATION_PERMISSION_CHANNEL,
   NOTIFICATION_SETTINGS_CHANNEL,
+  HAPTIC_CHANNEL,
   EDIT_COMMAND_CHANNEL,
   APP_ICON_CHANNEL,
   NAVIGABLE_PATH,
@@ -125,6 +126,7 @@ const bridge: SondineBridge = {
     return answer === "allowed" || answer === "silent" || answer === "blocked" ? answer : "unknown";
   },
   openNotificationSettings: () => void ipcRenderer.invoke(NOTIFICATION_SETTINGS_CHANNEL),
+  haptic: () => void ipcRenderer.invoke(HAPTIC_CHANNEL),
   pickApp: async () => {
     const answer: unknown = await ipcRenderer.invoke(PICK_APP_CHANNEL);
     if (typeof answer !== "object" || answer === null) return null;

@@ -428,6 +428,10 @@ check(
   existsSync(`${app}/Contents/Resources/native/notification-settings.node`),
   "notification settings addon in Contents/Resources/native",
 );
+check(
+  existsSync(`${app}/Contents/Resources/native/haptic.node`),
+  "haptic addon in Contents/Resources/native",
+);
 const migrations = `${app}/Contents/Resources/drizzle`;
 check(
   existsSync(migrations) && readdirSync(migrations).length > 0,

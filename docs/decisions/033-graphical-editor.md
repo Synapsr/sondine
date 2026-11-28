@@ -80,7 +80,8 @@ gradient of orange, pale sky and teal, warped by noise, with grain:
 `sky-surface.tsx`, about 15 frames a second, only while it shows);
 Sondine's wordmark, the site's (`SondineLogo`, in `packages/ui/src/icon`),
 arrives, « Bienvenue » under it, then a quiet line to click; a click fades
-it all out onto the first question. In dark mode the pale sky gives way to
+it all out onto the first question, with a light tap of the trackpad
+(`native/haptic.m`, a Node-API addon in main, packaged builds only). In dark mode the pale sky gives way to
 black and slow holes open onto the window's background, under white words.
 Téo first saw the site's sky photo there, then blurred halos, and chose the
 site's gradient. Each later use is a deliberate moment like this one, never
