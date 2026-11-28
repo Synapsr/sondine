@@ -7,7 +7,8 @@ import { SkySurface } from "./sky-surface";
 // launch): on the window's own background, the site's moving sky
 // (sky-surface.tsx) comes in; Sondine's wordmark arrives, « Bienvenue » under it, then a
 // quiet line says to click. A click anywhere, or Return or Space, fades it
-// all out onto the first question. Shown each time the first run opens
+// all out onto the first question. Hovered, the wordmark catches a band of
+// light and its disc turns, and the line to click shimmers. Shown each time the first run opens
 // before anything is chosen; nothing is saved. Reduced motion keeps it
 // still (renderer/styles.css).
 
@@ -40,7 +41,20 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
       />
       <h1 className="sr-only">{m.welcome_intro_title()}</h1>
       <div aria-hidden className="relative flex flex-col items-center gap-l px-l text-center">
-        <SondineLogo className="sondine-intro-logo w-[18rem]" />
+        {/* Hovered, a band of the sky's colors glides over the wordmark and its disc turns. */}
+        <span className="sondine-intro-logo relative block w-[18rem]">
+          <SondineLogo className="block w-full" />
+          <SondineLogo className="sondine-intro-shine absolute inset-zero block w-full" />
+          <svg width={0} height={0} className="absolute">
+            <defs>
+              <linearGradient id="sondine-intro-shine" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0" stopColor="var(--color-4)" />
+                <stop offset="0.5" stopColor="var(--color-3)" />
+                <stop offset="1" stopColor="var(--color-2)" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </span>
         <p className="sondine-intro-welcome font-display font-medium text-display-xs">
           {m.welcome_intro_welcome()}
         </p>
@@ -50,7 +64,7 @@ export function WelcomeIntro({ onDone }: { onDone: () => void }) {
         type="button"
         className="sondine-intro-begin absolute bottom-xxl corner-full px-m py-xs text-body-m focus-ring"
       >
-        {m.welcome_intro_begin()}
+        <span className="sondine-intro-shimmer">{m.welcome_intro_begin()}</span>
       </button>
     </div>
   );

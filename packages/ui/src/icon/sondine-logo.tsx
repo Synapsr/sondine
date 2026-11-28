@@ -1,6 +1,7 @@
 // Sondine's wordmark, as on the site: « S », the « o » drawn as a disc of
 // strokes, « ndine ». In the text's color; the name is read once, from the
-// label; give it a width, its height follows.
+// label; give it a width, its height follows. The disc and the letters are
+// marked (`data-part`), so a screen may move the disc alone.
 
 export function SondineLogo({
   className,
@@ -17,8 +18,8 @@ export function SondineLogo({
       aria-label={label}
       className={className}
     >
-      <path d={MARK} />
-      <path d={LETTERS} />
+      <path data-part="disc" d={MARK} />
+      <path data-part="letters" d={LETTERS} />
     </svg>
   );
 }
