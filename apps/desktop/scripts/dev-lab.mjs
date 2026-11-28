@@ -2,7 +2,8 @@
 // nothing of the user's and reaches no network. Its folder,
 // `~/.sondine-flow-lab` (short: macOS limits a socket's path to 103 bytes, and
 // a worktree's is long) or SONDINE_FLOW_LAB_ROOT, holds its data, a home of its own (models, agents'
-// settings, browsers' manifests), the fake Cloud's state and a fake `claude`.
+// settings, browsers' manifests), the fake Cloud's state, a fake `claude`, and
+// a fake recorder and embedder for the voice read (scripts/lab-fakes).
 // The HUD (⌃⌥⌘L) moves between the journeys' steps.
 //
 //   pnpm --filter @sondine/desktop dev:lab [--fresh]
@@ -37,6 +38,18 @@ const claude = join(root, "bin", "claude");
 const fakeClaude = resolve(desktop, "../../packages/engines/test/fake-claude.ts");
 writeFileSync(claude, `#!/bin/sh\nexec "${process.execPath}" "${fakeClaude}" "$@"\n`);
 chmodSync(claude, 0o755);
+
+// The voice read without a microphone or a model (scripts/lab-fakes): a
+// recorder of a tone read in sentences, and an embedder of fixed voices.
+const fakeTool = (name, script) => {
+  const path = join(root, "bin", name);
+  const source = resolve(desktop, "scripts/lab-fakes", script);
+  writeFileSync(path, `#!/bin/sh\nexec "${process.execPath}" "${source}" "$@"\n`);
+  chmodSync(path, 0o755);
+  return path;
+};
+const recorder = fakeTool("sondine-audio", "fake-recorder.mjs");
+const voice = fakeTool("sondine-voice", "fake-voice.mjs");
 
 run(process.execPath, ["scripts/compile-messages.mjs"], desktop);
 // The fake Cloud (apps/compute/scripts/fake-cloud.ts), built into one file as the server itself.
@@ -111,6 +124,8 @@ const env = {
   SONDINE_FAKE_HELPER: "1",
   SONDINE_FAKE_PERMISSIONS_FILE: permissions,
   SONDINE_FLOW_LAB_DIR: root,
+  SONDINE_FLOW_LAB_RECORDER: recorder,
+  SONDINE_FLOW_LAB_VOICE: voice,
   // What the first core reaches, before the HUD puts its step back (core/flow-lab.ts).
   SONDINE_FLOW_LAB: JSON.stringify({
     cloud: { endpoint, key },

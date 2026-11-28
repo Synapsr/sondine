@@ -576,7 +576,9 @@ function start(): void {
 
   const speechBinary = speechExecutable();
   log.info("speech.executable", { path: speechBinary });
-  const voice = voiceTool();
+  // The flow lab reads a voice with its fakes (scripts/lab-fakes): no microphone, no model.
+  const labVoice = flowLabRoot === undefined ? undefined : process.env["SONDINE_FLOW_LAB_VOICE"];
+  const voice = labVoice === undefined ? voiceTool() : { binary: labVoice, model: "unused" };
   log.info("voice.tool", { path: voice?.binary ?? null });
   const text = textServer(app.getPath("home"));
   log.info("text.server", { path: text?.binary ?? null });
@@ -600,10 +602,13 @@ function start(): void {
     dataDirectory: paths.root,
   });
   log.info("updates.target", { blocked: updateApp.blocked });
-  // The voice read's recorder (ADR 034): the helper's binary, on the same hardware.
-  const recorderExecutable = helperExecutable();
+  // The voice read's recorder (ADR 034): the helper's binary, on the same hardware;
+  // in the flow lab, its fake.
+  const labRecorder =
+    flowLabRoot === undefined ? undefined : process.env["SONDINE_FLOW_LAB_RECORDER"];
+  const recorderExecutable = labRecorder ?? helperExecutable();
   const voiceRecorder =
-    useFakeHelper || !existsSync(recorderExecutable)
+    (useFakeHelper && labRecorder === undefined) || !existsSync(recorderExecutable)
       ? null
       : createVoiceRecorder({
           executable: recorderExecutable,
