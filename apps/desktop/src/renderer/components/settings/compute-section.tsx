@@ -90,7 +90,7 @@ export function destinationOption(
   return (
     <RadioLabel className="items-start">
       <Radio value={value} disabled={disabled} className="mt-xxs" />
-      <span className="flex flex-col">
+      <span className="flex flex-col gap-xxs">
         <span>{label}</span>
         <span className="text-body-s text-cte-text-muted">{detail}</span>
       </span>

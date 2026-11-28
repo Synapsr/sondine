@@ -130,7 +130,7 @@ function ChoiceScreen({
         onValueChange={(next) => setPicked(next)}
       >
         {tooBig && models.data !== undefined ? (
-          <div className="flex items-start">
+          <div className="flex items-center">
             <span className="min-w-0 flex-1">
               {destinationOption("device", m.compute_device(), m.welcome_cloud_title(), true)}
             </span>
@@ -272,8 +272,15 @@ function BetaScreen({
 }) {
   const join = useJoinBeta(status.destination);
   const [invite, setInvite] = useState("");
-  // The invite link sits beside the trial's button; its field opens in the page.
+  // The invite link sits beside the trial's button; its field opens in a dialog.
   const [inviting, setInviting] = useState(false);
+  const take = () =>
+    join.take(() => {
+      setInvite("");
+      setInviting(false);
+      join.finish();
+      onNext();
+    }, invite);
   const full = useWaveFull(!status.beta.joined);
   const action = serverAction("beta", status.destination, status.own !== null);
   return (
@@ -289,35 +296,52 @@ function BetaScreen({
           <Button onClick={onNext}>{m.welcome_continue()}</Button>
         ) : (
           <>
-            {status.beta.joined || inviting ? null : (
-              <Button variant="ghost" onClick={() => setInviting(true)}>
+            {status.beta.joined ? null : (
+              <Button variant="outline" onClick={() => setInviting(true)}>
                 {m.compute_beta_invite_open()}
               </Button>
             )}
             <Button
-              isPending={join.pending}
-              disabled={!status.beta.joined && invite.trim() === "" && full}
-              onClick={() =>
+              isPending={join.pending && !inviting}
+              disabled={!status.beta.joined && full}
+              onClick={() => {
+                setInvite("");
                 join.take(() => {
-                  setInvite("");
                   join.finish();
                   onNext();
-                }, invite)
-              }
+                }, "");
+              }}
             >
-              {status.beta.joined || invite.trim() !== ""
-                ? m.compute_beta_use()
-                : m.compute_trial_start()}
+              {status.beta.joined ? m.compute_beta_use() : m.compute_trial_start()}
             </Button>
           </>
         )
       }
     >
       {status.beta.joined ? <CloudPoints /> : <CloudOffer />}
-      {status.beta.joined || !inviting ? null : (
-        <BetaInviteField value={invite} onChange={setInvite} opened />
-      )}
-      {join.problem === null ? null : (
+      <Dialog
+        open={inviting}
+        onOpenChange={(open) => {
+          if (!open) setInviting(false);
+        }}
+      >
+        <DialogPopup className="w-[min(28rem,calc(100vw-var(--space-xl)))]">
+          <DialogTitle>{m.compute_beta_invite_open()}</DialogTitle>
+          <BetaInviteField value={invite} onChange={setInvite} opened />
+          {join.problem === null ? null : (
+            <p role="alert" className="text-body-s text-error">
+              {join.problem}
+            </p>
+          )}
+          <DialogFooter>
+            <DialogClose>{m.usage_close()}</DialogClose>
+            <Button isPending={join.pending} disabled={invite.trim() === ""} onClick={take}>
+              {m.compute_beta_use()}
+            </Button>
+          </DialogFooter>
+        </DialogPopup>
+      </Dialog>
+      {join.problem === null || inviting ? null : (
         <p role="alert" className="text-body-s text-error">
           {join.problem}
         </p>
@@ -398,8 +422,11 @@ function CloudOffer() {
         <SkySurface className="sondine-cloud-sky absolute inset-zero" />
         <p className="relative font-display font-heavy text-display-s">{m.welcome_cloud_offer()}</p>
         <p className="relative text-body-s">{m.compute_trial_terms()}</p>
+        {/* On the sky, the gauge's share in the card's own color, as legible as the rest. */}
+        <div className="relative pt-s **:data-[slot=meter-value]:text-current">
+          <WaveGauge />
+        </div>
       </div>
-      <WaveGauge />
       <CloudPoints />
     </>
   );
@@ -438,8 +465,13 @@ function Points({
   return (
     <ul className="flex flex-col gap-xs text-body-s">
       {points.map(({ Icon, text }) => (
-        <li key={text} className="flex items-start gap-xs">
-          <Icon aria-hidden className="mt-xxs shrink-0 text-cte-text-muted" />
+        <li key={text} className="flex items-center gap-s">
+          <span
+            aria-hidden
+            className="flex size-[2.25rem] shrink-0 items-center justify-center corner-full bg-neutral-3 text-body-l"
+          >
+            <Icon />
+          </span>
           {text}
         </li>
       ))}
