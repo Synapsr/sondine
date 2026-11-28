@@ -12,7 +12,9 @@ import type { PeriodHeading } from "./period-heading";
 // under it; the controls keep their places: « Aujourd'hui » holds its slot
 // while hidden, and so does the « ⋯ » where a period has none. The header's
 // own width, never its words, puts the controls beside the title or under
-// it, so each layout stays still from one period to the next.
+// it, so each layout stays still from one period to the next. Beside them
+// from 48rem: the day's controls (about 36rem) and its longest title
+// (« Aujourd'hui », « Septembre ») fit there whole.
 
 export function PeriodHeader({
   heading,
@@ -37,7 +39,7 @@ export function PeriodHeader({
 }) {
   return (
     <header data-slot="period-header" className="@container">
-      <div className="flex flex-col gap-m @min-[44rem]:flex-row @min-[44rem]:items-end">
+      <div className="flex flex-col gap-m @min-[48rem]:flex-row @min-[48rem]:items-end">
         <div className="flex min-w-0 flex-1 flex-col gap-xs">
           <h1 data-slot="period-title" className={cn(titleClassName, "truncate")}>
             {heading.title}
