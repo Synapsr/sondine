@@ -9,6 +9,7 @@ import { cn } from "@sondine/ui";
 import { Button } from "@sondine/ui/components/button";
 import {
   CheckIcon,
+  CircleCheckIcon,
   ClockIcon,
   MicrophoneIcon,
   PhoneIcon,
@@ -433,32 +434,34 @@ function VoiceStep({ onBack, onNext }: { onBack: () => void; onNext: () => void 
         >
           <UserIcon />
         </span>
-        <Input
-          className="min-w-0 flex-1"
-          aria-label={m.welcome_voice_name()}
-          placeholder={m.welcome_voice_name()}
-          value={name}
-          disabled={known}
-          onChange={(event) => setName(event.target.value)}
-        />
-        {/* Whether Sondine knows the voice: a check, its words on hover (Téo, 2026-11-28). */}
-        <Tooltip>
-          <TooltipTrigger
-            render={
-              <span
-                tabIndex={0}
-                aria-label={voiceState}
-                className={cn(
-                  "flex size-[2rem] shrink-0 items-center justify-center corner-full focus-ring",
-                  known ? "bg-success text-neutral-10" : "bg-neutral-3 text-neutral-6",
-                )}
-              />
-            }
-          >
-            <CheckIcon aria-hidden />
-          </TooltipTrigger>
-          <TooltipPopup>{voiceState}</TooltipPopup>
-        </Tooltip>
+        {/* Whether Sondine knows the voice: a light check in the field, its words on hover (Téo, 2026-11-28). */}
+        <span className="relative min-w-0 flex-1">
+          <Input
+            className="w-full pe-xl"
+            aria-label={m.welcome_voice_name()}
+            placeholder={m.welcome_voice_name()}
+            value={name}
+            disabled={known}
+            onChange={(event) => setName(event.target.value)}
+          />
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <span
+                  tabIndex={0}
+                  aria-label={voiceState}
+                  className={cn(
+                    "absolute end-s top-1/2 flex -translate-y-1/2 corner-full focus-ring",
+                    known ? "text-success" : "text-neutral-5",
+                  )}
+                />
+              }
+            >
+              <CircleCheckIcon aria-hidden />
+            </TooltipTrigger>
+            <TooltipPopup>{voiceState}</TooltipPopup>
+          </Tooltip>
+        </span>
         <Button
           variant={known ? "secondary" : "primary"}
           className="shrink-0"
