@@ -163,7 +163,7 @@ async function exportTo(seeded: Seeded, dataDir: string, path: string, passphras
     path,
     passphrase,
     includeAudio: true,
-    prefs: { PARAGLIDE_LOCALE: "fr" },
+    prefs: { "sondine.locale": "fr" },
     appVersion: "0.11.0",
     macName: "Mac inventé",
     models: ["parakeet-invented"],
@@ -225,7 +225,7 @@ describe("a backup's round trip", () => {
         restoredAtMs: restoredAt,
         createdAtMs: t0 + 60_000,
         models: ["parakeet-invented"],
-        prefs: { PARAGLIDE_LOCALE: "fr" },
+        prefs: { "sondine.locale": "fr" },
       });
       const states = db
         .statement("SELECT audio_state AS state, count(*) AS n FROM chunks GROUP BY 1 ORDER BY 1")

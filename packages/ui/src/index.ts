@@ -30,4 +30,8 @@ export type {
 } from "./theme/theme-controller";
 export { ThemeProvider, useTheme } from "./theme/theme-provider";
 export type { ThemeContextValue, ThemeProviderProps } from "./theme/theme-provider";
-export { createLocalStorageThemeStorage, createMemoryThemeStorage } from "./theme/theme-storage";
+export {
+  createLocalStorageThemeStorage,
+  createMemoryThemeStorage,
+  THEME_STORAGE_KEY,
+} from "./theme/theme-storage";
