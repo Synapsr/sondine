@@ -32,14 +32,7 @@ import { modelsReady } from "../models/model-view";
 import { Step } from "./step";
 import { TranscriptionStep } from "./transcription-step";
 import { WelcomeIntro } from "./welcome-intro";
-import {
-  nextStep,
-  permissionOffer,
-  previousStep,
-  startNotes,
-  stepIndex,
-  WELCOME_STEPS,
-} from "./welcome-steps";
+import { nextStep, permissionOffer, previousStep, startNotes, stepIndex } from "./welcome-steps";
 
 // The first run (`/welcome`, ADR 037), shown until it is completed: what the
 // user wants to find again, whether to share anonymous statistics (ADR 042),
@@ -114,34 +107,6 @@ export function WelcomeScreen() {
         </Button>
       ) : null}
       <RestoreDialog open={restoring} replaces={false} onClose={() => setRestoring(false)} />
-      {/* The steps stay at the top, the width of the column, whatever the step's height
-          (Téo, 2026-11-19); the first step shows none, to stay bare (Téo, 2026-11-28). */}
-      <ol
-        aria-hidden={shown === "welcome" ? true : undefined}
-        aria-label={m.welcome_progress({
-          step: String(stepIndex(shown) + 1),
-          count: String(WELCOME_STEPS.length),
-        })}
-        className={cn(
-          "flex w-full max-w-[30rem] gap-xxs transition-opacity duration-motion ease-motion motion-reduce:transition-none",
-          shown === "welcome" && "opacity-0",
-        )}
-      >
-        {WELCOME_STEPS.map((candidate, index) => (
-          <li
-            key={candidate}
-            aria-current={candidate === shown ? "step" : undefined}
-            className={cn(
-              "h-xxs flex-1 corner-full transition-[background-color] duration-motion ease-motion motion-reduce:transition-none",
-              candidate === shown
-                ? "bg-color-1"
-                : index < stepIndex(shown)
-                  ? "bg-neutral-8"
-                  : "bg-neutral-4",
-            )}
-          />
-        ))}
-      </ol>
       {/* The step in the middle of what is left, both ways; a tall step scrolls from the top. */}
       <div
         className={cn(

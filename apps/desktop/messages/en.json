@@ -571,7 +571,6 @@
   "welcome_open_settings": "Open System Settings",
   "welcome_open_today": "Open Today",
   "welcome_permissions_intro": "macOS asks for your consent for each source. Nothing is recorded until you start listening.",
-  "welcome_progress": "Step {step} of {count}",
   "welcome_restricted": "The system prevents Sondine from using it (managed Mac).",
   "welcome_start": "Start listening",
   "welcome_start_intro": "Once you start, Sondine records the microphone and the Mac’s sound, and goes on until you pause.",
