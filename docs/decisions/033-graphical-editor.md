@@ -69,3 +69,19 @@ gradient and no animation from the site.
   pure black read too black, and the gray edges of cards too light.
 - A later change of the site's palette or type is carried to the app through
   `graphical/themes/graphical.json`, as any theme change.
+
+## Amendment — the site's look, sparingly (2026-11-28)
+
+Since the site was redone, Téo allows the app to take the site's gradients,
+pictures and animations, sparingly. The first is the first run's opening
+(`components/welcome/welcome-intro.tsx`), after Arc and Dia's first launch:
+on the window's own background, the site's moving sky comes in (its WebGL
+gradient of orange, pale sky and teal, warped by noise, with grain:
+`sky-surface.tsx`, about 15 frames a second, only while it shows);
+Sondine's wordmark, the site's (`SondineLogo`, in `packages/ui/src/icon`),
+arrives, « Bienvenue » under it, then a quiet line to click; a click fades
+it all out onto the first question. In dark mode the pale sky gives way to
+black and slow holes open onto the window's background, under white words.
+Téo first saw the site's sky photo there, then blurred halos, and chose the
+site's gradient. Each later use is a deliberate moment like this one, never
+a background for everyday screens, and keeps still under reduced motion.

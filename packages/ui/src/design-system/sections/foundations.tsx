@@ -273,6 +273,9 @@ export default function FoundationsSection() {
           </figure>
         ))}
       </Specimen>
+      <Specimen label="Wordmark" className="flex">
+        <icons.SondineLogo className="w-[12rem]" />
+      </Specimen>
     </Section>
   );
 }

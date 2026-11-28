@@ -31,6 +31,7 @@ import { RestoreDialog } from "../backup/backup-dialogs";
 import { modelsReady } from "../models/model-view";
 import { Step } from "./step";
 import { TranscriptionStep } from "./transcription-step";
+import { WelcomeIntro } from "./welcome-intro";
 import {
   nextStep,
   permissionOffer,
@@ -49,7 +50,8 @@ import {
 // permission prompt comes back to it. The voice read and the model are
 // optional; the read records only while the user reads, and never becomes a
 // memory (ADR 034). Each step's parts rise in one after the other; going to
-// another step, the one left slides away blurred (Téo, 2026-11-19).
+// another step, the one left slides away blurred (Téo, 2026-11-19). Before
+// anything is chosen, the opening comes first (welcome-intro.tsx).
 
 export function WelcomeScreen() {
   const onboarding = useQuery(orpc.onboarding.get.queryOptions());
@@ -58,6 +60,7 @@ export function WelcomeScreen() {
   const [step, setStep] = useState<OnboardingStep | null>(null);
   // After a change of step, the next one waits for the one left to be mostly gone.
   const [moved, setMoved] = useState(false);
+  const [opened, setOpened] = useState(false);
   const shown = step ?? onboarding.data?.step ?? "welcome";
   const go = (next: OnboardingStep | null, goal?: OnboardingGoal) => {
     if (next === null) return;
@@ -80,6 +83,16 @@ export function WelcomeScreen() {
       { onSuccess: (status) => queryClient.setQueryData(orpc.onboarding.get.queryKey(), status) },
     );
   };
+
+  // The window waits for the first run, so the opening never shows after a later step.
+  if (onboarding.isPending) return <div className="min-h-dvh bg-cte-canvas" />;
+  if (
+    !opened &&
+    step === null &&
+    onboarding.data?.step === "welcome" &&
+    onboarding.data.goal === null
+  )
+    return <WelcomeIntro onDone={() => setOpened(true)} />;
 
   return (
     <div className="relative flex min-h-dvh flex-col items-center bg-cte-canvas px-l pt-xxl text-cte-text">
