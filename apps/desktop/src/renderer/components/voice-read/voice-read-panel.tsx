@@ -9,7 +9,7 @@ import { errorMessage, orpc } from "../../core/orpc";
 import { m } from "../../paraglide/messages.js";
 import { getLocale } from "../../paraglide/runtime.js";
 import { SkySurface } from "../welcome/sky-surface";
-import { QUIET_LEVEL, voiceReadView } from "./voice-read-view";
+import { QUIET_LEVEL, trackRead, voiceReadView, type ReadTrack } from "./voice-read-view";
 
 // The voice read (ADR 034): the user reads a short text aloud and Sondine
 // keeps its voice print as one of the user's references, so « Moi » is
@@ -69,10 +69,15 @@ export function VoiceReadPanel({
 }) {
   const queryClient = useQueryClient();
   const status = useVoiceRead();
-  // An outcome left by an earlier read is not this panel's.
-  const [mine, setMine] = useState(false);
+  // An outcome left by an earlier read is not this panel's (trackRead).
+  const [track, setTrack] = useState<ReadTrack>("none");
+  const mine = track === "mine";
   const start = useMutation(
-    orpc.voiceRead.start.mutationOptions({ onMutate: () => setMine(true) }),
+    orpc.voiceRead.start.mutationOptions({
+      onMutate: () => setTrack((was) => trackRead(was, { type: "asked" })),
+      onSuccess: (next) =>
+        setTrack((was) => trackRead(was, { type: "started", phase: next.session.phase })),
+    }),
   );
   const finish = useMutation(
     orpc.voiceRead.finish.mutationOptions({ onSuccess: () => refreshVoices(queryClient) }),
@@ -88,10 +93,13 @@ export function VoiceReadPanel({
   );
   // Leaving the screen mid-read keeps nothing, a start still on its way included.
   const phase = status.data?.session.phase;
+  useEffect(() => {
+    if (phase !== undefined) setTrack((was) => trackRead(was, { type: "status", phase }));
+  }, [phase]);
   const underWay = start.isPending || phase === "recording" || phase === "embedding";
   const cancelOnLeave = useRef<() => void>(() => undefined);
   cancelOnLeave.current = () => {
-    if (mine && underWay) cancel.mutate({});
+    if (track !== "none" && underWay) cancel.mutate({});
   };
   useEffect(() => () => cancelOnLeave.current(), []);
   const name = selfName ?? m.voice_self();

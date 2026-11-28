@@ -51,5 +51,34 @@ export function voiceReadView(status: VoiceReadStatus, mine = true): VoiceReadVi
   return { kind: "ready", failure: session.phase === "failed" && mine ? session.failure : null };
 }
 
+/**
+ * Whether the session on screen is this panel's read. Asked for, the read is
+ * not yet this panel's: the status may still show what an earlier read left
+ * (kept, or failed) until the new one is seen under way, or until its start
+ * answers with its own failure. Only then is its outcome this panel's, so a
+ * « kept » from before never closes the first run's dialog on a new read.
+ */
+export type ReadTrack = "none" | "asked" | "mine";
+
+export function trackRead(
+  track: ReadTrack,
+  event:
+    | { readonly type: "asked" }
+    | { readonly type: "status"; readonly phase: VoiceReadSession["phase"] }
+    | { readonly type: "started"; readonly phase: VoiceReadSession["phase"] },
+): ReadTrack {
+  switch (event.type) {
+    case "asked":
+      return "asked";
+    case "status":
+      return track === "asked" && (event.phase === "recording" || event.phase === "embedding")
+        ? "mine"
+        : track;
+    // A start that fails answers with its failure; one under way is seen in the status.
+    case "started":
+      return track === "asked" && event.phase === "failed" ? "mine" : track;
+  }
+}
+
 /** Under this the meter warns that the voice is too quiet. */
 export const QUIET_LEVEL = 0.25;

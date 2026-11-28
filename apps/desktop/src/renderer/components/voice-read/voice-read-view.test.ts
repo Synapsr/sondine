@@ -1,6 +1,6 @@
 import type { VoiceReadSession, VoiceReadStatus } from "@sondine/api";
 import { describe, expect, it } from "vitest";
-import { voiceReadView } from "./voice-read-view";
+import { trackRead, voiceReadView, type ReadTrack } from "./voice-read-view";
 
 const session = (change: Partial<VoiceReadSession> = {}): VoiceReadSession => ({
   phase: "idle",
@@ -52,5 +52,29 @@ describe("the voice read's view", () => {
     const done = status({ session: session({ phase: "done" }) });
     expect(voiceReadView(done)).toEqual({ kind: "done" });
     expect(voiceReadView(done, false)).toEqual({ kind: "ready", failure: null });
+  });
+
+  it("takes a new read as this panel's only once it is seen under way, never from the « kept » an earlier one left", () => {
+    // « Relire » after a kept read: the status still says done while the start is on its way.
+    let track: ReadTrack = trackRead("mine", { type: "asked" });
+    const before = status({ session: session({ phase: "done" }) });
+    track = trackRead(track, { type: "status", phase: "done" });
+    track = trackRead(track, { type: "started", phase: "recording" });
+    expect(track).toBe("asked");
+    expect(voiceReadView(before, track === "mine")).toEqual({ kind: "ready", failure: null });
+    track = trackRead(track, { type: "status", phase: "recording" });
+    expect(track).toBe("mine");
+    expect(
+      voiceReadView(status({ session: session({ phase: "done" }) }), track === "mine"),
+    ).toEqual({ kind: "done" });
+  });
+
+  it("takes a start that fails at once as this panel's, to show why", () => {
+    const track = trackRead(trackRead("none", { type: "asked" }), {
+      type: "started",
+      phase: "failed",
+    });
+    expect(track).toBe("mine");
+    expect(trackRead("none", { type: "status", phase: "recording" })).toBe("none");
   });
 });
