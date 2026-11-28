@@ -744,7 +744,7 @@ an exception is written beside the screen's row.
 | 6   | Menus, popovers               | The primitive's own: fade and `--motion-popup-scale`                                                   | Small |
 | 7   | ⌘K, palette, dialogs          | The primitive's own                                                                                    | Large |
 | 8   | Toast                         | Rises from the bottom (translateY)                                                                     | Large |
-| 9   | First-run step                | The outgoing step fades; the next rises 12 px; the progress bar fills (scaleX)                         | Large |
+| 9   | First-run step                | The outgoing step fades; the next rises 12 px; no progress bar (Téo, 2026-11-28)                       | Large |
 | 10  | First memory found            | The matched word's highlight fades in                                                                  | Small |
 | 11  | Live text                     | New words fade in                                                                                      | Small |
 | 12  | Play ↔ pause                  | The icons cross-fade; the playing sentence's highlight fades                                           | Small |

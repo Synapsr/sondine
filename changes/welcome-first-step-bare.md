@@ -2,6 +2,6 @@
 type: improved
 ---
 
-## A barer first step of the welcome
+## A barer welcome
 
-The first screen of the welcome shows only its question: the progress bar appears from the second step, and « Restore a backup… » moves to the top corner, in light text. The cards' icons now follow the curve of their card.
+The welcome's screens show only their question: no more progress bar above them. On the first, « Restore a backup… » moves to the top corner, in light text, and the cards' icons now follow the curve of their card.
