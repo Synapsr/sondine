@@ -60,6 +60,7 @@ export function WelcomeScreen() {
   const [step, setStep] = useState<OnboardingStep | null>(null);
   // After a change of step, the next one waits for the one left to be mostly gone.
   const [moved, setMoved] = useState(false);
+  const [restoring, setRestoring] = useState(false);
   const [opened, setOpened] = useState(false);
   const shown = step ?? onboarding.data?.step ?? "welcome";
   const go = (next: OnboardingStep | null, goal?: OnboardingGoal) => {
@@ -101,13 +102,30 @@ export function WelcomeScreen() {
         aria-hidden
         className="absolute inset-x-zero top-zero h-[2.5rem] [-webkit-app-region:drag]"
       />
-      {/* The steps stay at the top, the width of the column, whatever the step's height (Téo, 2026-11-19). */}
+      {/* A Mac reinstalled, or a new one (ADR 048): everything back from one file,
+          offered lightly in the corner of the first step, on the traffic lights' line (Téo, 2026-11-28). */}
+      {shown === "welcome" ? (
+        <Button
+          variant="ghost"
+          className="absolute end-xxs top-xxs text-body-s text-cte-text-muted [-webkit-app-region:no-drag]"
+          onClick={() => setRestoring(true)}
+        >
+          {m.backup_welcome_restore()}
+        </Button>
+      ) : null}
+      <RestoreDialog open={restoring} replaces={false} onClose={() => setRestoring(false)} />
+      {/* The steps stay at the top, the width of the column, whatever the step's height
+          (Téo, 2026-11-19); the first step shows none, to stay bare (Téo, 2026-11-28). */}
       <ol
+        aria-hidden={shown === "welcome" ? true : undefined}
         aria-label={m.welcome_progress({
           step: String(stepIndex(shown) + 1),
           count: String(WELCOME_STEPS.length),
         })}
-        className="flex w-full max-w-[30rem] gap-xxs"
+        className={cn(
+          "flex w-full max-w-[30rem] gap-xxs transition-opacity duration-motion ease-motion motion-reduce:transition-none",
+          shown === "welcome" && "opacity-0",
+        )}
       >
         {WELCOME_STEPS.map((candidate, index) => (
           <li
@@ -202,7 +220,6 @@ function GoalStep({
   goal: OnboardingGoal | null;
   onPick: (goal: OnboardingGoal) => void;
 }) {
-  const [restoring, setRestoring] = useState(false);
   return (
     <section aria-labelledby="welcome-title" className="sondine-stagger flex flex-col gap-l">
       <h1 id="welcome-title" className="font-display font-heavy text-display-m">
@@ -216,7 +233,8 @@ function GoalStep({
               aria-pressed={goal === card.goal}
               onClick={() => onPick(card.goal)}
               className={cn(
-                "flex w-full items-center gap-s corner-m p-m text-start ring-[1px] focus-ring",
+                // Concentric corners: the icon's is the card's less the inset (28 − 17 ≈ 12).
+                "flex w-full items-center gap-s corner-l p-m text-start ring-[1px] focus-ring",
                 "transition-[background-color,box-shadow] duration-motion ease-motion motion-reduce:transition-none",
                 "control-hover:bg-neutral-2",
                 goal === card.goal ? "ring-neutral-10" : "ring-neutral-4",
@@ -224,7 +242,7 @@ function GoalStep({
             >
               <span
                 aria-hidden
-                className="flex size-[2.5rem] shrink-0 items-center justify-center corner-m bg-neutral-3 text-cte-text-muted"
+                className="flex size-[2.5rem] shrink-0 items-center justify-center corner-s bg-neutral-3 text-cte-text-muted"
               >
                 {card.icon}
               </span>
@@ -236,11 +254,6 @@ function GoalStep({
           </li>
         ))}
       </ul>
-      {/* A Mac reinstalled, or a new one (ADR 048): everything back from one file. */}
-      <Button variant="ghost" className="self-start" onClick={() => setRestoring(true)}>
-        {m.backup_welcome_restore()}
-      </Button>
-      <RestoreDialog open={restoring} replaces={false} onClose={() => setRestoring(false)} />
     </section>
   );
 }
