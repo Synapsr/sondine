@@ -7,6 +7,8 @@ import {
   APP_ICON_CHANNEL,
   NAVIGABLE_PATH,
   NAVIGATE_CHANNEL,
+  FLOW_LAB_CHANGED_CHANNEL,
+  FLOW_LAB_CHANNEL,
   NOTCH_LAB_CHANGED_CHANNEL,
   NOTCH_LAB_CHANNEL,
   PASTED_FILES_CHANNEL,
@@ -17,6 +19,7 @@ import {
   PORT_WINDOW_MESSAGE,
   type AppInfo,
   type EditCommand,
+  type FlowLabBridge,
   type NotchLabBridge,
   type SondineBridge,
 } from "../shared/bridge";
@@ -73,6 +76,15 @@ const notchLab: NotchLabBridge = {
   },
 };
 
+const flowLab: FlowLabBridge = {
+  run: (command) => ipcRenderer.invoke(FLOW_LAB_CHANNEL, command),
+  onChange: (listener) => {
+    const relay = (_event: unknown, view: Parameters<typeof listener>[0]) => listener(view);
+    ipcRenderer.on(FLOW_LAB_CHANGED_CHANNEL, relay);
+    return () => void ipcRenderer.removeListener(FLOW_LAB_CHANGED_CHANNEL, relay);
+  },
+};
+
 const bridge: SondineBridge = {
   info: Object.freeze(readAppInfo()),
   requestCorePort: () => ipcRenderer.send(PORT_REQUEST_CHANNEL),
@@ -119,7 +131,7 @@ const bridge: SondineBridge = {
     const { bundleId, name } = answer as Record<string, unknown>;
     return typeof bundleId === "string" && typeof name === "string" ? { bundleId, name } : null;
   },
-  ...(import.meta.env.DEV ? { notchLab } : {}),
+  ...(import.meta.env.DEV ? { notchLab, flowLab } : {}),
 };
 
 contextBridge.exposeInMainWorld("sondine", bridge);

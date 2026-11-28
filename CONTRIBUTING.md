@@ -23,7 +23,16 @@ native/scripts/fetch-models.sh       # the VAD and voice models, sha256-checked,
 (cd native && swift build -c release && swift build)
 pnpm dev                             # the desktop app, with real capture
 pnpm --filter @sondine/desktop dev:fake-hal   # the real helper on fake audio hardware, no prompts
+pnpm --filter @sondine/desktop dev:lab        # the flow lab: any journey's step on invented data, no network
 ```
+
+The flow lab ([ADR 049](docs/decisions/049-flow-lab.md)) runs in a folder of
+its own (`~/.sondine-flow-lab`), with a fake helper, a fake Cloud and a fake
+agent. Its HUD (⌃⌥⌘L) goes to any step of a journey, from the first run to
+the end, replays it from its starting state and switches its variants
+(permission refused, model present, offline, Cloud full…), the language,
+the theme and the window's size. Add a step to `apps/desktop/src/shared/flow-lab.ts`
+when you add a screen.
 
 No account, key or secret is needed for any of this. The speech and text
 models are downloaded from the app's first run, from their publishers.

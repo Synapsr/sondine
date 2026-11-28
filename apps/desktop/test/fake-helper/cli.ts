@@ -1,9 +1,13 @@
+import { existsSync, readFileSync } from "node:fs";
 import { parseArgs } from "node:util";
-import { startFakeHelper } from "./fake-helper";
+import { startFakeHelper, type FakePermissions } from "./fake-helper";
 
 // `fake-helper serve --socket <path> --data <dir>`, the same command line as
 // `sondine-audio serve`. Like the real helper it exits when its stdin closes
 // (main's lifetime pipe), on SIGTERM, or after acknowledging `shutdown`.
+// `SONDINE_FAKE_PERMISSIONS_FILE` names a file holding what the permissions
+// say (ask, granted, denied, restricted), read at each start: the flow lab
+// changes it between steps (ADR 049).
 
 const { positionals, values } = parseArgs({
   args: process.argv.slice(2),
@@ -23,8 +27,17 @@ const exit = (reason: string) => {
   void helper.close().finally(() => process.exit(0));
 };
 
+const PERMISSIONS: readonly FakePermissions[] = ["ask", "granted", "denied", "restricted"];
+const permissionsFile = process.env["SONDINE_FAKE_PERMISSIONS_FILE"];
+const given =
+  permissionsFile !== undefined && existsSync(permissionsFile)
+    ? readFileSync(permissionsFile, "utf8").trim()
+    : null;
+const permissions = PERMISSIONS.find((candidate) => candidate === given);
+
 const helper = await startFakeHelper({
   socketPath: values.socket,
+  ...(permissions === undefined ? {} : { permissions }),
   autoplay: { commitEveryMs: 2_000, healthEveryMs: 10_000 },
   onShutdown: () => setTimeout(() => exit("shutdown"), 50),
 });

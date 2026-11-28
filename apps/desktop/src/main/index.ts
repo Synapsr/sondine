@@ -24,6 +24,8 @@ import coreModulePath from "../core/index?modulePath";
 import { m } from "../renderer/paraglide/messages.js";
 import {
   EDIT_COMMAND_CHANNEL,
+  FLOW_LAB_CHANGED_CHANNEL,
+  FLOW_LAB_CHANNEL,
   NOTCH_LAB_CHANGED_CHANNEL,
   NOTCH_LAB_CHANNEL,
   NAVIGATE_CHANNEL,
@@ -60,6 +62,7 @@ import { appIcon } from "./app-icons";
 import { applicationMenu } from "./app-menu";
 import { isOpenCopy, readClipboard } from "./context-files";
 import { pastedFiles } from "./pasted-files";
+import { opensNoBrowser } from "./no-browser";
 import { pickApp } from "./pick-app";
 import { startCoreProcess } from "./core-process";
 import { createCoreStatusTracker } from "./core-status";
@@ -155,6 +158,19 @@ const helperHal = process.env.SONDINE_HELPER_HAL;
 // invented data (scripts/ux). Development only.
 const uxBackupFile = app.isPackaged ? undefined : process.env.SONDINE_UX_BACKUP_FILE;
 const useFakeHal = !app.isPackaged && helperHal === "fake";
+// SONDINE_FLOW_LAB_DIR: this app is the flow lab (scripts/dev-lab.mjs, ADR
+// 049), its folder prepared there. Development only.
+const flowLabRoot =
+  import.meta.env.DEV && !app.isPackaged ? process.env.SONDINE_FLOW_LAB_DIR : undefined;
+// Its home is the lab's (dev-lab.mjs sets HOME): models, agents' settings and
+// browsers' manifests stay there. Electron does not read HOME itself.
+const flowLabHome = flowLabRoot === undefined ? undefined : process.env.HOME;
+if (flowLabHome !== undefined) {
+  const appData = join(flowLabHome, "Library", "Application Support");
+  mkdirSync(appData, { recursive: true });
+  app.setPath("home", flowLabHome);
+  app.setPath("appData", appData);
+}
 
 const groupContainer = loadGroupContainerAccess();
 const dataDirectory = resolveDataDirectory({
@@ -251,13 +267,14 @@ function start(): void {
   // sign-up page and its privacy (shared/cloud.ts), and in development the sign-in page of
   // Graphical's theme editor (ADR 033).
   const isExternalLink = (url: string) =>
-    licenses(url) ||
-    isReleasePage(url) ||
-    isContactMail(url) ||
-    url === ISSUES_PAGE ||
-    isCloudWaitlist(url) ||
-    isCloudPrivacy(url) ||
-    (import.meta.env.DEV && devServerUrl !== undefined && isGraphicalSignIn(url));
+    !opensNoBrowser() &&
+    (licenses(url) ||
+      isReleasePage(url) ||
+      isContactMail(url) ||
+      url === ISSUES_PAGE ||
+      isCloudWaitlist(url) ||
+      isCloudPrivacy(url) ||
+      (import.meta.env.DEV && devServerUrl !== undefined && isGraphicalSignIn(url)));
   hardenSession(session.defaultSession, requestGuard(devServerUrl));
   app.on("web-contents-created", (_event, contents) =>
     hardenWebContents(contents, isAppUrl, isExternalLink),
@@ -567,7 +584,8 @@ function start(): void {
   const browserHost = browserRelay(sandboxedHelperCanReach(dataDirectory));
   const extension = browserExtension();
   log.info("browser.relay", { path: browserHost?.path ?? null, extension: extension !== null });
-  const lan = phoneRelay(sandboxedHelperCanReach(dataDirectory));
+  // The flow lab advertises nothing on the network: no phone sync there.
+  const lan = flowLabRoot === undefined ? phoneRelay(sandboxedHelperCanReach(dataDirectory)) : null;
   log.info("phone.relay", { path: lan?.path ?? null });
   // Updates (ADR 045): whether this app can replace itself, and how.
   const updateAddon = loadUpdateAddon();
@@ -663,8 +681,8 @@ function start(): void {
       // The page an episode came from (ADR 023): core vouches for it, main
       // opens only http(s), in the default browser, never in the window.
       case "open-page":
-        // The captures' runs (`ux:cloud-shots`, development only) open no browser.
-        if (!app.isPackaged && process.env["SONDINE_DEV_NO_BROWSER"] === "1") {
+        // The captures' runs and the flow lab (development only) open no browser.
+        if (opensNoBrowser()) {
           log.info("open-page.skipped");
           return;
         }
@@ -925,6 +943,60 @@ function start(): void {
         const { LabCommand } = await import("../shared/notch-lab");
         return lab.run(LabCommand.parse(command));
       });
+    });
+  }
+
+  // Development only, left out of production builds: the flow lab (ADR 049).
+  if (import.meta.env.DEV && flowLabRoot !== undefined) {
+    const root = flowLabRoot;
+    void import("./flow-lab/controller").then(({ createFlowLab, labPaths }) => {
+      const [endpoint, key] = (process.env["SONDINE_DEV_CLOUD"] ?? "").split(" ");
+      const lab = createFlowLab({
+        paths: labPaths(root),
+        migrationsDir: migrationsDirectory(),
+        cloud: endpoint && key ? { endpoint, key } : null,
+        stop: async () => {
+          helper.retire();
+          voiceRecorder?.stopAll();
+          await core.stop();
+          await helper.stop();
+        },
+        start: () => {
+          helper.start();
+          core.startAgain();
+        },
+        client: () => core.client(),
+        load: (path, storage) => {
+          const shown = window !== null && !window.isDestroyed() ? window : null;
+          if (shown === null) {
+            openWindow(path);
+            return;
+          }
+          // In the page itself: its storage, then a fresh load of the step's route.
+          const script = [
+            ...Object.entries(storage).map(([name, value]) =>
+              value === null
+                ? `localStorage.removeItem(${JSON.stringify(name)})`
+                : `localStorage.setItem(${JSON.stringify(name)}, ${JSON.stringify(value)})`,
+            ),
+            `history.replaceState(null, "", ${JSON.stringify(`#${path}`)})`,
+            "location.reload()",
+          ].join(";");
+          void shown.webContents.executeJavaScript(script).catch(logFailure("flow-lab.load"));
+        },
+        resize: (width, height) => window?.setSize(width, height, true),
+        publish: (view) => {
+          if (window !== null && !window.isDestroyed())
+            window.webContents.send(FLOW_LAB_CHANGED_CHANNEL, view);
+        },
+      });
+      ipcMain.handle(FLOW_LAB_CHANNEL, async (event, command: unknown) => {
+        if (!fromWindow(event)) return null;
+        if (command === null) return lab.view();
+        const { LabCommand } = await import("../shared/flow-lab");
+        return lab.run(LabCommand.parse(command));
+      });
+      void lab.resume();
     });
   }
 

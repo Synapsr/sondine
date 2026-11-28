@@ -1,3 +1,4 @@
+import type { LabCommand as FlowLabCommand, LabView as FlowLabView } from "./flow-lab";
 import type { LabCommand, LabView } from "./notch-lab";
 
 // The renderer ⇄ preload contract. Environment-free: the renderer compiles it
@@ -68,6 +69,18 @@ export const NOTCH_LAB_CHANNEL = "sondine:notch-lab";
 /** Development only. Main → preload: the notch lab changed. */
 export const NOTCH_LAB_CHANGED_CHANNEL = "sondine:notch-lab-changed";
 
+/** Development only: the flow lab's HUD (ADR 049). */
+export const FLOW_LAB_CHANNEL = "sondine:flow-lab";
+/** Main tells the HUD what changed (a step put back, a problem). */
+export const FLOW_LAB_CHANGED_CHANNEL = "sondine:flow-lab-changed";
+
+export interface FlowLabBridge {
+  /** Runs a command, or only reads; null outside the lab (`pnpm dev`). */
+  run(command: FlowLabCommand | null): Promise<FlowLabView | null>;
+  /** Returns the unsubscribe. */
+  onChange(listener: (view: FlowLabView) => void): () => void;
+}
+
 export interface NotchLabBridge {
   /** Runs a command, or only reads. */
   run(command: LabCommand | null): Promise<LabView>;
@@ -109,6 +122,8 @@ export interface SondineBridge {
   openNotificationSettings(): void;
   /** Development only: the notch lab. */
   readonly notchLab?: NotchLabBridge;
+  /** Development only: the flow lab. */
+  readonly flowLab?: FlowLabBridge;
 }
 
 /** `additionalArguments` prefix main uses to hand AppInfo to the sandboxed preload. */

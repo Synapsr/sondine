@@ -12,6 +12,7 @@
     "dev:fake": "node scripts/compile-messages.mjs && env -u ELECTRON_RUN_AS_NODE SONDINE_FAKE_HELPER=1 electron-vite dev",
     "dev:fake-hal": "node scripts/compile-messages.mjs && env -u ELECTRON_RUN_AS_NODE SONDINE_HELPER_HAL=fake electron-vite dev",
     "dev:notch": "node scripts/dev-notch.mjs",
+    "dev:lab": "node scripts/dev-lab.mjs",
     "build": "node scripts/compile-messages.mjs && electron-vite build",
     "build:mac": "node scripts/build-mac.mjs",
     "release:mac": "SONDINE_STATS_ENDPOINT=https://stats.sondine.app/v1/report infisical run --path /desktop -- node scripts/build-mac.mjs --release",

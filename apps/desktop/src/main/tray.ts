@@ -17,6 +17,7 @@ import { holdLines } from "../shared/hold-lines";
 import { KEEP_RECENT_SHORTCUT } from "../shared/keep-recent";
 import { isReleasePage } from "../shared/updates";
 import { log } from "./log";
+import { opensNoBrowser } from "./no-browser";
 import { PASTE_CONTEXT_SHORTCUT, PASTE_FEEDBACK_MS } from "./paste-context";
 import {
   activeHolds,
@@ -278,7 +279,8 @@ export function createSondineTray(
                 // Only a release page of Sondine's repository opens.
                 click: () => {
                   if (updateReady) actions.installUpdate();
-                  else if (isReleasePage(update.url)) void shell.openExternal(update.url);
+                  else if (isReleasePage(update.url) && !opensNoBrowser())
+                    void shell.openExternal(update.url);
                 },
               },
             ]),

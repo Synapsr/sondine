@@ -86,4 +86,25 @@ describe("production build", () => {
     expect(bundle).not.toContain("DesignSystemPage");
     expect(bundle).toContain("sondine:core-port");
   });
+
+  it("leaves the flow lab and its HUD out of every bundle (ADR 049)", () => {
+    const bundles = ["main", "main/chunks", "preload", "renderer/assets"]
+      .flatMap((dir) => files(dir).map((name) => `${dir}/${name}`))
+      .filter((path) => /\.(c?js|css)$/.test(path))
+      .map((path) => [path, read(path)] as const);
+    expect(bundles.map(([path]) => path).filter((path) => path.includes("flow-lab"))).toEqual([]);
+    for (const [path, text] of bundles) {
+      // What only the lab's code holds: its variables, channels, HUD and fake Cloud's catalog.
+      for (const mark of [
+        "SONDINE_FLOW_LAB",
+        "sondine:flow-lab",
+        "Labo des parcours",
+        "sondine.dev.flow-lab",
+        "cloud-checkout",
+        "FAKE_CLAUDE_MODE",
+      ]) {
+        expect(text.includes(mark), `${mark} in ${path}`).toBe(false);
+      }
+    }
+  });
 });
