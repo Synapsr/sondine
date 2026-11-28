@@ -2,8 +2,14 @@ import { USAGE_EXAMPLE, type UsageReport } from "@sondine/protocol";
 import { cn } from "@sondine/ui";
 import { Button } from "@sondine/ui/components/button";
 import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@sondine/ui/components/collapsible";
+import {
   Dialog,
   DialogClose,
+  DialogDescription,
   DialogFooter,
   DialogPopup,
   DialogTitle,
@@ -31,7 +37,11 @@ export function useShareUsage() {
   );
 }
 
-/** « Voir ce qui est envoyé »: today's report so far and those waiting, or an example without a yes. */
+/**
+ * « Voir ce qui est envoyé »: what a report holds, in plain words, then the
+ * report itself on demand (Téo, 2026-11-28): today's so far and those
+ * waiting, or an example without a yes.
+ */
 export function SentReports({ className }: { className?: string }) {
   const usage = useUsage();
   const status = usage.data;
@@ -60,10 +70,29 @@ export function SentReports({ className }: { className?: string }) {
         {m.usage_see()}
       </DialogTrigger>
       <DialogPopup className="w-[min(32rem,calc(100vw-var(--space-xl)))]">
-        <DialogTitle>{example ? m.usage_example() : m.usage_see()}</DialogTitle>
-        {(example ? [USAGE_EXAMPLE] : reports).map((report) => (
-          <Report key={report.id} report={report} />
-        ))}
+        <DialogTitle>{m.usage_see()}</DialogTitle>
+        <ul className="flex list-disc flex-col gap-xxs ps-l text-body-s">
+          {[
+            m.usage_sent_versions(),
+            m.usage_sent_memory(),
+            m.usage_sent_days(),
+            m.usage_sent_onboarding(),
+            m.usage_sent_counts(),
+          ].map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+        <DialogDescription>{m.usage_sent_never()}</DialogDescription>
+        <Collapsible>
+          <CollapsibleTrigger>
+            {example ? m.usage_example() : m.usage_sent_exact()}
+          </CollapsibleTrigger>
+          <CollapsiblePanel>
+            {(example ? [USAGE_EXAMPLE] : reports).map((report) => (
+              <Report key={report.id} report={report} />
+            ))}
+          </CollapsiblePanel>
+        </Collapsible>
         <DialogFooter>
           <DialogClose>{m.usage_close()}</DialogClose>
         </DialogFooter>
@@ -74,7 +103,7 @@ export function SentReports({ className }: { className?: string }) {
 
 function Report({ report }: { report: UsageReport }) {
   return (
-    <pre className="max-h-[60vh] shrink-0 overflow-y-auto corner-s bg-neutral-2 p-s font-data text-body-xs whitespace-pre-wrap select-text">
+    <pre className="max-h-[40vh] overflow-y-auto font-data text-body-xs whitespace-pre-wrap select-text">
       {JSON.stringify(report, null, 2)}
     </pre>
   );
