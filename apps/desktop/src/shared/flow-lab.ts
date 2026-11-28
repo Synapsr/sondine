@@ -149,7 +149,14 @@ export const LAB_JOURNEYS: readonly LabJourney[] = [
     id: "first-run",
     title: "Premier lancement",
     steps: [
-      { id: "goal", title: "Bienvenue, l’objectif", path: WELCOME, data: "empty" },
+      { id: "intro", title: "L’ouverture", path: WELCOME, data: "empty" },
+      {
+        id: "goal",
+        title: "L’objectif",
+        path: WELCOME,
+        data: "empty",
+        clicks: [{ type: "button", fr: "Cliquez pour commencer", en: "Click to begin" }],
+      },
       {
         id: "statistics",
         title: "Statistiques anonymes",
@@ -493,7 +500,7 @@ export const LabPosition = z.strictObject({
 });
 export type LabPosition = z.output<typeof LabPosition>;
 
-export const FIRST_POSITION: LabPosition = { journey: "first-run", step: "goal", situation: {} };
+export const FIRST_POSITION: LabPosition = { journey: "first-run", step: "intro", situation: {} };
 
 export const WINDOW_SIZES = [
   { width: 1280, height: 820 },
