@@ -224,19 +224,9 @@
 }
 
 /*
- * A band of the sky's colors over the wordmark and the line's shimmer each play
- * once when started (welcome-intro.tsx); hovered, the disc turns.
+ * Hovered, the wordmark's disc turns; the line's shimmer plays once when
+ * started (welcome-intro.tsx).
  */
-.sondine-intro-shine {
-  opacity: 0;
-  mask-image: linear-gradient(105deg, transparent 40%, #000 50%, transparent 60%);
-  mask-size: 300% 100%;
-  mask-position: 100% 0;
-  mask-repeat: no-repeat;
-}
-.sondine-intro-shine path {
-  fill: url(#sondine-intro-shine);
-}
 .sondine-intro-logo [data-part="disc"] {
   transform-box: fill-box;
   transform-origin: center;
@@ -264,9 +254,6 @@
   --shimmer-light: var(--color-3);
 }
 @media (prefers-reduced-motion: no-preference) {
-  .sondine-intro-shine[data-playing] {
-    animation: sondine-intro-glint 1200ms cubic-bezier(0.4, 0, 0.2, 1) both;
-  }
   .sondine-intro-logo:hover [data-part="disc"] {
     rotate: -35deg;
     scale: 1.08;
@@ -276,16 +263,6 @@
   }
 }
 
-@keyframes sondine-intro-glint {
-  0% {
-    opacity: 1;
-    mask-position: 100% 0;
-  }
-  100% {
-    opacity: 1;
-    mask-position: 0% 0;
-  }
-}
 @keyframes sondine-intro-shimmer {
   from {
     background-position: 100% 0;
