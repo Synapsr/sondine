@@ -32,6 +32,8 @@ export interface CoreProcess {
   readonly client: () => AppClient | null;
   /** Asks core to shut down cleanly, then kills it after `timeoutMs`. */
   stop(timeoutMs?: number): Promise<void>;
+  /** Starts core again once `stop` returned (the flow lab's steps, ADR 049). */
+  startAgain(): void;
 }
 
 function send(target: UtilityProcess, message: MainToCore, ports: MessagePortMain[]): void {
@@ -130,6 +132,11 @@ export function startCoreProcess(options: CoreProcessOptions): CoreProcess {
       }, timeoutMs);
       await exited;
       clearTimeout(timer);
+    },
+    startAgain() {
+      if (child !== null || !stopping) return;
+      stopping = false;
+      spawn();
     },
   };
 }

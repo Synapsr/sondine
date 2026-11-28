@@ -15,6 +15,7 @@ import { ContextStore } from "./context/context-layer";
 import { FilePicker } from "./file-picker";
 import { RpcHost } from "./rpc-host";
 import { makeCoreRuntime } from "./runtime";
+import { labCoreOptions, labSettings } from "./flow-lab";
 import { Updates } from "./updates/updates-layer";
 import { UsageStatistics } from "./usage/usage-layer";
 import { VoiceRead } from "./voices/voice-read";
@@ -26,7 +27,13 @@ const parentPort: ParentPort = process.parentPort;
 const config = coreConfigFrom(parseCoreArguments(process.argv));
 
 const post = (message: CoreToMain) => parentPort.postMessage(CoreToMain.parse(message));
-const runtime = makeCoreRuntime(config, { post });
+// The flow lab's core (development only, flow-lab.ts) reaches nothing but this Mac.
+const lab = import.meta.env.DEV ? labSettings(config) : null;
+const runtime = makeCoreRuntime(
+  config,
+  { post },
+  lab === null ? undefined : labCoreOptions(lab, config.appVersion),
+);
 
 /** When the helper last went away, as main said it; undefined until main first said. */
 let helperExit: number | null | undefined;

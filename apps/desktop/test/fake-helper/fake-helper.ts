@@ -25,12 +25,20 @@ const MIC_UID = "BuiltInMicrophoneDevice";
 const MIC_KEY = `input:${MIC_UID}` as const;
 const SAMPLES_PER_COMMIT = 32_000;
 
+export type FakePermissions = "ask" | "granted" | "denied" | "restricted";
+
 export interface FakeHelperOptions {
   readonly socketPath: string;
   /** Emit commits, regions and health on timers (dev mode). Tests drive events by hand. */
   readonly autoplay?: { commitEveryMs: number; healthEveryMs: number } | null;
   readonly protocol?: number;
   readonly startPaused?: boolean;
+  /**
+   * What the permissions say (the flow lab's variants, ADR 049): `ask`, the
+   * default, has the microphone granted and system audio to ask for, which
+   * the prompt grants; `denied` and `restricted` stay so whatever is asked.
+   */
+  readonly permissions?: FakePermissions;
   /**
    * Clocks follow the mic's sample positions instead of real time: a tick is
    * 2 s of capture time however fast the test runs. Tests read the matching
@@ -149,11 +157,20 @@ export async function startFakeHelper(options: FakeHelperOptions): Promise<FakeH
   };
   const reply = (client: Socket, event: HelperEvent) => client.write(encode(event));
 
-  let systemAudio: PermissionState = { status: "not-determined", evidence: "authorization-status" };
+  const given = options.permissions ?? "ask";
+  const fixed: PermissionState | null =
+    given === "denied" || given === "restricted"
+      ? { status: given, evidence: "authorization-status" }
+      : null;
+  let systemAudio: PermissionState =
+    fixed ??
+    (given === "granted"
+      ? { status: "granted", evidence: "tcc-preflight" }
+      : { status: "not-determined", evidence: "authorization-status" });
   const permissions = (replyTo?: string): HelperEvent => ({
     type: "permissions",
     ...(replyTo === undefined ? {} : { replyTo }),
-    microphone: { status: "granted-verified", evidence: "first-signal" },
+    microphone: fixed ?? { status: "granted-verified", evidence: "first-signal" },
     systemAudio,
   });
 
@@ -433,7 +450,7 @@ export async function startFakeHelper(options: FakeHelperOptions): Promise<FakeH
         break;
       case "request.permissions":
         // Stands for the user granting the prompt.
-        if (message.scope !== "microphone")
+        if (message.scope !== "microphone" && fixed === null)
           systemAudio = { status: "granted", evidence: "tcc-preflight" };
         reply(client, permissions(message.id));
         reply(client, { type: "ack", replyTo: message.id });

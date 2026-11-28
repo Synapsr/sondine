@@ -2,7 +2,8 @@ import { createHash } from "node:crypto";
 import { rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createClaudeProvider, makeLocator } from "@sondine/engines";
+import { createClaudeProvider } from "@sondine/engines";
+import { claudeLocator } from "../flow-lab";
 import { Context, Effect, Layer, Stream, SubscriptionRef } from "effect";
 import { CoreConfig } from "../config";
 import { Database } from "../database";
@@ -34,14 +35,12 @@ export const chatLayer = Layer.effect(
     const tag = createHash("sha256").update(config.dataDir).digest("hex").slice(0, 12);
     const workDirectory = join(tmpdir(), `app.sondine.chat-${tag}`);
     prepareWorkDirectory(workDirectory);
-    const locator = makeLocator({ names: ["claude"], inherited: process.env });
+    const locator = claudeLocator(config);
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const service = makeChatService({
       db,
       keys,
-      providers: [
-        createClaudeProvider({ locate: () => locator.locate("claude"), log: providerLog }),
-      ],
+      providers: [createClaudeProvider({ locate: locator.locate, log: providerLog })],
       relay:
         config.agentRelay === null
           ? null

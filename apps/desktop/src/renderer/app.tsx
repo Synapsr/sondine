@@ -6,6 +6,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { queryClient } from "./core/orpc";
+import { FlowLabRoot } from "./flow-lab/flow-lab-root";
 import { EditorRoot } from "./graphical/editor-root";
 import { LocaleProvider, useLocale } from "./i18n/locale";
 import { m } from "./paraglide/messages.js";
@@ -36,6 +37,8 @@ export function App() {
               <LocaleProvider>
                 <Overlays>
                   <RouterProvider router={router} />
+                  {/* The flow lab's HUD, in `pnpm dev:lab` only (ADR 049). */}
+                  <FlowLabRoot />
                 </Overlays>
               </LocaleProvider>
             </ShortcutsProvider>

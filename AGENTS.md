@@ -40,6 +40,7 @@ pnpm install        # also downloads Electron (apps/desktop postinstall)
 pnpm dev            # desktop app (unsets ELECTRON_RUN_AS_NODE)
 pnpm --filter @sondine/desktop dev:fake-hal  # real helper, fake audio hardware, no prompts
 pnpm --filter @sondine/desktop dev:notch     # the notch lab: the island's flows on the real notch, no call needed
+pnpm --filter @sondine/desktop dev:lab       # the flow lab (ADR 049): every journey's steps on invented data, a HUD (⌃⌥⌘L), no network
 pnpm lint           # oxlint
 pnpm format         # oxfmt (writes)
 pnpm format:check

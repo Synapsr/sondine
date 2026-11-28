@@ -7,7 +7,6 @@ import {
   createClaudeTextEngine,
   createJournalEngine,
   JOURNAL_ARTIFACT,
-  makeLocator,
   stopWorkerProcesses,
   type StopWorkersReport,
   type TextEngine,
@@ -16,6 +15,7 @@ import { journalSettings } from "@sondine/db";
 import { usageError } from "@sondine/protocol";
 import { Context, Effect, Layer } from "effect";
 import { CoreConfig } from "../config";
+import { claudeLocator } from "../flow-lab";
 import { Database } from "../database";
 import { log } from "../log";
 import { Models } from "../models/models-layer";
@@ -96,8 +96,8 @@ export const journalLayer = Layer.effect(
     const tag = createHash("sha256").update(config.dataDir).digest("hex").slice(0, 12);
     const workDirectory = join(tmpdir(), `app.sondine.journal-${tag}`);
     prepareWorkDirectory(workDirectory);
-    const locator = makeLocator({ names: ["claude"], inherited: process.env });
-    const locate = () => locator.locate("claude");
+    const locator = claudeLocator(config);
+    const locate = locator.locate;
     const claude = createClaudeTextEngine({
       locate,
       model: CLAUDE_JOURNAL_MODEL,

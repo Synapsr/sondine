@@ -7,7 +7,11 @@
 //
 // It prints `ready <endpoint> <key>`, then reads one scenario a line on its
 // input and answers `ok <scenario>` once the state on disk says it:
-//   wave-70 | wave-full | trial | trial-done | subscribed | cancelling | past-due
+//   reset | wave-70 | wave-full | trial | trial-done | subscribed | cancelling | past-due
+//
+// `reset` forgets every place, the app's too, and the claims counted per
+// address (a new server on the same port): the flow lab (ADR 049) starts each
+// step from it.
 
 import { createInterface } from "node:readline";
 import { NEMOTRON_CAPABILITIES, NEMOTRON_MANIFEST, NEMOTRON_RESOURCES } from "@sondine/engines";
@@ -68,7 +72,9 @@ const sessions = new Sessions({
   },
   known: (id) => clients.has(id),
 });
-const server = createComputeServer({ clients, sessions, billing, name: "Sondine", beta: null });
+const serve = () =>
+  createComputeServer({ clients, sessions, billing, name: "Sondine", beta: null });
+let server = serve();
 
 /** The place the app took: the newest trial that is not a filler. */
 function appPlace(): string | null {
@@ -105,6 +111,10 @@ function subscribe(id: string, status: "active" | "past_due", cancelAtPeriodEnd:
 function apply(scenario: string): void {
   const id = appPlace();
   switch (scenario) {
+    case "reset":
+      for (const { id } of clients.list()) clients.remove(id);
+      clients.setWavePlaces(10);
+      return;
     case "wave-70":
       return fill(7);
     case "wave-full":
@@ -138,6 +148,14 @@ for await (const line of createInterface({ input: process.stdin })) {
   if (scenario === "") continue;
   try {
     apply(scenario);
+    if (scenario === "reset") {
+      // A new server on the same port: the real one allows a few claims a day
+      // from one address, and the lab claims at every step.
+      server.closeAllConnections();
+      await new Promise((done) => server.close(done));
+      server = serve();
+      await new Promise<void>((done) => server.listen(Number(port), "127.0.0.1", done));
+    }
     console.log(`ok ${scenario}`);
   } catch (error) {
     console.log(`error ${scenario} ${String(error)}`);
