@@ -553,7 +553,7 @@
   "welcome_continue": "Continuer",
   "welcome_microphone_use": "Les conversations en personne, et votre voix en appel.",
   "welcome_system_audio_use": "L’autre côté des appels, les vidéos et la musique.",
-  "welcome_model_continues": "(le téléchargement se poursuit en arrière-plan)",
+  "welcome_model_continues": "(téléchargement en arrière-plan)",
   "welcome_model_intro": "Sur ce Mac, la transcription demande ce modèle. Sans lui, Sondine enregistre quand même et transcrira plus tard.",
   "welcome_where_title": "Où transcrire ?",
   "welcome_no_microphone_note": "Sans le micro, Sondine n’entend que le son du Mac.",

@@ -185,6 +185,40 @@ function ArtifactPanel({
           : m.model_download_note({ free: formatBytes(status.freeDiskBytes, locale) })}
       </p>
     ) : null;
+  const progress = (
+    <Progress
+      className={compact ? "gap-xxs" : undefined}
+      value={artifact.progress === null ? null : Math.round(artifact.progress * 100)}
+    >
+      <ProgressLabel className={compact ? "text-body-xs" : undefined}>
+        {/* A 19 GB download reads better in bytes than in percent alone. */}
+        {artifact.phase === "downloading" && artifact.progress !== null
+          ? m.model_downloading_bytes({
+              done: formatBytes(artifact.sizeBytes * artifact.progress, locale),
+              size,
+            })
+          : busyText[artifact.phase]?.()}
+      </ProgressLabel>
+      <ProgressValue />
+    </Progress>
+  );
+  const licenseLine = (
+    <p className="text-body-xs text-cte-text-muted">
+      {compact
+        ? `${m.model_compact_source({ free: formatBytes(status.freeDiskBytes, locale) })} · `
+        : null}
+      {m.model_license({ name: artifact.license.name })}{" "}
+      {/* Main opens this pinned page in the default browser, never in Sondine. */}
+      <a
+        href={artifact.license.url}
+        target="_blank"
+        rel="noreferrer"
+        className="corner-xs font-body font-medium underline underline-offset-4 focus-ring"
+      >
+        {m.model_license_link()}
+      </a>
+    </p>
+  );
   return (
     <section aria-label={artifact.displayName} className="flex flex-col gap-s">
       <div className="flex flex-col gap-s corner-m bg-neutral-2 p-m">
@@ -216,28 +250,14 @@ function ArtifactPanel({
             </p>
           </div>
         ) : null}
-        {view.busy ? (
-          <Progress value={artifact.progress === null ? null : Math.round(artifact.progress * 100)}>
-            <ProgressLabel>
-              {/* A 19 GB download reads better in bytes than in percent alone. */}
-              {artifact.phase === "downloading" && artifact.progress !== null
-                ? m.model_downloading_bytes({
-                    done: formatBytes(artifact.sizeBytes * artifact.progress, locale),
-                    size,
-                  })
-                : busyText[artifact.phase]?.()}
-            </ProgressLabel>
-            <ProgressValue />
-          </Progress>
-        ) : null}
-        {/* The first run keeps the progress's place before it starts: nothing moves then. */}
-        {compact && !view.busy && !view.ready ? (
-          <div aria-hidden className="invisible">
-            <Progress value={0}>
-              <ProgressLabel>{m.model_downloading_bytes({ done: "0", size })}</ProgressLabel>
-              <ProgressValue />
-            </Progress>
+        {/* The first run: where it comes from and its license, in the place the progress takes
+            once it starts, so the card neither holds an empty space nor grows (Téo, 2026-11-28). */}
+        {compact ? (
+          <div className="flex min-h-[1.75rem] flex-col justify-end">
+            {view.busy ? progress : licenseLine}
           </div>
+        ) : view.busy ? (
+          progress
         ) : null}
         {view.ready ? (
           <p className="flex items-center gap-xs">
@@ -285,21 +305,7 @@ function ArtifactPanel({
           {downloadNote}
         </>
       )}
-      <p className="text-body-xs text-cte-text-muted">
-        {compact
-          ? `${m.model_compact_source({ free: formatBytes(status.freeDiskBytes, locale) })} · `
-          : null}
-        {m.model_license({ name: artifact.license.name })}{" "}
-        {/* Main opens this pinned page in the default browser, never in Sondine. */}
-        <a
-          href={artifact.license.url}
-          target="_blank"
-          rel="noreferrer"
-          className="corner-xs font-body font-medium underline underline-offset-4 focus-ring"
-        >
-          {m.model_license_link()}
-        </a>
-      </p>
+      {compact ? null : licenseLine}
       {pick.data?.outcome === "busy" ? (
         <p className="text-body-xs text-cte-text-muted">{m.model_pick_busy()}</p>
       ) : null}
