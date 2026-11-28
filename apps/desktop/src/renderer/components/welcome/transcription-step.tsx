@@ -227,20 +227,20 @@ function OwnScreen({
         ]}
       />
       {status.own === null ? (
-        <a
-          className="flex items-center gap-xxs self-start text-body-s underline"
-          href={COMPUTE_GUIDE_URL}
-          target="_blank"
-          rel="noreferrer"
-        >
-          {m.welcome_own_guide()}
-          <ExternalLinkIcon aria-hidden />
-        </a>
-      ) : null}
-      {status.own === null ? (
         <OwnLinkForm
           id="welcome-connect"
           connect={connect}
+          aside={
+            <Button
+              variant="secondary"
+              className="shrink-0"
+              nativeButton={false}
+              render={<a href={COMPUTE_GUIDE_URL} target="_blank" rel="noreferrer" />}
+            >
+              {m.welcome_own_guide()}
+              <ExternalLinkIcon />
+            </Button>
+          }
           onConnected={() => {
             connect.finish();
             onNext();

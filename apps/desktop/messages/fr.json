@@ -1588,7 +1588,7 @@
   "welcome_own_point_sent": "L’audio de vos conversations terminées, voix des autres comprises, part chiffré vers votre machine ; le texte revient ici.",
   "welcome_own_point_access": "Ceux qui administrent cette machine pourraient techniquement accéder à l’audio et au texte pendant le calcul.",
   "welcome_own_point_back": "Ce qui est envoyé ne peut pas être rappelé. « Ce Mac » reste disponible à tout moment.",
-  "welcome_own_guide": "Préparer votre machine",
+  "welcome_own_guide": "Guide",
   "welcome_others": "Les voix autour de vous sont aussi enregistrées ; prévenez-les si la loi le demande.",
   "voice_confirm": "Confirmer : c’est {name}",
   "voice_listen": "Écouter",
