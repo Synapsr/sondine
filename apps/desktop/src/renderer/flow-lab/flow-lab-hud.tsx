@@ -81,6 +81,12 @@ export function FlowLabHud() {
     }
   }, [open]);
 
+  // Two labs side by side: the window's title says which one this is.
+  const label = view?.label ?? null;
+  useEffect(() => {
+    if (label !== null) document.title = `Sondine · Labo ${label}`;
+  }, [label]);
+
   // A step put back makes its clicks once, on its fresh page.
   const found = view === null ? null : findStep(view.position.journey, view.position.step);
   useEffect(() => {
@@ -115,6 +121,7 @@ export function FlowLabHud() {
           className="shadow-m"
         >
           <ChevronUpIcon />
+          {view.label === null ? null : `${view.label} · `}
           {step.title}
         </Button>
       </div>
@@ -132,6 +139,7 @@ export function FlowLabHud() {
       <header className="flex items-start gap-s">
         <div className="flex min-w-0 flex-1 flex-col">
           <p className="text-body-xs text-cte-text-muted">
+            {view.label === null ? null : `Labo ${view.label} · `}
             {journey.title} · {index + 1} / {journey.steps.length}
           </p>
           <h2 className="text-body-m font-medium">{step.title}</h2>

@@ -24,7 +24,8 @@ the journeys' steps.
 ### Isolation
 
 - One folder, `~/.sondine-flow-lab` (`SONDINE_FLOW_LAB_ROOT` to move it;
-  short, as macOS limits a socket's path to 103 bytes): `data/` is the data
+  short, as macOS limits a socket's path to 103 bytes; `SONDINE_FLOW_LAB_LABEL`
+  names a second lab in its HUD and window title): `data/` is the data
   folder (`SONDINE_DATA_DIR`, Chromium's profile inside), `home/` is the
   app's home (`HOME`, and main sets Electron's `home` and `appData` to it):
   models, agents' settings and browsers' manifests stay there. Sondine's

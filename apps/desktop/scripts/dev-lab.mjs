@@ -7,7 +7,8 @@
 //
 //   pnpm --filter @sondine/desktop dev:lab [--fresh]
 //
-// `--fresh` empties the folder first. SONDINE_LAB_DEBUG_PORT opens the
+// `--fresh` empties the folder first. SONDINE_FLOW_LAB_LABEL names this lab in
+// its HUD and window title, to tell two side by side apart. SONDINE_LAB_DEBUG_PORT opens the
 // window's DevTools protocol on that port (for the captures).
 import { spawn, spawnSync } from "node:child_process";
 import { chmodSync, existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";

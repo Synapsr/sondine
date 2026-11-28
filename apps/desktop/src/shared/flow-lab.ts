@@ -536,6 +536,8 @@ export interface LabView {
   readonly generation: number;
   /** When the step's page was asked for: only a page loaded after it makes the clicks. */
   readonly loadedAtMs: number;
+  /** SONDINE_FLOW_LAB_LABEL: tells two labs' windows apart, in the HUD and the window's title. */
+  readonly label: string | null;
 }
 
 export function findStep(
