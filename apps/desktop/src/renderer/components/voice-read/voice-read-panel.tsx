@@ -49,7 +49,16 @@ export function VoiceReadPanel({
   onDone,
   doneLabel,
   leading,
+  selfName,
+  autoStart = false,
+  large = false,
 }: {
+  /** The user's name, should the read make their row; « Moi » by default. */
+  readonly selfName?: string | undefined;
+  /** Starts at once (the first run's dialog: its button was the start). */
+  readonly autoStart?: boolean;
+  /** The progress wide and its share big (the first run's dialog). */
+  readonly large?: boolean;
   /** At the start of the buttons' row (the first run's « Retour »), the others at its end. */
   readonly leading?: ReactNode;
   /** The first run: « Passer » beside « Commencer ». */
@@ -85,6 +94,15 @@ export function VoiceReadPanel({
     if (mine && underWay) cancel.mutate({});
   };
   useEffect(() => () => cancelOnLeave.current(), []);
+  const name = selfName ?? m.voice_self();
+  // Once, as the panel opens ready to read.
+  const started = useRef(false);
+  const ready = status.data !== undefined && voiceReadView(status.data, mine).kind === "ready";
+  useEffect(() => {
+    if (!autoStart || started.current || !ready) return;
+    started.current = true;
+    start.mutate({ selfName: name });
+  }, [autoStart, ready, start, name]);
 
   if (status.data === undefined) {
     return status.error === null ? null : (
@@ -130,7 +148,7 @@ export function VoiceReadPanel({
           <ReadText muted />
           {/* The progress's place, kept from the start: nothing moves once it begins. */}
           <div aria-hidden className="invisible">
-            <Progress percent={0} level={0} />
+            <Progress percent={0} level={0} large={large} />
           </div>
           {view.failure === null ? null : (
             <p role="alert" className="text-error">
@@ -142,10 +160,7 @@ export function VoiceReadPanel({
       actions = (
         <>
           {skip}
-          <Button
-            isPending={start.isPending}
-            onClick={() => start.mutate({ selfName: m.voice_self() })}
-          >
+          <Button isPending={start.isPending} onClick={() => start.mutate({ selfName: name })}>
             {view.failure === null ? m.voice_read_start() : m.voice_read_again()}
           </Button>
         </>
@@ -156,6 +171,7 @@ export function VoiceReadPanel({
         <>
           <ReadText />
           <Progress
+            large={large}
             percent={view.percent}
             level={view.level}
             label={m.voice_read_counter({
@@ -241,12 +257,33 @@ function Progress({
   level,
   label,
   hint,
+  large = false,
 }: {
   readonly percent: number;
   readonly level: number;
   readonly label?: string;
   readonly hint?: string;
+  readonly large?: boolean;
 }) {
+  if (large) {
+    return (
+      <div className="flex flex-col gap-s">
+        <div className="flex items-end justify-between gap-s">
+          <span className="flex flex-col">
+            <span className="text-body-s text-cte-text-muted">{m.voice_read_heard()}</span>
+            <span className="font-display font-heavy text-display-m tabular-nums">{percent} %</span>
+          </span>
+          <LevelBars level={level} large />
+        </div>
+        <Meter
+          value={percent}
+          aria-label={m.voice_read_heard()}
+          getAriaValueText={() => label ?? ""}
+        />
+        <p className="text-body-xs text-cte-text-muted">{hint ?? m.voice_read_recording_hint()}</p>
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col gap-xs">
       <div className="flex items-center gap-s">
@@ -269,18 +306,22 @@ function Progress({
 const BARS = [0.55, 0.85, 1, 0.7, 0.45] as const;
 
 /** Five bars that rise with the microphone's level. */
-function LevelBars({ level }: { readonly level: number }) {
+function LevelBars({ level, large = false }: { readonly level: number; readonly large?: boolean }) {
   return (
     <span
       role="img"
       aria-label={m.voice_read_level()}
-      className="flex h-[1.5rem] shrink-0 items-center gap-[3px] self-end"
+      className={cn(
+        "flex shrink-0 items-center self-end",
+        large ? "h-[3rem] gap-[4px]" : "h-[1.5rem] gap-[3px]",
+      )}
     >
       {BARS.map((weight, index) => (
         <span
           key={index}
           className={cn(
-            "w-[3px] corner-full transition-[height] duration-100 ease-out motion-reduce:transition-none",
+            "corner-full transition-[height] duration-100 ease-out motion-reduce:transition-none",
+            large ? "w-[4px]" : "w-[3px]",
             level < QUIET_LEVEL ? "bg-neutral-6" : "bg-cte-text",
           )}
           style={{ height: `${Math.round(15 + 85 * Math.min(1, level * 1.6) * weight)}%` }}

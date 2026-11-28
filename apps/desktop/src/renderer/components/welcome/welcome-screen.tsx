@@ -12,6 +12,7 @@ import {
   ClockIcon,
   MicrophoneIcon,
   PhoneIcon,
+  UserIcon,
   VolumeIcon,
   WaveformIcon,
 } from "@sondine/ui/icon";
@@ -25,7 +26,9 @@ import { useModels } from "../models/model-panel";
 import { asksForUpdates } from "../updates/update-view";
 import { UpdateAnswers, useUpdates } from "../updates/updates";
 import { SentReports, UsageAnswers } from "../usage/usage";
-import { VoiceReadPanel } from "../voice-read/voice-read-panel";
+import { Dialog, DialogPopup, DialogTitle } from "@sondine/ui/components/dialog";
+import { Input } from "@sondine/ui/components/input";
+import { useVoiceRead, VoiceReadPanel } from "../voice-read/voice-read-panel";
 import { useCompute } from "../settings/compute-section";
 import { RestoreDialog } from "../backup/backup-dialogs";
 import { modelsReady } from "../models/model-view";
@@ -389,30 +392,88 @@ function PermissionRow({
 }
 
 /**
- * « Apprendre ma voix » (ADR 034): the user reads a text so « Moi » is
- * suggested from the first day; « Passer » is as plain as « Commencer ».
+ * « Apprendre ma voix » (ADR 034): the user's card, their name and whether
+ * Sondine knows their voice; « Me reconnaître » opens the read in a dialog,
+ * started at once (Téo, 2026-11-28). « Passer » is as plain as « Continuer ».
  */
 function VoiceStep({ onBack, onNext }: { onBack: () => void; onNext: () => void }) {
+  const status = useVoiceRead();
+  const [name, setName] = useState("");
+  const [reading, setReading] = useState(false);
+  const known = status.data?.read != null;
+  const available = status.data?.available === true;
   return (
-    <section aria-labelledby="welcome-title" className="sondine-stagger flex flex-col gap-l">
-      <h1 id="welcome-title" className="font-display font-heavy text-display-m">
-        {m.welcome_voice_title()}
-      </h1>
+    <Step
+      title={m.welcome_voice_title()}
+      onBack={onBack}
+      next={
+        known ? (
+          <Button onClick={onNext}>{m.welcome_continue()}</Button>
+        ) : (
+          <Button variant="secondary" onClick={onNext}>
+            {m.voice_read_skip()}
+          </Button>
+        )
+      }
+    >
       <p>
         {m.welcome_voice_intro()}{" "}
         <span className="text-cte-text-muted">{m.voice_read_privacy()}</span>
       </p>
-      {/* Back on the same row as Skip and Start, as on the other steps. */}
-      <VoiceReadPanel
-        onSkip={onNext}
-        onDone={onNext}
-        leading={
-          <Button variant="ghost" className="-ms-s" onClick={onBack}>
-            {m.welcome_back()}
-          </Button>
-        }
-      />
-    </section>
+      <div className="flex items-center gap-s corner-m p-m inset-ring-[1px] inset-ring-neutral-4">
+        <span
+          aria-hidden
+          className="flex size-[2.5rem] shrink-0 items-center justify-center corner-full bg-neutral-3 text-cte-text-muted"
+        >
+          <UserIcon />
+        </span>
+        <span className="flex min-w-0 flex-1 flex-col gap-xxs">
+          <Input
+            aria-label={m.welcome_voice_name()}
+            placeholder={m.welcome_voice_name()}
+            value={name}
+            disabled={known}
+            onChange={(event) => setName(event.target.value)}
+          />
+          <span className="flex items-center gap-xxs text-body-xs text-cte-text-muted">
+            {known ? <CheckIcon aria-hidden /> : null}
+            {known
+              ? m.welcome_voice_known()
+              : available
+                ? m.welcome_voice_unknown()
+                : m.voice_read_unavailable()}
+          </span>
+        </span>
+        <Button
+          variant={known ? "secondary" : "primary"}
+          className="shrink-0"
+          disabled={!available}
+          onClick={() => setReading(true)}
+        >
+          {known ? m.voice_read_again() : m.welcome_voice_recognize()}
+        </Button>
+      </div>
+      <Dialog
+        open={reading}
+        onOpenChange={(open) => {
+          if (!open) setReading(false);
+        }}
+      >
+        <DialogPopup className="w-[min(40rem,calc(100vw-var(--space-xl)))]">
+          <DialogTitle>{m.welcome_voice_title()}</DialogTitle>
+          {reading ? (
+            <VoiceReadPanel
+              autoStart
+              large
+              selfName={name.trim() === "" ? undefined : name.trim()}
+              onSkip={() => setReading(false)}
+              onDone={() => setReading(false)}
+              doneLabel={m.voice_read_close()}
+            />
+          ) : null}
+        </DialogPopup>
+      </Dialog>
+    </Step>
   );
 }
 
