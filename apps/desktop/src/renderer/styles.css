@@ -94,6 +94,48 @@
 }
 
 /*
+ * The first run's end (Téo, 2026-11-28): on « Commencer l'écoute », the
+ * whole first run grows, blurs and fades toward the user, quickly but not
+ * at once, and Today shows behind it, a smaller picture with round corners
+ * growing to fill the window (a picture within the picture): one
+ * picture over the other, no named part moving alone. Reduced motion keeps
+ * the plain switch.
+ */
+html:active-view-transition-type(welcome-done) * {
+  view-transition-name: none !important;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html:active-view-transition-type(welcome-done)::view-transition-old(root) {
+    z-index: 1;
+    mix-blend-mode: normal;
+    animation: sondine-welcome-leave 560ms cubic-bezier(0.4, 0, 1, 1) both;
+  }
+  html:active-view-transition-type(welcome-done)::view-transition-new(root) {
+    mix-blend-mode: normal;
+    animation: sondine-welcome-reveal 1100ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+}
+
+@keyframes sondine-welcome-leave {
+  to {
+    opacity: 0;
+    scale: 1.12;
+    filter: blur(12px);
+  }
+}
+
+@keyframes sondine-welcome-reveal {
+  from {
+    scale: 0.84;
+    clip-path: inset(0 round 28px);
+    filter: brightness(0.85);
+  }
+  to {
+    clip-path: inset(0 round 0);
+  }
+}
+
+/*
  * The first run (Téo, 2026-11-19): a step's parts rise in one after the
  * other from a light blur (`.sondine-stagger`, the delay starting at
  * --stagger-start); going to another step, the one left slides away blurred
