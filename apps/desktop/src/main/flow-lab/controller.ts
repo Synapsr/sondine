@@ -69,6 +69,8 @@ export interface FlowLabDeps {
   readonly load: (path: string, localStorage: Readonly<Record<string, string | null>>) => void;
   readonly resize: (width: number, height: number) => void;
   readonly publish: (view: LabView) => void;
+  /** SONDINE_FLOW_LAB_LABEL, when two labs run side by side. */
+  readonly label: string | null;
 }
 
 export interface FlowLab {
@@ -98,6 +100,7 @@ export function createFlowLab(deps: FlowLabDeps): FlowLab {
       last: found !== null && found.index === found.journey.steps.length - 1,
       generation,
       loadedAtMs,
+      label: deps.label,
     };
   };
   const publish = () => deps.publish(view());

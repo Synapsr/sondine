@@ -955,6 +955,7 @@ function start(): void {
         paths: labPaths(root),
         migrationsDir: migrationsDirectory(),
         cloud: endpoint && key ? { endpoint, key } : null,
+        label: process.env["SONDINE_FLOW_LAB_LABEL"]?.trim() || null,
         stop: async () => {
           helper.retire();
           voiceRecorder?.stopAll();
