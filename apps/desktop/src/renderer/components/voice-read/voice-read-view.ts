@@ -14,7 +14,9 @@ export type VoiceReadView =
       readonly voicedSeconds: number;
       readonly targetSeconds: number;
       readonly canFinish: boolean;
-      /** The meter, 0 to 1. */
+      /** The voice heard toward the target, 0 to 100. */
+      readonly percent: number;
+      /** The microphone's level, 0 to 1. */
       readonly level: number;
     }
   | { readonly kind: "embedding" }
@@ -35,6 +37,10 @@ export function voiceReadView(status: VoiceReadStatus, mine = true): VoiceReadVi
       ),
       targetSeconds: Math.round(session.targetMs / 1000),
       canFinish: session.voicedMs >= session.minimumMs,
+      percent:
+        session.targetMs <= 0
+          ? 100
+          : Math.min(100, Math.floor((session.voicedMs / session.targetMs) * 100)),
       level: session.level,
     };
   }

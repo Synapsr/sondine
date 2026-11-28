@@ -399,7 +399,8 @@ function VoiceStep({ onBack, onNext }: { onBack: () => void; onNext: () => void 
         {m.welcome_voice_title()}
       </h1>
       <p>
-        {m.welcome_voice_intro()} {m.voice_read_privacy()}
+        {m.welcome_voice_intro()}{" "}
+        <span className="text-cte-text-muted">{m.voice_read_privacy()}</span>
       </p>
       {/* Back on the same row as Skip and Start, as on the other steps. */}
       <VoiceReadPanel
