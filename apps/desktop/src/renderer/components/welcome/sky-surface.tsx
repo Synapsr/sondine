@@ -4,7 +4,10 @@ import { useEffect, useRef } from "react";
 // theme's orange (color-4), pale sky (color-3) and teal (color-2), slowly
 // warped by noise, with a little grain, drawn with WebGL about 15 times a
 // second while it is shown. Before the first frame, without WebGL, or under
-// reduced motion (one still frame), the CSS gradient under it stays. In
+// reduced motion (one still frame), the CSS gradient under it stays. Nothing
+// runs on the GPU once it is gone, nor while the window is hidden or
+// minimized: its frames stop with the page's visibility, and its WebGL
+// context is let go when it unmounts (always-on budget, AGENTS.md). In
 // dark mode (Téo, 2026-11-28) the pale sky gives way to the window's black,
 // and slow holes open in the colors where the background shows through.
 
@@ -63,7 +66,61 @@ function compile(gl: WebGL2RenderingContext, type: number, source: string): WebG
   return shader;
 }
 
-/** Draws the sky in the canvas until stopped; null without WebGL. */
+/** What the frames need from the page: its visibility, and the frame clock. */
+export interface FramePage {
+  readonly hidden: boolean;
+  addEventListener(type: "visibilitychange", listener: () => void): void;
+  removeEventListener(type: "visibilitychange", listener: () => void): void;
+  requestAnimationFrame(callback: (now: number) => void): number;
+  cancelAnimationFrame(handle: number): void;
+}
+
+const browserPage: FramePage = {
+  get hidden() {
+    return document.hidden;
+  },
+  addEventListener: (type, listener) => document.addEventListener(type, listener),
+  removeEventListener: (type, listener) => document.removeEventListener(type, listener),
+  requestAnimationFrame: (callback) => window.requestAnimationFrame(callback),
+  cancelAnimationFrame: (handle) => window.cancelAnimationFrame(handle),
+};
+
+/**
+ * Calls `draw` at each frame while the page shows, once only when `still`;
+ * none while it is hidden, and again when it shows. Returns the stop.
+ */
+export function runFrames(
+  draw: (now: number) => void,
+  still: boolean,
+  page: FramePage = browserPage,
+): () => void {
+  let frame: number | null = null;
+  let drawn = false;
+  const tick = (now: number) => {
+    frame = null;
+    draw(now);
+    drawn = true;
+    if (!still) schedule();
+  };
+  const schedule = () => {
+    if (frame === null && !page.hidden && !(still && drawn)) {
+      frame = page.requestAnimationFrame(tick);
+    }
+  };
+  const pause = () => {
+    if (frame !== null) page.cancelAnimationFrame(frame);
+    frame = null;
+  };
+  const onVisibility = () => (page.hidden ? pause() : schedule());
+  page.addEventListener("visibilitychange", onVisibility);
+  schedule();
+  return () => {
+    page.removeEventListener("visibilitychange", onVisibility);
+    pause();
+  };
+}
+
+/** Draws the sky in the canvas until stopped, then lets its context go; null without WebGL. */
 function startSky(canvas: HTMLCanvasElement, still: boolean): (() => void) | null {
   const gl = canvas.getContext("webgl2", { antialias: false });
   if (gl === null) return null;
@@ -88,7 +145,6 @@ function startSky(canvas: HTMLCanvasElement, still: boolean): (() => void) | nul
   const time = gl.getUniformLocation(program, "t");
   const dark = gl.getUniformLocation(program, "d");
 
-  let frame = 0;
   let last = -Infinity;
   const start = performance.now() - 8000;
   const draw = (now: number) => {
@@ -112,23 +168,29 @@ function startSky(canvas: HTMLCanvasElement, still: boolean): (() => void) | nul
       // The CSS gradient under it would show through the holes.
       canvas.parentElement?.setAttribute("data-drawn", "");
     }
-    if (!still) frame = requestAnimationFrame(draw);
   };
-  frame = requestAnimationFrame(draw);
-  return () => cancelAnimationFrame(frame);
+  const stop = runFrames(draw, still);
+  return () => {
+    stop();
+    gl.getExtension("WEBGL_lose_context")?.loseContext();
+  };
 }
 
 export function SkySurface({ className }: { className?: string }) {
-  const canvas = useRef<HTMLCanvasElement>(null);
+  const box = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const surface = canvas.current;
+    const surface = box.current;
     if (surface === null) return;
+    // A canvas of its own each time: a context let go cannot draw again.
+    const canvas = document.createElement("canvas");
+    canvas.className = "block size-full";
+    surface.append(canvas);
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    return startSky(surface, still) ?? undefined;
+    const stop = startSky(canvas, still);
+    return () => {
+      stop?.();
+      canvas.remove();
+    };
   }, []);
-  return (
-    <div aria-hidden className={className}>
-      <canvas ref={canvas} className="block size-full" />
-    </div>
-  );
+  return <div ref={box} aria-hidden className={className} />;
 }
