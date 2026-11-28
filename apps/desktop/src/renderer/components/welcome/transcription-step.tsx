@@ -11,6 +11,7 @@ import { RadioGroup } from "@sondine/ui/components/radio-group";
 import { ExternalLinkIcon, InfoIcon } from "@sondine/ui/icon";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { CLOUD_WAITLIST_URL } from "../../../shared/cloud";
 import { errorMessage, orpc } from "../../core/orpc";
 import { m } from "../../paraglide/messages.js";
@@ -338,16 +339,21 @@ function CloudCard() {
   );
 }
 
-/** Development only: see the choice as a Mac too small for the model would (small-mac.ts). */
+/**
+ * Development only: see the choice as a Mac too small for the model would
+ * (small-mac.ts). Out of the step's layout, in the window's bottom left
+ * corner (Téo, 2026-11-28).
+ */
 function SmallMacSwitch() {
   const on = useSmallMac();
-  return (
+  return createPortal(
     <Button
       variant="ghost"
-      className="-ms-s self-start text-body-xs text-cte-text-muted"
+      className="fixed start-l bottom-l z-[100] text-body-xs text-cte-text-muted"
       onClick={() => setSmallMac(!on)}
     >
       {on ? "Dev : revenir à ce Mac" : "Dev : simuler un Mac de 16 Go"}
-    </Button>
+    </Button>,
+    document.body,
   );
 }
