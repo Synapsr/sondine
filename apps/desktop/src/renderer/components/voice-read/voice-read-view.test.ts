@@ -34,12 +34,14 @@ describe("the voice read's view", () => {
       voicedSeconds: 9,
       targetSeconds: 25,
       canFinish: false,
+      percent: 39,
       level: 0.5,
     });
     const enough = session({ phase: "recording", voicedMs: 26_000 });
     expect(voiceReadView(status({ session: enough }))).toMatchObject({
       voicedSeconds: 25,
       canFinish: true,
+      percent: 100,
     });
   });
 

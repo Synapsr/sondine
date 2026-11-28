@@ -1,11 +1,14 @@
 import type { VoiceReadFailure } from "@sondine/api";
 import { Button } from "@sondine/ui/components/button";
+import { cn } from "@sondine/ui";
 import { Meter, MeterLabel, MeterValue } from "@sondine/ui/components/meter";
+import { CheckIcon } from "@sondine/ui/icon";
 import { useMutation, useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { errorMessage, orpc } from "../../core/orpc";
 import { m } from "../../paraglide/messages.js";
 import { getLocale } from "../../paraglide/runtime.js";
+import { SkySurface } from "../welcome/sky-surface";
 import { QUIET_LEVEL, voiceReadView } from "./voice-read-view";
 
 // The voice read (ADR 034): the user reads a short text aloud and Sondine
@@ -125,6 +128,10 @@ export function VoiceReadPanel({
       body = (
         <>
           <ReadText muted />
+          {/* The progress's place, kept from the start: nothing moves once it begins. */}
+          <div aria-hidden className="invisible">
+            <Progress percent={0} level={0} />
+          </div>
           {view.failure === null ? null : (
             <p role="alert" className="text-error">
               {failureText[view.failure]()}
@@ -148,32 +155,19 @@ export function VoiceReadPanel({
       body = (
         <>
           <ReadText />
-          <Meter
-            value={view.level * 100}
-            low={QUIET_LEVEL * 100}
-            aria-label={m.voice_read_level()}
-            getAriaValueText={() =>
-              m.voice_read_counter({
-                seconds: String(view.voicedSeconds),
-                target: String(view.targetSeconds),
-              })
+          <Progress
+            percent={view.percent}
+            level={view.level}
+            label={m.voice_read_counter({
+              seconds: String(view.voicedSeconds),
+              target: String(view.targetSeconds),
+            })}
+            hint={
+              view.level > 0 && view.level < QUIET_LEVEL
+                ? m.voice_read_quiet()
+                : m.voice_read_recording_hint()
             }
-          >
-            <MeterLabel>{m.voice_read_heard()}</MeterLabel>
-            <MeterValue>
-              {(_formatted: string) =>
-                m.voice_read_counter({
-                  seconds: String(view.voicedSeconds),
-                  target: String(view.targetSeconds),
-                })
-              }
-            </MeterValue>
-          </Meter>
-          <p className="text-body-xs text-cte-text-muted">
-            {view.level > 0 && view.level < QUIET_LEVEL
-              ? m.voice_read_quiet()
-              : m.voice_read_recording_hint()}
-          </p>
+          />
         </>
       );
       actions = (
@@ -204,7 +198,15 @@ export function VoiceReadPanel({
       actions = null;
       break;
     case "done":
-      body = <p>{m.voice_read_done()}</p>;
+      body = (
+        <div className="sondine-cloud relative flex items-center gap-m overflow-hidden corner-l p-l">
+          <SkySurface className="sondine-cloud-sky absolute inset-zero" />
+          <span className="relative flex size-[3rem] shrink-0 items-center justify-center corner-full bg-neutral-1 text-display-xs text-neutral-10">
+            <CheckIcon aria-hidden />
+          </span>
+          <p className="relative font-display font-heavy text-display-xs">{m.voice_read_done()}</p>
+        </div>
+      );
       actions =
         onDone === undefined ? null : (
           <Button onClick={onDone}>{doneLabel ?? m.welcome_continue()}</Button>
@@ -230,16 +232,73 @@ export function VoiceReadPanel({
   );
 }
 
-/** The text to read, in the window's language. */
+/**
+ * The voice heard toward the target, as a share, and beside it the
+ * microphone's level, live (Téo, 2026-11-28): bars that follow the voice.
+ */
+function Progress({
+  percent,
+  level,
+  label,
+  hint,
+}: {
+  readonly percent: number;
+  readonly level: number;
+  readonly label?: string;
+  readonly hint?: string;
+}) {
+  return (
+    <div className="flex flex-col gap-xs">
+      <div className="flex items-center gap-s">
+        <Meter
+          className="min-w-0 flex-1"
+          value={percent}
+          aria-label={m.voice_read_heard()}
+          getAriaValueText={() => label ?? ""}
+        >
+          <MeterLabel>{m.voice_read_heard()}</MeterLabel>
+          <MeterValue>{(_formatted: string) => `${percent} %`}</MeterValue>
+        </Meter>
+        <LevelBars level={level} />
+      </div>
+      <p className="text-body-xs text-cte-text-muted">{hint ?? m.voice_read_recording_hint()}</p>
+    </div>
+  );
+}
+
+const BARS = [0.55, 0.85, 1, 0.7, 0.45] as const;
+
+/** Five bars that rise with the microphone's level. */
+function LevelBars({ level }: { readonly level: number }) {
+  return (
+    <span
+      role="img"
+      aria-label={m.voice_read_level()}
+      className="flex h-[1.5rem] shrink-0 items-center gap-[3px] self-end"
+    >
+      {BARS.map((weight, index) => (
+        <span
+          key={index}
+          className={cn(
+            "w-[3px] corner-full transition-[height] duration-100 ease-out motion-reduce:transition-none",
+            level < QUIET_LEVEL ? "bg-neutral-6" : "bg-cte-text",
+          )}
+          style={{ height: `${Math.round(15 + 85 * Math.min(1, level * 1.6) * weight)}%` }}
+        />
+      ))}
+    </span>
+  );
+}
+
+/** The text to read, in the window's language: the same size before and during the read. */
 function ReadText({ muted = false }: { readonly muted?: boolean }) {
   return (
     <blockquote
       lang={getLocale()}
-      className={
-        muted
-          ? "m-zero corner-s bg-cte-surface-muted p-m text-body-m text-cte-text-muted"
-          : "m-zero corner-s bg-cte-surface-muted p-m text-body-l"
-      }
+      className={cn(
+        "m-zero corner-s bg-cte-surface-muted p-m text-body-l transition-colors duration-motion motion-reduce:transition-none",
+        muted && "text-cte-text-muted",
+      )}
     >
       {m.voice_read_text()}
     </blockquote>
