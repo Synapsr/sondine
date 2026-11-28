@@ -34,6 +34,7 @@ import { useVoiceRead, VoiceReadPanel } from "../voice-read/voice-read-panel";
 import { useCompute } from "../settings/compute-section";
 import { RestoreDialog } from "../backup/backup-dialogs";
 import { modelsReady } from "../models/model-view";
+import { StartBody } from "./start-step-body";
 import { Step } from "./step";
 import { TranscriptionStep } from "./transcription-step";
 import { WelcomeIntro } from "./welcome-intro";
@@ -529,16 +530,7 @@ function StartStep({ onBack }: { onBack: () => void }) {
         </Button>
       }
     >
-      <p className="text-body-m">
-        {listening ? m.welcome_already_listening() : m.welcome_start_intro()}
-      </p>
-      <p>{m.welcome_menu_bar()}</p>
-      <ul className="flex flex-col gap-xs text-cte-text-muted">
-        <li>{m.welcome_transcription_when()}</li>
-        {notes.noModel ? <li>{m.welcome_no_model_note()}</li> : null}
-        {notes.missing.includes("microphone") ? <li>{m.welcome_no_microphone_note()}</li> : null}
-        {notes.missing.includes("systemAudio") ? <li>{m.welcome_no_system_audio_note()}</li> : null}
-      </ul>
+      <StartBody listening={listening} notes={notes} />
       {complete.error === null ? null : (
         <p role="alert" className="text-error">
           {errorMessage(complete.error)}
