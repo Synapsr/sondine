@@ -51,7 +51,14 @@ export function useModels() {
 }
 
 /** The models of one role: the transcript's (onboarding, Settings ▸ Modèle) or near-live text's. */
-export function ModelPanel({ role = "final" }: { role?: ModelArtifactStatus["role"] }) {
+export function ModelPanel({
+  role = "final",
+  compact = false,
+}: {
+  role?: ModelArtifactStatus["role"];
+  /** The first run: where it comes from, the free disk and the license in one line that never moves. */
+  compact?: boolean;
+}) {
   const models = useModels();
   if (models.data === undefined) {
     return (
@@ -66,7 +73,12 @@ export function ModelPanel({ role = "final" }: { role?: ModelArtifactStatus["rol
       {status.artifacts
         .filter((artifact) => artifact.role === role)
         .map((artifact) => (
-          <ArtifactPanel key={artifact.artifactId} status={status} artifact={artifact} />
+          <ArtifactPanel
+            key={artifact.artifactId}
+            status={status}
+            artifact={artifact}
+            compact={compact}
+          />
         ))}
     </div>
   );
@@ -75,9 +87,11 @@ export function ModelPanel({ role = "final" }: { role?: ModelArtifactStatus["rol
 function ArtifactPanel({
   status,
   artifact,
+  compact,
 }: {
   status: ModelsStatus;
   artifact: ModelArtifactStatus;
+  compact: boolean;
 }) {
   const locale = getLocale();
   const view = modelView(status, artifact);
@@ -160,16 +174,17 @@ function ArtifactPanel({
   const offersDownload = view.actions.includes("download") || view.actions.includes("resume");
   const [first, ...others] = view.actions;
   const foundFirst = first === "import-found" && others.length > 0;
-  const downloadNote = offersDownload ? (
-    <p className="text-body-xs text-cte-text-muted">
-      {view.missingDiskBytes > 0
-        ? m.model_disk_short({
-            needed: formatBytes(artifact.downloadNeedsBytes, locale),
-            free: formatBytes(status.freeDiskBytes, locale),
-          })
-        : m.model_download_note({ free: formatBytes(status.freeDiskBytes, locale) })}
-    </p>
-  ) : null;
+  const downloadNote =
+    compact && view.missingDiskBytes === 0 ? null : offersDownload ? (
+      <p className="text-body-xs text-cte-text-muted">
+        {view.missingDiskBytes > 0
+          ? m.model_disk_short({
+              needed: formatBytes(artifact.downloadNeedsBytes, locale),
+              free: formatBytes(status.freeDiskBytes, locale),
+            })
+          : m.model_download_note({ free: formatBytes(status.freeDiskBytes, locale) })}
+      </p>
+    ) : null;
   return (
     <section aria-label={artifact.displayName} className="flex flex-col gap-s">
       <div className="flex flex-col gap-s corner-m bg-neutral-2 p-m">
@@ -214,6 +229,15 @@ function ArtifactPanel({
             </ProgressLabel>
             <ProgressValue />
           </Progress>
+        ) : null}
+        {/* The first run keeps the progress's place before it starts: nothing moves then. */}
+        {compact && !view.busy && !view.ready ? (
+          <div aria-hidden className="invisible">
+            <Progress value={0}>
+              <ProgressLabel>{m.model_downloading_bytes({ done: "0", size })}</ProgressLabel>
+              <ProgressValue />
+            </Progress>
+          </div>
         ) : null}
         {view.ready ? (
           <p className="flex items-center gap-xs">
@@ -262,6 +286,9 @@ function ArtifactPanel({
         </>
       )}
       <p className="text-body-xs text-cte-text-muted">
+        {compact
+          ? `${m.model_compact_source({ free: formatBytes(status.freeDiskBytes, locale) })} · `
+          : null}
         {m.model_license({ name: artifact.license.name })}{" "}
         {/* Main opens this pinned page in the default browser, never in Sondine. */}
         <a
