@@ -468,7 +468,7 @@ function Points({
         <li key={text} className="flex items-center gap-s">
           <span
             aria-hidden
-            className="flex size-[2.25rem] shrink-0 items-center justify-center corner-full bg-neutral-3 text-body-l"
+            className="flex size-[2.25rem] shrink-0 items-center justify-center corner-full bg-neutral-3 text-body-l text-cte-text-muted"
           >
             <Icon />
           </span>
