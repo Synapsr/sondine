@@ -2058,8 +2058,6 @@ export const OnboardingStatus = z.strictObject({
   step: OnboardingStep,
   /** What the user wants to find again (ADR 037): what Today shows first; null before they chose. */
   goal: OnboardingGoal.nullable(),
-  /** « Me prévenir »: tell this Mac's user when a cloud transcription exists; stored here only. */
-  cloudNotify: z.boolean(),
 });
 export type OnboardingStatus = z.output<typeof OnboardingStatus>;
 
@@ -2085,7 +2083,6 @@ export type DisplayUpdateInput = z.input<typeof DisplayUpdateInput>;
 export const OnboardingAdvanceInput = z.strictObject({
   step: OnboardingStep,
   goal: OnboardingGoal.optional(),
-  cloudNotify: z.boolean().optional(),
 });
 export type OnboardingAdvanceInput = z.input<typeof OnboardingAdvanceInput>;
 

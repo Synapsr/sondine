@@ -307,7 +307,7 @@ function seed(
 }
 
 function onboardingRow(step: string, startedAtMs: number, completedAtMs: number | null) {
-  return { origin: "first-run", step, startedAtMs, completedAtMs, goal: null, cloudNotify: false };
+  return { origin: "first-run", step, startedAtMs, completedAtMs, goal: null };
 }
 
 function coreSettings(deps: FlowLabDeps, situation: LabSituation): LabCoreSettings {

@@ -585,6 +585,12 @@ ask for system audio.
     to be contacted when the cloud is ready. Sondine itself still sends
     nothing: the page is the browser's, typed into by the user, and main
     allows that one address as an external link. The flag is still stored.
+  - **Removed (Téo, 2026-11-28).** The first run no longer shows the
+    card nor « Me prévenir », and nothing is stored: « Ce Mac » shows why
+    in a dialog (the memory the model asks for, this Mac's, and that an
+    update will offer a lighter model once one runs well), and Sondine
+    Cloud is a card of its own with its terms. Settings keep their link to
+    the sign-up page.
 - **What it does not do.**
   - « Prévu » and « conçue pour ne rien garder » state an intention, not
     a service.

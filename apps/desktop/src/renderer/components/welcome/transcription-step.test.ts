@@ -70,8 +70,8 @@ vi.mock("../../core/orpc", () => {
         wave: query("compute-wave", () => ({ percent: 30, full: false })),
       },
       onboarding: {
-        get: query("onboarding", () => ({ step: "model", cloudNotify: false })),
-        advance: mutation("advance", () => ({ step: "model", cloudNotify: true })),
+        get: query("onboarding", () => ({ step: "model" })),
+        advance: mutation("advance", () => ({ step: "model" })),
       },
     },
   };
@@ -86,6 +86,7 @@ vi.mock("../models/model-view", () => ({
   modelsBusy: () => false,
   modelsReady: () => false,
   modelsTooBig: () => core.tooBig,
+  memoryAsked: () => ({ needed: 32, memory: 16 }),
 }));
 
 vi.mock("../models/small-mac", () => ({ setSmallMac: () => undefined, useSmallMac: () => false }));
@@ -131,13 +132,16 @@ vi.mock("@sondine/ui/components/button", () => ({
     ),
 }));
 
-vi.mock("@sondine/ui/components/popover", () => ({
-  Popover: plain,
-  PopoverDescription: plain,
-  PopoverPopup: plain,
-  PopoverTitle: plain,
-  PopoverTrigger: plain,
+vi.mock("@sondine/ui/components/dialog", () => ({
+  Dialog: plain,
+  DialogClose: plain,
+  DialogDescription: plain,
+  DialogFooter: plain,
+  DialogPopup: plain,
+  DialogTitle: plain,
+  DialogTrigger: plain,
 }));
+vi.mock("@sondine/ui/components/badge", () => ({ Badge: plain }));
 
 vi.mock("@sondine/ui/components/alert-dialog", () => ({
   AlertDialog: () => null,
@@ -283,13 +287,15 @@ describe("the first run's transcription step", () => {
     expect(core.destination).toBe("device");
   });
 
-  it("shows this Mac unavailable when it is too small, with the cloud sign-up", async () => {
+  it("shows this Mac unavailable when it is too small, and why", async () => {
     core.tooBig = true;
     await render();
     expect(picked()).toBe("");
     expect(document.querySelector<HTMLButtonElement>("#radio-device")?.disabled).toBe(true);
     expect(document.body.textContent).toContain(m.welcome_cloud_title());
-    expect(document.body.textContent).toContain(m.welcome_cloud_notify());
+    expect(document.body.textContent).toContain(
+      m.welcome_device_why_detail({ needed: "32", memory: "16" }),
+    );
     press(m.welcome_without_model());
     expect(steps).toEqual(["next"]);
   });

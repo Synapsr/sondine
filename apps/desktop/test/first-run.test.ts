@@ -80,7 +80,6 @@ describe("first run", () => {
       origin: "first-run",
       step: "welcome",
       goal: null,
-      cloudNotify: false,
     });
     expect(await api.onboarding.advance({ step: "permissions", goal: "meetings" })).toMatchObject({
       step: "permissions",
@@ -92,15 +91,13 @@ describe("first run", () => {
     const second = launch(data);
     const again = await second.runtime.runPromise(Api);
     await waitUntil(() => snapshots(fake) >= 2, { label: "second snapshot" });
-    // The goal survives the relaunch; « Me prévenir » is kept the same way.
+    // The goal survives the relaunch.
     expect(await again.onboarding.get()).toMatchObject({
       completed: false,
       step: "permissions",
       goal: "meetings",
     });
-    expect((await again.onboarding.advance({ step: "model", cloudNotify: true })).cloudNotify).toBe(
-      true,
-    );
+    expect((await again.onboarding.advance({ step: "model" })).step).toBe("model");
     expect((await status(second.runtime)).listening.desired).toBe("paused");
     expect(fake.micRun()).toBeNull();
 
@@ -146,5 +143,24 @@ describe("first run", () => {
     });
     expect((await status(after.runtime)).listening.desired).toBe("listening");
     expect(fake.received.filter((message) => message.type === "pause")).toHaveLength(pausesBefore);
+  });
+
+  it("reads a row from before « Me prévenir » was removed without starting over", async () => {
+    const data = setup();
+    await helper(data);
+    const before = launch(data);
+    const api = await before.runtime.runPromise(Api);
+    await api.onboarding.advance({ step: "model", goal: "day" });
+    await before.stop();
+    const db = openDatabase(data.config().databasePath, { migrationsFolder: migrationsDir });
+    db.statement(
+      "UPDATE settings SET value = json_set(value, '$.cloudNotify', json('true')) WHERE key = 'onboarding'",
+    ).run();
+    db.close();
+
+    const after = launch(data);
+    const again = await after.runtime.runPromise(Api);
+    expect(await again.onboarding.get()).toMatchObject({ step: "model", goal: "day" });
+    await after.stop();
   });
 });
