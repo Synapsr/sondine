@@ -97,8 +97,9 @@
  * The first run (Téo, 2026-11-19): a step's parts rise in one after the
  * other from a light blur (`.sondine-stagger`, the delay starting at
  * --stagger-start); going to another step, the one left slides away blurred
- * toward where the user goes, and the next one rises in once it is mostly
- * gone (--stagger-offset). Reduced motion
+ * toward where the user goes, and the next one comes in once it is mostly
+ * gone (--stagger-offset), from the side the user goes toward (--rise-from;
+ * Téo, 2026-11-28). Reduced motion
  * keeps both still.
  */
 @media (prefers-reduced-motion: no-preference) {
@@ -134,7 +135,7 @@
 @keyframes sondine-rise {
   from {
     opacity: 0;
-    translate: 0 10px;
+    translate: var(--rise-from, 0 10px);
     filter: blur(4px);
   }
 }
