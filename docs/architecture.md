@@ -1006,7 +1006,7 @@ See [ADR 012](decisions/012-third-parties-and-biometrics.md).
     resumes, then marks the first run done; a helper refusal leaves it open.
     Later calls change nothing.
   - The steps: what Sondine does, the question about anonymous statistics
-    (ADR 042: `usage.setSharing`, two equal answers), the permissions, the
+    (ADR 042: `usage.setSharing`, two answers, yes the primary one), the permissions, the
     voice read
     (optional, ADR 034: `voiceRead.start`, `finish`, `cancel`, `forget`,
     `get`, `watch`, in the app only), the model (optional), and starting to

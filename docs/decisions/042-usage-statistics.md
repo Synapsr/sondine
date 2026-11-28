@@ -16,7 +16,8 @@ activation; Sondine keeps conversations, so it cannot follow the handbook's
 defaults (on by default, a stable device identifier, the hour of each event).
 He agreed to this, and only this:
 
-1. One question at the first launch, two equal buttons. Nothing leaves without
+1. One question at the first launch, two buttons of the same size (yes the
+   primary one since 2026-11-28, see the amendment). Nothing leaves without
    a yes.
 2. One report a day, made of counts: actions per feature, the onboarding step
    reached, errors by code, the version of Sondine and of macOS, a band of
@@ -227,6 +228,13 @@ in.
 - PostHog's free plan has one project per organization, and Téo's first is
   another product's: Sondine has an organization of its own, in the EU. The development Worker
   has no token and forwards nothing.
+
+## Amendment — yes is the primary answer (2026-11-28)
+
+Téo chose that « Oui » takes the primary style, as the way forward does on
+every other step of the first run, and « Non » stays secondary. Both keep the
+same size and sit side by side; no answer is still a no, and nothing else
+about the consent changes. The sidebar's question uses the same pair.
 
 ## Rejected
 
