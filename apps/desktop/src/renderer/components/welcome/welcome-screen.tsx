@@ -198,16 +198,17 @@ function GoalStep({
               aria-pressed={goal === card.goal}
               onClick={() => onPick(card.goal)}
               className={cn(
-                // Concentric corners: the icon's is the card's less the inset (28 − 17 ≈ 12).
-                "flex w-full items-center gap-s corner-l p-m text-start ring-[1px] focus-ring",
-                "transition-[background-color,box-shadow] duration-motion ease-motion motion-reduce:transition-none",
+                "flex w-full items-center gap-s corner-m p-m text-start ring-[1px] focus-ring",
+                // Only the ground eases: an edge (a shadow) in transition thickens as it goes (Téo, 2026-11-28).
+                "transition-[background-color] duration-motion ease-motion motion-reduce:transition-none",
                 "control-hover:bg-neutral-2",
-                goal === card.goal ? "ring-neutral-10" : "ring-neutral-4",
+                // The card chosen, quietly: a grey edge on a faint ground, not black.
+                goal === card.goal ? "bg-neutral-2 ring-neutral-6" : "ring-neutral-4",
               )}
             >
               <span
                 aria-hidden
-                className="flex size-[2.5rem] shrink-0 items-center justify-center corner-s bg-neutral-3 text-cte-text-muted"
+                className="flex size-[2.5rem] shrink-0 items-center justify-center corner-m bg-neutral-3 text-cte-text-muted"
               >
                 {card.icon}
               </span>
