@@ -51,25 +51,27 @@ export function WelcomeScreen() {
   const queryClient = useQueryClient();
   const advance = useMutation(orpc.onboarding.advance.mutationOptions());
   const [step, setStep] = useState<OnboardingStep | null>(null);
-  // After a change of step, the next one waits for the one left to be mostly gone.
-  const [moved, setMoved] = useState(false);
+  // After a change of step, the next one waits for the one left to be mostly gone,
+  // and comes in from the side the user goes toward.
+  const [moved, setMoved] = useState<"forward" | "back" | null>(null);
   const [restoring, setRestoring] = useState(false);
   const [opened, setOpened] = useState(false);
   const shown = step ?? onboarding.data?.step ?? "welcome";
   const go = (next: OnboardingStep | null, goal?: OnboardingGoal) => {
     if (next === null) return;
+    const direction = stepIndex(next) > stepIndex(shown) ? "forward" : "back";
     // The step left slides away blurred, toward where the user goes (renderer/styles.css).
     const change = () =>
       flushSync(() => {
         setStep(next);
-        setMoved(true);
+        setMoved(direction);
       });
     const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (calm || typeof document.startViewTransition !== "function") change();
     else {
       document.startViewTransition({
         update: change,
-        types: [stepIndex(next) > stepIndex(shown) ? "step-forward" : "step-back"],
+        types: [direction === "forward" ? "step-forward" : "step-back"],
       });
     }
     advance.mutate(
@@ -107,41 +109,47 @@ export function WelcomeScreen() {
         </Button>
       ) : null}
       <RestoreDialog open={restoring} replaces={false} onClose={() => setRestoring(false)} />
-      {/* The step in the middle of what is left, both ways; a tall step scrolls from the top. */}
+      {/* The steps all share one box, all that is left of the window, so a step
+          left behind does not move up or down as it goes (Téo, 2026-11-28). */}
       <div
         className={cn(
-          "my-auto flex w-full max-w-[30rem] flex-col gap-xl py-xl [view-transition-name:welcome-step]",
-          moved && "[--stagger-offset:160ms]",
+          "flex w-full max-w-[30rem] flex-1 flex-col [view-transition-name:welcome-step]",
+          moved !== null && "[--stagger-offset:160ms]",
+          moved === "forward" && "[--rise-from:40px_0]",
+          moved === "back" && "[--rise-from:-40px_0]",
         )}
       >
-        {shown === "welcome" ? (
-          <GoalStep
-            goal={onboarding.data?.goal ?? null}
-            onPick={(goal) => go(nextStep(shown), goal)}
-          />
-        ) : null}
-        {shown === "statistics" ? (
-          <StatisticsStep
-            onBack={() => go(previousStep(shown))}
-            onNext={() => go(nextStep(shown))}
-          />
-        ) : null}
-        {shown === "permissions" ? (
-          <PermissionsStep
-            onBack={() => go(previousStep(shown))}
-            onNext={() => go(nextStep(shown))}
-          />
-        ) : null}
-        {shown === "voice" ? (
-          <VoiceStep onBack={() => go(previousStep(shown))} onNext={() => go(nextStep(shown))} />
-        ) : null}
-        {shown === "model" ? (
-          <TranscriptionStep
-            onBack={() => go(previousStep(shown))}
-            onNext={() => go(nextStep(shown))}
-          />
-        ) : null}
-        {shown === "start" ? <StartStep onBack={() => go(previousStep(shown))} /> : null}
+        {/* The step in the middle of it, both ways; a tall step scrolls from the top. */}
+        <div className="my-auto flex flex-col gap-xl py-xl">
+          {shown === "welcome" ? (
+            <GoalStep
+              goal={onboarding.data?.goal ?? null}
+              onPick={(goal) => go(nextStep(shown), goal)}
+            />
+          ) : null}
+          {shown === "statistics" ? (
+            <StatisticsStep
+              onBack={() => go(previousStep(shown))}
+              onNext={() => go(nextStep(shown))}
+            />
+          ) : null}
+          {shown === "permissions" ? (
+            <PermissionsStep
+              onBack={() => go(previousStep(shown))}
+              onNext={() => go(nextStep(shown))}
+            />
+          ) : null}
+          {shown === "voice" ? (
+            <VoiceStep onBack={() => go(previousStep(shown))} onNext={() => go(nextStep(shown))} />
+          ) : null}
+          {shown === "model" ? (
+            <TranscriptionStep
+              onBack={() => go(previousStep(shown))}
+              onNext={() => go(nextStep(shown))}
+            />
+          ) : null}
+          {shown === "start" ? <StartStep onBack={() => go(previousStep(shown))} /> : null}
+        </div>
       </div>
     </div>
   );
