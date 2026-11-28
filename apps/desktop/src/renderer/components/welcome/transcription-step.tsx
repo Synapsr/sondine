@@ -11,10 +11,17 @@ import {
   DialogTrigger,
 } from "@sondine/ui/components/dialog";
 import { Radio, RadioGroup, RadioLabel } from "@sondine/ui/components/radio-group";
-import { EyeOffIcon, InfoIcon, LockIcon, ShieldIcon } from "@sondine/ui/icon";
-import { useState } from "react";
+import {
+  ExternalLinkIcon,
+  EyeOffIcon,
+  InfoIcon,
+  LockIcon,
+  ShieldIcon,
+  type IconProps,
+} from "@sondine/ui/icon";
+import { useState, type ComponentType } from "react";
 import { createPortal } from "react-dom";
-import { CLOUD_PRIVACY_URL } from "../../../shared/cloud";
+import { CLOUD_PRIVACY_URL, COMPUTE_GUIDE_URL } from "../../../shared/cloud";
 import { errorMessage } from "../../core/orpc";
 import { useLocale } from "../../i18n/locale";
 import { m } from "../../paraglide/messages.js";
@@ -24,7 +31,6 @@ import { setSmallMac, useSmallMac } from "../models/small-mac";
 import { useWaveFull, WaveGauge } from "../settings/cloud-section";
 import {
   BetaInviteField,
-  BetaTerms,
   destinationOption,
   OwnLinkForm,
   useChoose,
@@ -213,7 +219,24 @@ function OwnScreen({
         )
       }
     >
-      <p>{m.compute_own_confirm()}</p>
+      <Points
+        points={[
+          { Icon: LockIcon, text: m.welcome_own_point_sent() },
+          { Icon: ShieldIcon, text: m.welcome_own_point_access() },
+          { Icon: InfoIcon, text: m.welcome_own_point_back() },
+        ]}
+      />
+      {status.own === null ? (
+        <a
+          className="flex items-center gap-xxs self-start text-body-s underline"
+          href={COMPUTE_GUIDE_URL}
+          target="_blank"
+          rel="noreferrer"
+        >
+          {m.welcome_own_guide()}
+          <ExternalLinkIcon aria-hidden />
+        </a>
+      ) : null}
       {status.own === null ? (
         <OwnLinkForm
           id="welcome-connect"
@@ -290,7 +313,7 @@ function BetaScreen({
         )
       }
     >
-      {status.beta.joined ? <BetaTerms joined /> : <CloudOffer />}
+      {status.beta.joined ? <CloudPoints /> : <CloudOffer />}
       {status.beta.joined || !inviting ? null : (
         <BetaInviteField value={invite} onChange={setInvite} opened />
       )}
@@ -307,12 +330,7 @@ function BetaScreen({
 function DeviceWhy({ needed, memory }: { needed: number; memory: number }) {
   return (
     <Dialog>
-      <DialogTrigger
-        variant="ghost"
-        size="icon-s"
-        aria-label={m.welcome_device_why()}
-        className="mt-s text-cte-text-muted"
-      >
+      <DialogTrigger variant="secondary" size="icon" aria-label={m.welcome_device_why()}>
         <InfoIcon />
       </DialogTrigger>
       <DialogPopup className="w-[min(28rem,calc(100vw-var(--space-xl)))]">
@@ -334,16 +352,15 @@ function DeviceWhy({ needed, memory }: { needed: number; memory: number }) {
  */
 function CloudOption() {
   return (
-    <RadioLabel className="sondine-cloud relative items-start overflow-hidden corner-m p-m inset-ring-[1px] inset-ring-neutral-4 has-data-checked:inset-ring-neutral-10">
+    <RadioLabel className="sondine-cloud relative items-start overflow-hidden corner-m p-m shadow-s inset-ring-[1px] inset-ring-neutral-4-transparent has-data-checked:inset-ring-neutral-10">
       <SkySurface className="sondine-cloud-sky absolute inset-zero" />
       <Radio value="beta" className="relative mt-xxs" />
       <span className="relative flex min-w-0 flex-1 flex-col gap-xxs">
         <span className="flex items-center justify-between gap-s">
-          <span className="font-medium">{m.compute_beta()}</span>
+          <span className="font-display font-heavy text-body-m">{m.compute_beta()}</span>
           <Badge>{m.welcome_cloud_free()}</Badge>
         </span>
         <span className="text-body-s">{m.welcome_cloud_detail()}</span>
-        <span className="text-body-s">{m.compute_trial_terms()}</span>
       </span>
     </RadioLabel>
   );
@@ -375,7 +392,6 @@ function SmallMacSwitch() {
  * the site. Settings' dialog keeps the whole text.
  */
 function CloudOffer() {
-  const { locale } = useLocale();
   return (
     <>
       <div className="sondine-cloud relative flex flex-col gap-xs overflow-hidden corner-l p-l">
@@ -384,20 +400,23 @@ function CloudOffer() {
         <p className="relative text-body-s">{m.compute_trial_terms()}</p>
       </div>
       <WaveGauge />
-      <ul className="flex flex-col gap-xs text-body-s">
-        {[
-          { icon: <LockIcon />, text: m.welcome_cloud_point_sent() },
-          { icon: <ShieldIcon />, text: m.welcome_cloud_point_access() },
-          { icon: <EyeOffIcon />, text: m.welcome_cloud_point_word() },
-        ].map(({ icon, text }) => (
-          <li key={text} className="flex items-start gap-xs">
-            <span aria-hidden className="mt-xxs text-cte-text-muted">
-              {icon}
-            </span>
-            {text}
-          </li>
-        ))}
-      </ul>
+      <CloudPoints />
+    </>
+  );
+}
+
+/** What leaves for the Cloud, who could read it and the word given (ADR 040), then the rest on the site. */
+function CloudPoints() {
+  const { locale } = useLocale();
+  return (
+    <>
+      <Points
+        points={[
+          { Icon: LockIcon, text: m.welcome_cloud_point_sent() },
+          { Icon: ShieldIcon, text: m.welcome_cloud_point_access() },
+          { Icon: EyeOffIcon, text: m.welcome_cloud_point_word() },
+        ]}
+      />
       <a
         className="self-start text-body-s text-cte-text-muted underline"
         href={locale === "fr" ? CLOUD_PRIVACY_URL.fr : CLOUD_PRIVACY_URL.en}
@@ -407,5 +426,23 @@ function CloudOffer() {
         {m.compute_trial_privacy()}
       </a>
     </>
+  );
+}
+
+/** A server's terms, one short line each beside its icon (Téo, 2026-11-28). */
+function Points({
+  points,
+}: {
+  points: readonly { readonly Icon: ComponentType<IconProps>; readonly text: string }[];
+}) {
+  return (
+    <ul className="flex flex-col gap-xs text-body-s">
+      {points.map(({ Icon, text }) => (
+        <li key={text} className="flex items-start gap-xs">
+          <Icon aria-hidden className="mt-xxs shrink-0 text-cte-text-muted" />
+          {text}
+        </li>
+      ))}
+    </ul>
   );
 }

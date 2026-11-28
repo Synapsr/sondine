@@ -263,7 +263,7 @@ describe("the first run's transcription step", () => {
     await render();
     await open("own");
     await vi.waitFor(() => expect(title()).toBe(m.compute_own()));
-    expect(document.body.textContent).toContain(m.compute_own_confirm());
+    expect(document.body.textContent).toContain(m.welcome_own_point_access());
     expect(document.querySelector("form#welcome-connect")).not.toBeNull();
     press(m.welcome_back());
     await vi.waitFor(() => expect(title()).toBe(m.welcome_where_title()));
