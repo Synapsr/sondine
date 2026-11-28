@@ -57,7 +57,7 @@ export function VoiceReadPanel({
   readonly selfName?: string | undefined;
   /** Starts at once (the first run's dialog: its button was the start). */
   readonly autoStart?: boolean;
-  /** The progress wide and its share big (the first run's dialog). */
+  /** The progress wide and its share big, no hint, and once kept it leaves at once (the first run's dialog). */
   readonly large?: boolean;
   /** At the start of the buttons' row (the first run's « Retour »), the others at its end. */
   readonly leading?: ReactNode;
@@ -103,6 +103,11 @@ export function VoiceReadPanel({
     started.current = true;
     start.mutate({ selfName: name });
   }, [autoStart, ready, start, name]);
+  // The first run's dialog shows no outcome: kept, it closes, and the card says so.
+  const kept = status.data !== undefined && voiceReadView(status.data, mine).kind === "done";
+  useEffect(() => {
+    if (large && kept) onDone?.();
+  }, [large, kept, onDone]);
 
   if (status.data === undefined) {
     return status.error === null ? null : (
@@ -276,11 +281,20 @@ function Progress({
           <LevelBars level={level} large />
         </div>
         <Meter
+          className="**:data-[slot=meter-track]:h-s"
           value={percent}
           aria-label={m.voice_read_heard()}
           getAriaValueText={() => label ?? ""}
         />
-        <p className="text-body-xs text-cte-text-muted">{hint ?? m.voice_read_recording_hint()}</p>
+        {/* Only the warning, its place kept: the rest goes without saying in a dialog. */}
+        <p
+          className={cn(
+            "text-body-xs text-cte-text-muted",
+            !(level > 0 && level < QUIET_LEVEL) && "invisible",
+          )}
+        >
+          {m.voice_read_quiet()}
+        </p>
       </div>
     );
   }

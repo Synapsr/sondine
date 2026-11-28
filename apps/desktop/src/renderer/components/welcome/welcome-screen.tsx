@@ -28,6 +28,7 @@ import { UpdateAnswers, useUpdates } from "../updates/updates";
 import { SentReports, UsageAnswers } from "../usage/usage";
 import { Dialog, DialogPopup, DialogTitle } from "@sondine/ui/components/dialog";
 import { Input } from "@sondine/ui/components/input";
+import { Tooltip, TooltipPopup, TooltipTrigger } from "@sondine/ui/components/tooltip";
 import { useVoiceRead, VoiceReadPanel } from "../voice-read/voice-read-panel";
 import { useCompute } from "../settings/compute-section";
 import { RestoreDialog } from "../backup/backup-dialogs";
@@ -402,6 +403,11 @@ function VoiceStep({ onBack, onNext }: { onBack: () => void; onNext: () => void 
   const [reading, setReading] = useState(false);
   const known = status.data?.read != null;
   const available = status.data?.available === true;
+  const voiceState = known
+    ? m.welcome_voice_known()
+    : available
+      ? m.welcome_voice_unknown()
+      : m.voice_read_unavailable();
   return (
     <Step
       title={m.welcome_voice_title()}
@@ -427,23 +433,32 @@ function VoiceStep({ onBack, onNext }: { onBack: () => void; onNext: () => void 
         >
           <UserIcon />
         </span>
-        <span className="flex min-w-0 flex-1 flex-col gap-xxs">
-          <Input
-            aria-label={m.welcome_voice_name()}
-            placeholder={m.welcome_voice_name()}
-            value={name}
-            disabled={known}
-            onChange={(event) => setName(event.target.value)}
-          />
-          <span className="flex items-center gap-xxs text-body-xs text-cte-text-muted">
-            {known ? <CheckIcon aria-hidden /> : null}
-            {known
-              ? m.welcome_voice_known()
-              : available
-                ? m.welcome_voice_unknown()
-                : m.voice_read_unavailable()}
-          </span>
-        </span>
+        <Input
+          className="min-w-0 flex-1"
+          aria-label={m.welcome_voice_name()}
+          placeholder={m.welcome_voice_name()}
+          value={name}
+          disabled={known}
+          onChange={(event) => setName(event.target.value)}
+        />
+        {/* Whether Sondine knows the voice: a check, its words on hover (Téo, 2026-11-28). */}
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <span
+                tabIndex={0}
+                aria-label={voiceState}
+                className={cn(
+                  "flex size-[2rem] shrink-0 items-center justify-center corner-full focus-ring",
+                  known ? "bg-success text-neutral-10" : "bg-neutral-3 text-neutral-6",
+                )}
+              />
+            }
+          >
+            <CheckIcon aria-hidden />
+          </TooltipTrigger>
+          <TooltipPopup>{voiceState}</TooltipPopup>
+        </Tooltip>
         <Button
           variant={known ? "secondary" : "primary"}
           className="shrink-0"
