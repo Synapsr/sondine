@@ -426,7 +426,8 @@ function StartStep({ onBack }: { onBack: () => void }) {
     orpc.onboarding.complete.mutationOptions({
       onSuccess: (result) => {
         queryClient.setQueryData(orpc.onboarding.get.queryKey(), result.onboarding);
-        void navigate({ to: "/" });
+        // The first run grows and fades toward the user, Today rising behind it (styles.css).
+        void navigate({ to: "/", viewTransition: { types: ["welcome-done"] } });
       },
     }),
   );
