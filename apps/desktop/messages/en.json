@@ -1597,7 +1597,7 @@
   "welcome_own_point_sent": "The audio of your finished conversations, other people’s voices included, goes encrypted to your machine; the text comes back here.",
   "welcome_own_point_access": "Whoever administers that machine could technically access the audio and the text while it computes.",
   "welcome_own_point_back": "What is sent cannot be called back. “This Mac” stays available at any time.",
-  "welcome_own_guide": "How to set up your machine",
+  "welcome_own_guide": "Guide",
   "welcome_others": "The voices around you are recorded too; tell people when the law asks you to.",
   "voice_confirm": "Confirm: this is {name}",
   "voice_listen": "Listen",

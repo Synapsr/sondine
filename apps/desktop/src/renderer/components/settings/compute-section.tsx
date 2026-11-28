@@ -17,7 +17,7 @@ import { Field, FieldLabel } from "@sondine/ui/components/field";
 import { Input } from "@sondine/ui/components/input";
 import { Radio, RadioGroup, RadioLabel } from "@sondine/ui/components/radio-group";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState, type ElementType } from "react";
+import { useState, type ElementType, type ReactNode } from "react";
 import { CLOUD_WAITLIST_URL } from "../../../shared/cloud";
 import { useWaveFull, WaveGauge } from "./cloud-section";
 import { errorMessage, orpc } from "../../core/orpc";
@@ -233,10 +233,13 @@ export function OwnLinkForm({
   id,
   connect,
   onConnected,
+  aside,
 }: {
   id: string;
   connect: ReturnType<typeof useConnectOwn>;
   onConnected: () => void;
+  /** Beside the field: the first run's guide to setting the machine up. */
+  aside?: ReactNode;
 }) {
   return (
     <form
@@ -248,13 +251,17 @@ export function OwnLinkForm({
     >
       <Field className="items-stretch">
         <FieldLabel>{m.compute_connect_label()}</FieldLabel>
-        <Input
-          value={connect.link}
-          autoComplete="off"
-          spellCheck={false}
-          placeholder="sondine-compute://connect?…"
-          onChange={(event) => connect.setLink(event.target.value)}
-        />
+        <span className="flex items-center gap-xs">
+          <Input
+            className="min-w-0 flex-1"
+            value={connect.link}
+            autoComplete="off"
+            spellCheck={false}
+            placeholder="sondine-compute://connect?…"
+            onChange={(event) => connect.setLink(event.target.value)}
+          />
+          {aside}
+        </span>
       </Field>
     </form>
   );
