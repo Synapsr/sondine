@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.11.0 — 2026-11-28
+
+Back up all of Sondine in one file, and transcribe in the Sondine Cloud: 60 free minutes, then a plan paid in your browser.
+
+### New
+
+#### Back up all of Sondine in one file, and get it all back at once
+
+Settings ▸ Data saves your conversations, transcripts, voices, people, journal, context and settings to one `.sondine` file, protected by a passphrase unless you choose otherwise. After a reinstall or on another Mac, choose « Restaurer une sauvegarde… » and everything comes back. The data it replaces is kept aside, and listening stays paused until you resume it.
+
+#### Try the Sondine Cloud for free, then subscribe from Sondine
+
+Places are limited: Wave 1 opens with 10. Choosing Sondine Cloud shows how full the current wave is and offers 60 free minutes in one click, with no card and no account. In Settings ▸ Transcription you can then subscribe to the Founder plan (19 € a month for 40 hours), add 10 hours for 10 €, and manage your card, invoices or cancellation: each opens Stripe's secure page in your browser, Sondine never talks to Stripe itself, and it updates by itself once you have paid. Transcriptions that waited for hours start again on their own.
+
+#### Join Sondine Cloud with an invite link, and see your remaining hours
+
+If you have a Sondine Cloud invite link or code, paste it during the first run or in Settings ▸ Transcription ▸ Cloud to activate your trial or plan, even when the wave is full. Settings shows how much of your trial or monthly hours (and any top-up hours) remains, and disconnecting a Mac from an invited plan leaves your plan and top-ups intact on the server.
+
 ## 0.10.0 — 2026-11-27
 
 Sondine takes the look of its site, shows the logo of the video you heard, and Search gets tighter.
