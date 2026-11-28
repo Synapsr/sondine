@@ -154,3 +154,104 @@
     filter: blur(6px);
   }
 }
+
+/*
+ * The first run's opening (welcome-intro.tsx; Téo, 2026-11-28, after Arc
+ * and Dia's first launch, ADR 033): on the window's background, the site's
+ * moving sky comes in; the wordmark arrives from a light blur, « Bienvenue »
+ * rises under it, the line to click comes last. Leaving, everything fades
+ * and blurs a little. The words take the site's ink on its sky in both
+ * modes. Reduced motion shows the sky and the words still.
+ */
+.sondine-intro {
+  color: #0b2230;
+}
+.sondine-intro-welcome,
+.sondine-intro-begin {
+  color: rgb(11 34 48 / 0.72);
+}
+/* Under the moving sky, and in its place before its first frame or without WebGL. */
+.sondine-intro-sky {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-4) 0%,
+    color-mix(in oklab, var(--color-4) 55%, white) 22%,
+    var(--color-3) 52%,
+    var(--color-2) 85%
+  );
+}
+.sondine-intro-sky[data-drawn] {
+  background-image: none;
+}
+/* Dark: black where the pale sky was, holes onto the window, white words. */
+.dark .sondine-intro,
+[data-theme="dark"] .sondine-intro {
+  --sondine-sky-holes: 1;
+  color: #ffffff;
+}
+.dark .sondine-intro-welcome,
+.dark .sondine-intro-begin,
+[data-theme="dark"] .sondine-intro-welcome,
+[data-theme="dark"] .sondine-intro-begin {
+  color: rgb(255 255 255 / 0.72);
+}
+.dark .sondine-intro-sky:not([data-drawn]),
+[data-theme="dark"] .sondine-intro-sky:not([data-drawn]) {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-4) 0%,
+    transparent 45%,
+    transparent 60%,
+    var(--color-2) 100%
+  );
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sondine-intro-sky {
+    animation: sondine-intro-sky-in 1600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .sondine-intro-logo {
+    animation: sondine-intro-arrive 1100ms cubic-bezier(0.23, 1, 0.32, 1) 500ms both;
+  }
+  .sondine-intro-welcome {
+    animation: sondine-intro-rise 900ms cubic-bezier(0.23, 1, 0.32, 1) 1300ms both;
+  }
+  .sondine-intro-begin {
+    animation: sondine-intro-fade 800ms ease-out 2300ms both;
+  }
+  .sondine-intro[data-leaving] {
+    animation: sondine-intro-leave 600ms cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+}
+
+@keyframes sondine-intro-sky-in {
+  from {
+    opacity: 0;
+    scale: 1.08;
+  }
+}
+@keyframes sondine-intro-arrive {
+  from {
+    opacity: 0;
+    scale: 0.94;
+    filter: blur(12px);
+  }
+}
+@keyframes sondine-intro-rise {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+    filter: blur(6px);
+  }
+}
+@keyframes sondine-intro-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes sondine-intro-leave {
+  to {
+    opacity: 0;
+    scale: 1.03;
+    filter: blur(10px);
+  }
+}

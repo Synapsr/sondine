@@ -4,3 +4,4 @@
 export type { IconProps } from "./icon-types";
 export * from "./nucleo";
 export { BrandMark, type Brand } from "./brand-mark";
+export { SondineLogo } from "./sondine-logo";
