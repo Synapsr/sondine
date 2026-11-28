@@ -463,7 +463,7 @@ function Points({
   points: readonly { readonly Icon: ComponentType<IconProps>; readonly text: string }[];
 }) {
   return (
-    <ul className="flex flex-col gap-xs text-body-s">
+    <ul className="flex flex-col gap-m text-body-s">
       {points.map(({ Icon, text }) => (
         <li key={text} className="flex items-center gap-s">
           <span
