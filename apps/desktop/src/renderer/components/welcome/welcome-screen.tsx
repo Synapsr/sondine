@@ -206,12 +206,13 @@ function GoalStep({
               aria-pressed={goal === card.goal}
               onClick={() => onPick(card.goal)}
               className={cn(
-                "flex w-full items-center gap-s corner-m p-m text-start ring-[1px] focus-ring",
+                // The edge inside, over the ground: outside, a grey ground beside it reads thicker (Téo, 2026-11-28).
+                "flex w-full items-center gap-s corner-m p-m text-start inset-ring-[1px] focus-ring",
                 // Only the ground eases: an edge (a shadow) in transition thickens as it goes (Téo, 2026-11-28).
                 "transition-[background-color] duration-motion ease-motion motion-reduce:transition-none",
                 "control-hover:bg-neutral-2",
                 // The card chosen, quietly: a grey edge on a faint ground, not black.
-                goal === card.goal ? "bg-neutral-2 ring-neutral-6" : "ring-neutral-4",
+                goal === card.goal ? "bg-neutral-2 inset-ring-neutral-6" : "inset-ring-neutral-4",
               )}
             >
               <span
@@ -337,26 +338,39 @@ function PermissionRow({
             <span className="font-body font-medium">{label}</span>
             <span className="text-body-xs text-cte-text-muted">{description}</span>
           </div>
-          {/* A quiet state when granted; otherwise what to do, in its place (Téo, 2026-11-19). */}
-          {offer === "granted" ? (
-            <span className="flex shrink-0 items-center gap-xxs text-body-s text-cte-text-muted">
-              <CheckIcon aria-hidden />
-              {m.permission_granted()}
+          {/* A quiet state when granted; otherwise what to do, in its place (Téo, 2026-11-19).
+              The place keeps the size of the largest button: nothing moves once granted (Téo, 2026-11-28). */}
+          <span className="grid shrink-0 items-center justify-items-end">
+            {[m.permission_grant(), m.welcome_open_settings()].map((placeholder) => (
+              <Button
+                key={placeholder}
+                variant="secondary"
+                aria-hidden
+                tabIndex={-1}
+                className="invisible [grid-area:1/1]"
+              >
+                {placeholder}
+              </Button>
+            ))}
+            <span className="flex [grid-area:1/1]">
+              {offer === "granted" ? (
+                <span className="flex items-center gap-xxs text-body-s text-cte-text-muted">
+                  <CheckIcon aria-hidden />
+                  {m.permission_granted()}
+                </span>
+              ) : offer === "restricted" ? (
+                <span className="text-body-s text-cte-text-muted">{m.permission_restricted()}</span>
+              ) : (
+                <Button
+                  variant="secondary"
+                  isPending={request.isPending}
+                  onClick={() => request.mutate({ kind })}
+                >
+                  {offer === "ask" ? m.permission_grant() : m.welcome_open_settings()}
+                </Button>
+              )}
             </span>
-          ) : offer === "restricted" ? (
-            <span className="shrink-0 text-body-s text-cte-text-muted">
-              {m.permission_restricted()}
-            </span>
-          ) : (
-            <Button
-              variant="secondary"
-              className="shrink-0"
-              isPending={request.isPending}
-              onClick={() => request.mutate({ kind })}
-            >
-              {offer === "ask" ? m.permission_grant() : m.welcome_open_settings()}
-            </Button>
-          )}
+          </span>
         </div>
         {offer === "restricted" ? (
           <p className="text-body-xs text-cte-text-muted">{m.welcome_restricted()}</p>
