@@ -34,7 +34,6 @@ const Stored = z.strictObject({
   completedAtMs: z.number().nullable(),
   // Added with ADR 037: older rows read as not chosen.
   goal: OnboardingGoal.nullable().default(null),
-  cloudNotify: z.boolean().default(false),
 });
 type Stored = z.output<typeof Stored>;
 
@@ -42,12 +41,11 @@ export interface OnboardingService {
   get(): OnboardingStatus;
   /**
    * Saves the step on screen (ignored once the first run is done), and the
-   * goal and « Me prévenir » when given (kept at any time).
+   * goal when given (kept at any time).
    */
   advance(input: {
     readonly step: OnboardingStep;
     readonly goal?: OnboardingGoal | undefined;
-    readonly cloudNotify?: boolean | undefined;
   }): OnboardingStatus;
   /**
    * Ends the first run, once: with `startListening`, resumes listening first
@@ -81,7 +79,6 @@ const toStatus = (stored: Stored): OnboardingStatus => ({
   origin: stored.origin,
   step: stored.step,
   goal: stored.goal,
-  cloudNotify: stored.cloudNotify,
 });
 
 export const onboardingLayer = (options: OnboardingOptions = {}) =>
@@ -99,7 +96,12 @@ export const onboardingLayer = (options: OnboardingOptions = {}) =>
         ];
         if (typeof raw !== "string") return null;
         try {
-          const parsed = Stored.safeParse(JSON.parse(raw));
+          // « Me prévenir » (the cloud sign-up, gone 2026-11-28) left its key
+          // in older rows: dropped, so they still read and the first run does not start over.
+          const { cloudNotify: _gone, ...row } = z
+            .record(z.string(), z.unknown())
+            .parse(JSON.parse(raw));
+          const parsed = Stored.safeParse(row);
           return parsed.success ? parsed.data : null;
         } catch {
           return null;
@@ -125,7 +127,6 @@ export const onboardingLayer = (options: OnboardingOptions = {}) =>
             startedAtMs: now(),
             completedAtMs: now(),
             goal: null,
-            cloudNotify: false,
           });
         }
         // The pause first: a crash before the setting is written starts over here.
@@ -143,7 +144,6 @@ export const onboardingLayer = (options: OnboardingOptions = {}) =>
           startedAtMs: now(),
           completedAtMs: null,
           goal: null,
-          cloudNotify: false,
         });
       });
 
@@ -154,18 +154,13 @@ export const onboardingLayer = (options: OnboardingOptions = {}) =>
 
       return Onboarding.of({
         get: () => toStatus(current),
-        advance: ({ step, goal, cloudNotify }) => {
+        advance: ({ step, goal }) => {
           const next = {
             ...current,
             step: current.completedAtMs === null ? step : current.step,
             goal: goal ?? current.goal,
-            cloudNotify: cloudNotify ?? current.cloudNotify,
           };
-          if (
-            next.step !== current.step ||
-            next.goal !== current.goal ||
-            next.cloudNotify !== current.cloudNotify
-          ) {
+          if (next.step !== current.step || next.goal !== current.goal) {
             save(next);
             log.info("onboarding.step", { step: next.step, goal: next.goal ?? "none" });
           }

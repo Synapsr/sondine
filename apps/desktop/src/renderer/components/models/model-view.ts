@@ -48,6 +48,16 @@ function idleActions(artifact: ModelArtifactStatus): ModelAction[] {
 const finalModels = (status: ModelsStatus) =>
   status.artifacts.filter((artifact) => artifact.role === "final");
 
+/** The memory the transcript's models ask for, in whole GB, and this Mac's. */
+export function memoryAsked(status: ModelsStatus): {
+  readonly needed: number;
+  readonly memory: number;
+} {
+  const gb = (bytes: number) => Math.round(bytes / 1024 ** 3);
+  const needed = Math.max(0, ...finalModels(status).map((artifact) => artifact.minimumMemoryBytes));
+  return { needed: gb(needed), memory: gb(status.memoryBytes) };
+}
+
 /** Whether every model the transcript needs is installed and verified. */
 export function modelsReady(status: ModelsStatus): boolean {
   const models = finalModels(status);

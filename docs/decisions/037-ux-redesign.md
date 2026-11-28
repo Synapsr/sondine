@@ -249,7 +249,9 @@ Sondine's own text outside the exemptions:
     to transcribe, and « Continuer sans transcription » while no server is
     chosen;
   - and a card: « Prévu : une transcription dans le cloud, conçue pour ne
-    rien garder. » with « Me prévenir ».
+    rien garder. » with « Me prévenir ». (Removed from the first run on
+    2026-11-28 by Téo: « Ce Mac » says why in a dialog, and Sondine Cloud
+    is a card of its own; see `docs/ux-redesign.md`.)
 
   The button stores `cloud.notify` on this Mac. The news arrives through
   the update check, which stays the user's separate choice. There is no

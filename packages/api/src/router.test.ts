@@ -135,7 +135,6 @@ const onboarding: OnboardingStatus = {
   origin: "first-run",
   step: "welcome",
   goal: null,
-  cloudNotify: false,
 };
 
 const agentsStatus: AgentsStatus = {

@@ -1,22 +1,23 @@
 import type { ComputeDestination, ComputeStatus } from "@sondine/api";
 import { Button } from "@sondine/ui/components/button";
+import { Badge } from "@sondine/ui/components/badge";
 import {
-  Popover,
-  PopoverDescription,
-  PopoverPopup,
-  PopoverTitle,
-  PopoverTrigger,
-} from "@sondine/ui/components/popover";
-import { RadioGroup } from "@sondine/ui/components/radio-group";
-import { ExternalLinkIcon, InfoIcon } from "@sondine/ui/icon";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+  Dialog,
+  DialogClose,
+  DialogDescription,
+  DialogFooter,
+  DialogPopup,
+  DialogTitle,
+  DialogTrigger,
+} from "@sondine/ui/components/dialog";
+import { Radio, RadioGroup, RadioLabel } from "@sondine/ui/components/radio-group";
+import { InfoIcon } from "@sondine/ui/icon";
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { CLOUD_WAITLIST_URL } from "../../../shared/cloud";
-import { errorMessage, orpc } from "../../core/orpc";
+import { errorMessage } from "../../core/orpc";
 import { m } from "../../paraglide/messages.js";
 import { ModelPanel, useModels } from "../models/model-panel";
-import { modelsBusy, modelsReady, modelsTooBig } from "../models/model-view";
+import { memoryAsked, modelsBusy, modelsReady, modelsTooBig } from "../models/model-view";
 import { setSmallMac, useSmallMac } from "../models/small-mac";
 import { useWaveFull } from "../settings/cloud-section";
 import {
@@ -43,8 +44,8 @@ import {
 // This Mac shows what the model needs and its download; a server shows what
 // leaves and who could read it, as Settings' dialogs say it, and nothing
 // leaves before its button. « Retour » goes back to the choice. A Mac too
-// small for the model shows « Ce Mac » unavailable, with why, and the cloud
-// sign-up.
+// small for the model shows « Ce Mac » unavailable, and why on demand. The
+// Cloud is a card of its own, its terms in it (Téo, 2026-11-28).
 
 export function TranscriptionStep({ onBack, onNext }: { onBack: () => void; onNext: () => void }) {
   const compute = useCompute();
@@ -120,11 +121,15 @@ function ChoiceScreen({
         value={shown}
         onValueChange={(next) => setPicked(next)}
       >
-        {destinationOption(
-          "device",
-          m.compute_device(),
-          tooBig ? m.welcome_cloud_title() : m.compute_device_detail(),
-          tooBig,
+        {tooBig && models.data !== undefined ? (
+          <div className="flex items-start">
+            <span className="min-w-0 flex-1">
+              {destinationOption("device", m.compute_device(), m.welcome_cloud_title(), true)}
+            </span>
+            <DeviceWhy {...memoryAsked(models.data)} />
+          </div>
+        ) : (
+          destinationOption("device", m.compute_device(), m.compute_device_detail())
         )}
         {destinationOption(
           "own",
@@ -133,11 +138,8 @@ function ChoiceScreen({
             ? m.compute_own_detail()
             : m.compute_own_connected({ name: own.name, host: own.host }),
         )}
-        {beta.available || beta.joined
-          ? destinationOption("beta", m.compute_beta(), m.compute_beta_detail())
-          : null}
+        {beta.available || beta.joined ? <CloudOption /> : null}
       </RadioGroup>
-      {tooBig ? <CloudCard /> : null}
       {import.meta.env.DEV ? <SmallMacSwitch /> : null}
     </Step>
   );
@@ -288,54 +290,45 @@ function BetaScreen({
   );
 }
 
-/**
- * A Mac too small for the local model (ADR 037): the cloud designed to keep
- * nothing is an intention, not a service. « Me prévenir » opens the sign-up
- * page in the browser, where the user leaves an e-mail (Téo, 2026-11-19), and
- * stores a flag on this Mac. The « ⓘ » says how that cloud is designed.
- */
-function CloudCard() {
-  const queryClient = useQueryClient();
-  const onboarding = useQuery(orpc.onboarding.get.queryOptions());
-  const advance = useMutation(
-    orpc.onboarding.advance.mutationOptions({
-      onSuccess: (status) => queryClient.setQueryData(orpc.onboarding.get.queryKey(), status),
-    }),
-  );
-  const asked = onboarding.data?.cloudNotify === true;
+/** Why this Mac cannot transcribe well, and that it may later (Téo, 2026-11-28). */
+function DeviceWhy({ needed, memory }: { needed: number; memory: number }) {
   return (
-    <div className="flex flex-col gap-s">
-      <p className="text-cte-text-muted">
-        {m.compute_beta_secure()}{" "}
-        <Popover>
-          <PopoverTrigger
-            variant="ghost"
-            size="icon-s"
-            aria-label={m.welcome_cloud_how()}
-            className="align-middle text-cte-text-muted"
-          >
-            <InfoIcon />
-          </PopoverTrigger>
-          <PopoverPopup className="w-[20rem] gap-xs">
-            <PopoverTitle>{m.welcome_cloud_how()}</PopoverTitle>
-            <PopoverDescription>{m.welcome_cloud_how_detail()}</PopoverDescription>
-          </PopoverPopup>
-        </Popover>
-      </p>
-      {/* The page asks for an e-mail; Sondine sends nothing itself (shared/cloud.ts). */}
-      <Button
-        variant="secondary"
-        className="self-start"
-        nativeButton={false}
-        render={<a href={CLOUD_WAITLIST_URL} target="_blank" rel="noreferrer" />}
-        onClick={() => {
-          if (!asked) advance.mutate({ step: onboarding.data?.step ?? "model", cloudNotify: true });
-        }}
+    <Dialog>
+      <DialogTrigger
+        variant="ghost"
+        size="icon-s"
+        aria-label={m.welcome_device_why()}
+        className="mt-s text-cte-text-muted"
       >
-        {m.welcome_cloud_notify()}
-        <ExternalLinkIcon />
-      </Button>
-    </div>
+        <InfoIcon />
+      </DialogTrigger>
+      <DialogPopup className="w-[min(28rem,calc(100vw-var(--space-xl)))]">
+        <DialogTitle>{m.welcome_device_why()}</DialogTitle>
+        <DialogDescription>
+          {m.welcome_device_why_detail({ needed: String(needed), memory: String(memory) })}
+        </DialogDescription>
+        <DialogFooter>
+          <DialogClose>{m.usage_close()}</DialogClose>
+        </DialogFooter>
+      </DialogPopup>
+    </Dialog>
+  );
+}
+
+/** Sondine Cloud, a card apart from the other places, with its terms. */
+function CloudOption() {
+  return (
+    <RadioLabel className="items-start corner-m p-m inset-ring-[1px] inset-ring-neutral-4 not-has-data-disabled:has-data-checked:bg-neutral-2 has-data-checked:inset-ring-neutral-6">
+      <Radio value="beta" className="mt-xxs" />
+      <span className="flex min-w-0 flex-1 flex-col gap-xxs">
+        <span className="flex items-center justify-between gap-s">
+          <span className="font-medium">{m.compute_beta()}</span>
+          <Badge>{m.welcome_cloud_free()}</Badge>
+        </span>
+        <span className="text-body-s text-cte-text-muted">{m.welcome_cloud_detail()}</span>
+        <span className="text-body-s text-cte-text-muted">{m.compute_trial_terms()}</span>
+      </span>
+    </RadioLabel>
   );
 }
 
