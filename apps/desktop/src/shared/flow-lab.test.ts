@@ -54,14 +54,14 @@ describe("moving in the lab", () => {
   it("goes to the next and previous steps, keeping what the user chose", () => {
     expect(nextPosition(at, { type: "next" })).toEqual({ ...at, step: "where" });
     expect(nextPosition(at, { type: "previous" })).toEqual({ ...at, step: "statistics" });
-    expect(nextPosition({ ...at, step: "goal" }, { type: "previous" })).toBeNull();
+    expect(nextPosition({ ...at, step: "intro" }, { type: "previous" })).toBeNull();
     expect(nextPosition({ ...at, step: "restore" }, { type: "next" })).toBeNull();
   });
 
   it("starts the journey again from its first step and the step's own situation", () => {
     expect(nextPosition(at, { type: "restart" })).toEqual({
       journey: "first-run",
-      step: "goal",
+      step: "intro",
       situation: {},
     });
   });
