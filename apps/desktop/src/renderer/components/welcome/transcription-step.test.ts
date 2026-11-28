@@ -228,7 +228,8 @@ async function open(destination: "device" | "own" | "beta"): Promise<void> {
 describe("the first run's transcription step", () => {
   it("only asks where, with this Mac picked and no download", async () => {
     await render();
-    expect(picked()).toBe("device");
+    // The place in force arrives with the query: waited for, not assumed after a fixed delay.
+    await vi.waitFor(() => expect(picked()).toBe("device"));
     expect(document.querySelector("#model-panel")).toBeNull();
     expect(document.querySelector("#radio-beta")).not.toBeNull();
   });
