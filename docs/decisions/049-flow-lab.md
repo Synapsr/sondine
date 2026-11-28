@@ -46,6 +46,12 @@ the journeys' steps.
 - A model « present » is an empty file of the catalog's size (sparse on
   APFS) with its manifest: the launch check trusts a matching size, inode
   and mtime. Nothing is downloaded.
+- The voice read records nothing and loads no model (Téo, 2026-11-28):
+  main runs the lab's fake recorder, a tone read in sentences with its
+  levels, and core the lab's fake `sondine-voice`, which embeds only the
+  read and refuses every other voice (`scripts/lab-fakes`), so the read
+  goes through to a voice learned and the invented episodes get no new
+  suggestion.
 
 ### Steps
 
