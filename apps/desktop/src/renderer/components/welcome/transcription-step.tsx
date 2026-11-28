@@ -297,7 +297,7 @@ function BetaScreen({
         ) : (
           <>
             {status.beta.joined ? null : (
-              <Button variant="outline" onClick={() => setInviting(true)}>
+              <Button variant="secondary" onClick={() => setInviting(true)}>
                 {m.compute_beta_invite_open()}
               </Button>
             )}
@@ -444,14 +444,24 @@ function CloudPoints() {
           { Icon: EyeOffIcon, text: m.welcome_cloud_point_word() },
         ]}
       />
-      <a
-        className="self-start text-body-s text-cte-text-muted underline"
-        href={locale === "fr" ? CLOUD_PRIVACY_URL.fr : CLOUD_PRIVACY_URL.en}
-        target="_blank"
-        rel="noreferrer"
-      >
-        {m.compute_trial_privacy()}
-      </a>
+      {/* The whole text on the site, in the window's top corner, as the first step's restore (Téo, 2026-11-28). */}
+      {createPortal(
+        <Button
+          variant="ghost"
+          className="fixed end-xxs top-xxs z-[100] text-body-s text-cte-text-muted [-webkit-app-region:no-drag]"
+          nativeButton={false}
+          render={
+            <a
+              href={locale === "fr" ? CLOUD_PRIVACY_URL.fr : CLOUD_PRIVACY_URL.en}
+              target="_blank"
+              rel="noreferrer"
+            />
+          }
+        >
+          {m.compute_trial_privacy()}
+        </Button>,
+        document.body,
+      )}
     </>
   );
 }
